@@ -22,6 +22,11 @@ namespace Poly3D.Engine.Meshes
             get { return _Faces.ToList<IFace>(); }
         }
 
+        public IEnumerable<Vertex> Vertices
+        {
+            get { return _Faces.SelectMany(f=>f.Vertices).Distinct(); }
+        }
+
         public Mesh Mesh
         {
             get { return Faces.Count > 0 ? Faces[0].Mesh : null; }

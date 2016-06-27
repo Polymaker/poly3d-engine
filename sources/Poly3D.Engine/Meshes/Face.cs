@@ -63,7 +63,6 @@ namespace Poly3D.Engine.Meshes
             }
         }
 
-
         internal Face()
         {
             _IsNormalComputed = false;

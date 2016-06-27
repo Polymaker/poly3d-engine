@@ -14,7 +14,7 @@ namespace Poly3D.Test
         {
             var timer = new Stopwatch();
             timer.Start();
-            var objMesh = WavefrontMeshLoader.LoadWavefrontObj(@"C:\Users\jturner\Documents\32496.obj");
+            var objMesh = Poly3D.Engine.Data.WavefrontMeshLoader.LoadWavefrontObj(@"C:\Users\jturner\Documents\32496.obj");
             timer.Stop();
             Trace.WriteLine("Mesh loaded in " + timer.Elapsed);
             timer.Restart();
