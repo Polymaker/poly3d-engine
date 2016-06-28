@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Poly3D.Test
 {
-    class Program
+    class ConsoleProgram
     {
         static void Main(string[] args)
         {
