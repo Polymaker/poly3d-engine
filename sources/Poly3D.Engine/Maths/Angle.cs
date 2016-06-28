@@ -150,7 +150,6 @@ namespace Poly3D.Engine.Maths
             return Angle.FromDegrees((360d - angle1) + angle2);
         }
 
-
         #region Convertion
 
         public static double ToDegrees(double radians)
