@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Poly3D.Engine.Maths
+namespace Poly3D.Maths
 {
     public struct Angle
     {
-        public static readonly Angle Zero = new Angle();
+        public static readonly Poly3D.Maths.Angle Zero = new Poly3D.Maths.Angle();
         public static AngleUnit DefaultConvertionUnit = AngleUnit.Degrees;
 
         private double angleDeg;
@@ -32,89 +29,89 @@ namespace Poly3D.Engine.Maths
 
         #region Static Ctors
 
-        public static Angle FromDegrees(double degrees)
+        public static Poly3D.Maths.Angle FromDegrees(double degrees)
         {
-            return new Angle { Degrees = degrees };
+            return new Poly3D.Maths.Angle { Degrees = degrees };
         }
 
-        public static Angle FromRadians(double radians)
+        public static Poly3D.Maths.Angle FromRadians(double radians)
         {
-            return new Angle { Radians = radians };
+            return new Poly3D.Maths.Angle { Radians = radians };
         }
 
         #endregion
 
         #region Operators
 
-        public static explicit operator double(Angle angle)
+        public static explicit operator double(Poly3D.Maths.Angle angle)
         {
             return DefaultConvertionUnit == AngleUnit.Degrees ? angle.Degrees : angle.Radians;
         }
 
-        public static explicit operator Angle(double angle)
+        public static explicit operator Poly3D.Maths.Angle(double angle)
         {
             return DefaultConvertionUnit == AngleUnit.Degrees ? FromDegrees(angle) : FromRadians(angle);
         }
 
-        public static Angle operator +(Angle a1, Angle a2)
+        public static Poly3D.Maths.Angle operator +(Poly3D.Maths.Angle a1, Poly3D.Maths.Angle a2)
         {
             return FromDegrees(a1.Degrees + a2.Degrees);
         }
 
-        public static Angle operator -(Angle a1, Angle a2)
+        public static Poly3D.Maths.Angle operator -(Poly3D.Maths.Angle a1, Poly3D.Maths.Angle a2)
         {
             return FromDegrees(a1.Degrees - a2.Degrees);
         }
 
-        public static Angle operator *(Angle a1, double value)
+        public static Poly3D.Maths.Angle operator *(Poly3D.Maths.Angle a1, double value)
         {
             return FromDegrees(a1.Degrees * value);
         }
 
-        public static Angle operator /(Angle a1, double value)
+        public static Poly3D.Maths.Angle operator /(Poly3D.Maths.Angle a1, double value)
         {
             return FromDegrees(a1.Degrees / value);
         }
 
-        public static Angle operator %(Angle a1, double value)
+        public static Poly3D.Maths.Angle operator %(Poly3D.Maths.Angle a1, double value)
         {
             return FromDegrees(a1.Degrees % value);
         }
 
-        public static bool operator ==(Angle a1, Angle a2)
+        public static bool operator ==(Poly3D.Maths.Angle a1, Poly3D.Maths.Angle a2)
         {
             return a1.Degrees == a2.Degrees;
         }
 
-        public static bool operator !=(Angle a1, Angle a2)
+        public static bool operator !=(Poly3D.Maths.Angle a1, Poly3D.Maths.Angle a2)
         {
             return a1.Degrees != a2.Degrees;
         }
 
-        public static bool operator >(Angle a1, Angle a2)
+        public static bool operator >(Poly3D.Maths.Angle a1, Poly3D.Maths.Angle a2)
         {
             return a1.Degrees > a2.Degrees;
         }
 
-        public static bool operator <(Angle a1, Angle a2)
+        public static bool operator <(Poly3D.Maths.Angle a1, Poly3D.Maths.Angle a2)
         {
             return a1.Degrees < a2.Degrees;
         }
 
-        public static bool operator >=(Angle a1, Angle a2)
+        public static bool operator >=(Poly3D.Maths.Angle a1, Poly3D.Maths.Angle a2)
         {
             return a1.Degrees >= a2.Degrees;
         }
 
-        public static bool operator <=(Angle a1, Angle a2)
+        public static bool operator <=(Poly3D.Maths.Angle a1, Poly3D.Maths.Angle a2)
         {
             return a1.Degrees <= a2.Degrees;
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is Angle)
-                return Degrees.Equals(((Angle)obj).Degrees);
+            if (obj is Poly3D.Maths.Angle)
+                return Degrees.Equals(((Poly3D.Maths.Angle)obj).Degrees);
             return base.Equals(obj);
         }
 
@@ -133,21 +130,21 @@ namespace Poly3D.Engine.Maths
             angleDeg = ClampDegrees(angleDeg);
         }
 
-        public Angle Clamped()
+        public Poly3D.Maths.Angle Clamped()
         {
-            return Angle.FromDegrees(ClampDegrees(angleDeg));
+            return Poly3D.Maths.Angle.FromDegrees(ClampDegrees(angleDeg));
         }
 
         //assuming this is the minimum
-        public Angle Diff(Angle other)//clockwise
+        public Poly3D.Maths.Angle Diff(Poly3D.Maths.Angle other)//clockwise
         {
             var angle1 = ClampDegrees(Degrees);
             var angle2 = ClampDegrees(other.Degrees);
             if (angle2 > angle1)
             {
-                return Angle.FromDegrees(angle2 - angle1);
+                return Poly3D.Maths.Angle.FromDegrees(angle2 - angle1);
             }
-            return Angle.FromDegrees((360d - angle1) + angle2);
+            return Poly3D.Maths.Angle.FromDegrees((360d - angle1) + angle2);
         }
 
         #region Convertion

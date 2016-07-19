@@ -54,6 +54,9 @@
     <Compile Include="Control\RenderStrategy.cs" />
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\IViewPort.cs" />
+    <Compile Include="Engine\Ray.cs" />
+    <Compile Include="Engine\Scene.cs" />
+    <Compile Include="Engine\SceneObject.cs" />
     <Compile Include="Maths\Angle.cs" />
     <Compile Include="Maths\AngleUnit.cs" />
     <Compile Include="Maths\GLMath.cs" />

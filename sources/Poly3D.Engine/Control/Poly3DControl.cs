@@ -23,6 +23,7 @@ namespace Poly3D.Control
         private RenderBehavior _RenderBehavior;
         private Color _BackColor;
         private FlagList dirtyFlags;
+        private bool parentFormHooked = false;
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
@@ -203,9 +204,42 @@ namespace Poly3D.Control
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+           
+            HookParentForm();
+
             SetupUpdateRenderStrategy();
         }
 
+        protected override void OnParentChanged(EventArgs e)
+        {
+            base.OnParentChanged(e);
+            HookParentForm();
+        }
+
+        private void HookParentForm()
+        {
+            if (parentFormHooked)
+                return;
+            var parentForm = FindForm();
+            if (parentForm != null)
+            {
+                Trace.WriteLine("found parent!");
+                parentFormHooked = true;
+                parentForm.Move += ParentForm_Move;
+                parentForm.Resize += ParentForm_Move;
+            }
+        }
+
+        private void ParentForm_Move(object sender, EventArgs e)
+        {
+            if (UpdateTimer != null && 
+                UpdateTimer.IsRunning && 
+                RenderSettings.Strategy == RenderStrategy.OnIdle)
+            {
+                RaiseUpdateFrame(UpdateTimer, ref NextUpdate);
+                RaiseRenderFrame(RenderTimer, ref NextRender);
+            }
+        }
 
         public void SetGraphicsMode(GraphicsMode mode)
         {
@@ -274,11 +308,15 @@ namespace Poly3D.Control
         private Stopwatch RenderTimer;
         private double NextUpdate;
         private double NextRender;
+        private bool loopRunning = true;
 
         private void SetupUpdateRenderStrategy()
         {
             if (DesignMode)
                 return;
+
+            loopRunning = false;
+
             if (UpdateTimer == null)
             {
                 UpdateTimer = Stopwatch.StartNew();
@@ -286,8 +324,10 @@ namespace Poly3D.Control
             }
             
             Application.Idle -= Application_Idle;
+
             if (RenderSettings.Strategy == RenderStrategy.OnIdle)
             {
+                loopRunning = true;
                 Application.Idle += Application_Idle;
             }
             else
@@ -299,7 +339,7 @@ namespace Poly3D.Control
         private void Application_Idle(object sender, EventArgs e)
         {
 
-            while (IsIdle)
+            while (IsIdle && loopRunning)
             {
                 RaiseUpdateFrame(UpdateTimer, ref NextUpdate);
                 RaiseRenderFrame(RenderTimer, ref NextRender);
@@ -390,6 +430,7 @@ namespace Poly3D.Control
             {
                 if (!Context.IsCurrent)
                     MakeCurrent();
+
                 CheckSetGLBackColor();
                 OnRenderFrame(e);
                 if(AutoSwapBuffers)
