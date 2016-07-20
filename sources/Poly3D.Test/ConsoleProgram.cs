@@ -34,7 +34,7 @@ namespace Poly3D.Test
 
             var testObj4 = new SceneObject();
             testObj4.Parent = testObj3;
-            //testObj4.Transform.Position = testObj4.Transform.Forward * 5;
+            testObj4.Transform.Position = testObj4.Transform.Forward * 5;
             Trace.WriteLine(testObj4.Transform.WorldPosition);
             //var timer = new Stopwatch();
             //timer.Start();

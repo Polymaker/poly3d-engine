@@ -101,9 +101,9 @@ namespace Poly3D.Engine
         {
             get
             {
-                //return LocalToWorldMatrix.ExtractTranslation();
+                return LocalToWorldMatrix.ExtractTranslation();
 
-                return Vector3.Transform(Position, LocalToWorldMatrix);
+                //return Vector3.Transform(Position, LocalToWorldMatrix);
             }
             //set
             //{
@@ -140,6 +140,7 @@ namespace Poly3D.Engine
             _LocalToWorldMatrix = Matrix4.Identity;
             _Scale = Vector3.One;
             _Position = Vector3.Zero;
+            isWorldMatrixDirty = true;
         }
 
         internal Transform(SceneObject sceneObject)
@@ -149,6 +150,7 @@ namespace Poly3D.Engine
             _LocalToWorldMatrix = Matrix4.Identity;
             _Scale = Vector3.One;
             _Position = Vector3.Zero;
+            isWorldMatrixDirty = true;
         }
 
         public Matrix4 GetLocalMatrix()
@@ -172,7 +174,7 @@ namespace Poly3D.Engine
             if (SceneObject == null)
                 return;
             _LocalToWorldMatrix = Matrix4.Identity;
-            foreach (var node in SceneObject.GetHierarchy(false))
+            foreach (var node in SceneObject.GetHierarchy().Reverse())
             {
                 var transformMatrix = node.Transform.GetLocalMatrix();
                 _LocalToWorldMatrix = Matrix4.Mult(_LocalToWorldMatrix, transformMatrix);
