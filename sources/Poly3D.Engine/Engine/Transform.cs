@@ -7,11 +7,13 @@ using Poly3D.Engine.Maths;
 
 namespace Poly3D.Engine
 {
-    public class Transform
+    public sealed class Transform : ObjectComponent
     {
         private Quaternion _Rotation;//local
         private Vector3 _Scale;//local
         private Vector3 _Position;//local
+        internal bool isWorldMatrixDirty;
+        private Matrix4 _LocalToWorldMatrix;
 
         /// <summary>
         /// The blue axis of the transform in world space. (Z Axis)
@@ -85,11 +87,98 @@ namespace Poly3D.Engine
             }
         }
 
+        public Matrix4 LocalToWorldMatrix
+        {
+            get
+            {
+                if (isWorldMatrixDirty)
+                    BuildConvertionMatrices();
+                return _LocalToWorldMatrix;
+            }
+        }
+
+        public Vector3 WorldPosition
+        {
+            get
+            {
+                //return LocalToWorldMatrix.ExtractTranslation();
+
+                return Vector3.Transform(Position, LocalToWorldMatrix);
+            }
+            //set
+            //{
+            //    //_Position = 
+            //}
+        }
+
+        public Vector3 WorldScale
+        {
+            get
+            {
+                return LocalToWorldMatrix.ExtractScale();
+                //return Vector3.Multiply(LocalToWorldMatrix.ExtractScale(), Scale);
+            }
+            //set
+            //{
+            //    //_Position = 
+            //}
+        }
+
+        public Transform ParentTransform
+        {
+            get
+            {
+                if (SceneObject != null && SceneObject.Parent != null)
+                    return SceneObject.Parent.Transform;
+                return null;
+            }
+        }
+
         public Transform()
         {
             _Rotation = Quaternion.Identity;
+            _LocalToWorldMatrix = Matrix4.Identity;
             _Scale = Vector3.One;
             _Position = Vector3.Zero;
+        }
+
+        internal Transform(SceneObject sceneObject)
+            : base(sceneObject)
+        {
+            _Rotation = Quaternion.Identity;
+            _LocalToWorldMatrix = Matrix4.Identity;
+            _Scale = Vector3.One;
+            _Position = Vector3.Zero;
+        }
+
+        public Matrix4 GetLocalMatrix()
+        {
+            var finalMat = Matrix4.Identity;
+            
+            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateScale(Scale));
+            
+            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateFromQuaternion(Rotation));
+            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateTranslation(Position));
+            return finalMat;
+        }
+
+        public Matrix4 GetFinalMatrix()
+        {
+            return Matrix4.Mult(LocalToWorldMatrix, GetLocalMatrix());
+        }
+
+        public void BuildConvertionMatrices()
+        {
+            if (SceneObject == null)
+                return;
+            _LocalToWorldMatrix = Matrix4.Identity;
+            foreach (var node in SceneObject.GetHierarchy(false))
+            {
+                var transformMatrix = node.Transform.GetLocalMatrix();
+                _LocalToWorldMatrix = Matrix4.Mult(_LocalToWorldMatrix, transformMatrix);
+            }
+
+            isWorldMatrixDirty = false;
         }
     }
 }

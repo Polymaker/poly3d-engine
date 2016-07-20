@@ -212,5 +212,15 @@ namespace Poly3D.Maths
         }
 
         #endregion
+
+        public static implicit operator Rect(System.Drawing.Rectangle rec)
+        {
+            return new Rect(rec.X, rec.Y, rec.Width, rec.Height);
+        }
+
+        public static implicit operator Rect(System.Drawing.RectangleF rec)
+        {
+            return new Rect(rec.X, rec.Y, rec.Width, rec.Height);
+        }
     }
 }

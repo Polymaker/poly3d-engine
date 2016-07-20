@@ -11,6 +11,7 @@ namespace Poly3D.Engine
 	public class Camera : SceneObject
     {
         // Fields...
+        private bool _Active;
         private Rect _ViewRectangle;
         private float _OrthographicSize;
         private Matrix4 _ProjectionMatrix;
@@ -143,6 +144,15 @@ namespace Poly3D.Engine
                 _OrthographicSize = value;
                 if (Projection == ProjectionType.Orthographic)
                     isPMatrixDirty = true;
+            }
+        }
+
+        public bool Active
+        {
+            get { return _Active; }
+            set
+            {
+                _Active = value;
             }
         }
 
