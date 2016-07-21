@@ -2,14 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Poly3D.Engine.Maths;
+using Poly3D.Maths;
 
 namespace Poly3D.Engine
 {
     public sealed class Transform : ObjectComponent
     {
-        private Quaternion _Rotation;//local
+        private Rotation _Rotation;//local
         private Vector3 _Scale;//local
         private Vector3 _Position;//local
         internal bool isWorldMatrixDirty;
@@ -20,10 +19,7 @@ namespace Poly3D.Engine
         /// </summary>
         public Vector3 Forward
         {
-            get { return Rotation.Mult(Vector3.UnitZ); }
-            //set
-            //{
-            //}
+            get { return WorldRotation.Quaternion.Mult(Vector3.UnitZ); }
         }
 
         /// <summary>
@@ -31,10 +27,7 @@ namespace Poly3D.Engine
         /// </summary>
         public Vector3 Up
         {
-            get { return Rotation.Mult(Vector3.UnitY); }
-            //set
-            //{
-            //}
+            get { return WorldRotation.Quaternion.Mult(Vector3.UnitY); }
         }
 
         /// <summary>
@@ -42,33 +35,12 @@ namespace Poly3D.Engine
         /// </summary>
         public Vector3 Right
         {
-            get { return Rotation.Mult(Vector3.UnitX); }
-            //set
-            //{
-            //}
+            get { return WorldRotation.Quaternion.Mult(Vector3.UnitX); }
         }
 
         /// <summary>
-        /// The rotation of the transform in local space stored as a Quaternion.
+        /// Gets or sets the position of the transform in local space.
         /// </summary>
-        public Quaternion Rotation
-        {
-            get { return _Rotation; }
-            set
-            {
-                _Rotation = value;
-            }
-        }
-
-        public Vector3 EulerAngles
-        {
-            get { return GLMath.EulerAnglesFromQuaternion(Rotation) * GLMath.TO_DEG; }
-            set
-            {
-                Rotation = GLMath.QuaternionFromEulerAngles(value * GLMath.TO_RAD);
-            }
-        }
-
         public Vector3 Position
         {
             get { return _Position; }
@@ -78,6 +50,21 @@ namespace Poly3D.Engine
             }
         }
 
+        /// <summary>
+        /// Gets or sets the rotation of the transform in local space.
+        /// </summary>
+        public Rotation Rotation
+        {
+            get { return _Rotation; }
+            set
+            {
+                _Rotation = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the scale of the transform in local space.
+        /// </summary>
         public Vector3 Scale
         {
             get { return _Scale; }
@@ -87,6 +74,9 @@ namespace Poly3D.Engine
             }
         }
 
+        /// <summary>
+        /// Get a matrix that transforms a point from local space into world space.
+        /// </summary>
         public Matrix4 LocalToWorldMatrix
         {
             get
@@ -97,13 +87,13 @@ namespace Poly3D.Engine
             }
         }
 
+        /// <summary>
+        /// Gets or sets the position of the transform in world space.
+        /// </summary>
         public Vector3 WorldPosition
         {
             get
             {
-
-                //return LocalToWorldMatrix.ExtractTranslation();
-
                 return Vector3.Transform(Position, LocalToWorldMatrix);
             }
             set
@@ -112,13 +102,15 @@ namespace Poly3D.Engine
             }
         }
 
-        public Quaternion WorldRotation
+        /// <summary>
+        /// Gets or sets the rotation of the transform in world space.
+        /// </summary>
+        public Rotation WorldRotation
         {
             get
             {
                 var rot = LocalToWorldMatrix.ExtractRotation();
-                return Quaternion.Multiply(rot, Rotation.Inverted());
-                //return Vector3.Multiply(LocalToWorldMatrix.ExtractScale(), Scale);
+                return Quaternion.Multiply(rot, Rotation.Quaternion.Inverted());
             }
             //set
             //{
@@ -126,26 +118,19 @@ namespace Poly3D.Engine
             //}
         }
 
-        public Vector3 WorldEulerAngles
-        {
-            get { return GLMath.EulerAnglesFromQuaternion(WorldRotation) * GLMath.TO_DEG; }
-            set
-            {
-                //Rotation = GLMath.QuaternionFromEulerAngles(value * GLMath.TO_RAD);
-            }
-        }
-
+        /// <summary>
+        /// Gets or sets the scale of the transform in world space.
+        /// </summary>
         public Vector3 WorldScale
         {
             get
             {
-                //return LocalToWorldMatrix.ExtractScale();
                 return Vector3.Multiply(LocalToWorldMatrix.ExtractScale(), Scale);
             }
-            //set
-            //{
-            //    //_Position = 
-            //}
+            set
+            {
+                _Scale = Vector3.Divide(value, LocalToWorldMatrix.ExtractScale());
+            }
         }
 
         public Transform ParentTransform
@@ -182,8 +167,9 @@ namespace Poly3D.Engine
             var finalMat = Matrix4.Identity;
             
             finalMat = Matrix4.Mult(finalMat, Matrix4.CreateScale(Scale));
-            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateFromQuaternion(Rotation.Inverted()));
+            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateFromQuaternion(Rotation.Quaternion.Inverted()));
             finalMat = Matrix4.Mult(finalMat, Matrix4.CreateTranslation(Position));
+
             return finalMat;
         }
 

@@ -9,11 +9,11 @@ namespace Poly3D.Engine
     {
         // Fields...
         private List<SceneObject> _Objects;
-        private IViewPort _DisplayTarget;
+        private IViewPort _Viewport;
 
-        public IViewPort DisplayTarget
+        public IViewPort Viewport
         {
-            get { return _DisplayTarget; }
+            get { return _Viewport; }
         }
 
         public IEnumerable<SceneObject> Objects
@@ -34,7 +34,7 @@ namespace Poly3D.Engine
         public Scene()
         {
             _Objects = new List<SceneObject>();
-            _DisplayTarget = null;
+            _Viewport = null;
         }
     }
 }

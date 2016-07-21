@@ -55,7 +55,6 @@
     <Compile Include="Control\RenderSettings.cs" />
     <Compile Include="Control\RenderStrategy.cs" />
     <Compile Include="Engine\Camera.cs" />
-    <Compile Include="Engine\ComponentCollection.cs" />
     <Compile Include="Engine\EngineObject.cs" />
     <Compile Include="Engine\IViewPort.cs" />
     <Compile Include="Engine\Material.cs" />
@@ -70,9 +69,11 @@
     <Compile Include="Graphics\ColorConverter.cs" />
     <Compile Include="Graphics\ColorHSV.cs" />
     <Compile Include="Maths\Angle.cs" />
+    <Compile Include="Maths\AngleD.cs" />
     <Compile Include="Maths\AngleUnit.cs" />
     <Compile Include="Maths\GLMath.cs" />
     <Compile Include="Maths\Rect.cs" />
+    <Compile Include="Maths\Rotation.cs" />
     <Compile Include="Meshes\Edge.cs" />
     <Compile Include="Meshes\Face.cs" />
     <Compile Include="Meshes\FaceQuad.cs" />

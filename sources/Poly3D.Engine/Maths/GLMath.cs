@@ -1,10 +1,7 @@
 ﻿using OpenTK;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Poly3D.Engine.Maths
+namespace Poly3D.Maths
 {
     public static class GLMath
     {
@@ -68,31 +65,6 @@ namespace Poly3D.Engine.Maths
             Quaternion.Multiply(ref rotateZ, ref rotateY, out rotateY);
             Quaternion.Multiply(ref rotateX, ref rotateY, out rotateY);
             return rotateY;
-            //// Heading = Yaw
-            //// Attitude = Pitch
-            //// Bank = Roll
-
-            //yaw *= 0.5f;
-            //pitch *= 0.5f;
-            //roll *= 0.5f;
-
-            //// Assuming the angles are in radians.
-            //float c1 = (float)Math.Cos(yaw);
-            //float s1 = (float)Math.Sin(yaw);
-            //float c2 = (float)Math.Cos(pitch);
-            //float s2 = (float)Math.Sin(pitch);
-            //float c3 = (float)Math.Cos(roll);
-            //float s3 = (float)Math.Sin(roll);
-            //float c1c2 = c1 * c2;
-            //float s1s2 = s1 * s2;
-
-            //Quaternion quaternion = new Quaternion();
-            //quaternion.W = c1c2 * c3 - s1s2 * s3;
-            //quaternion.X = c1c2 * s3 + s1s2 * c3;
-            //quaternion.Y = s1 * c2 * c3 + c1 * s2 * s3;
-            //quaternion.Z = c1 * s2 * c3 - s1 * c2 * s3;
-
-            //return quaternion;
         }
 
         public static Vector3 EulerAnglesFromQuaternion(Quaternion q)

@@ -2,7 +2,6 @@
 using Poly3D.Engine;
 using Poly3D.Engine.Meshes;
 using Poly3D.Maths;
-using Poly3D.Engine.Maths;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,17 +24,17 @@ namespace Poly3D.Test
 
             var testObj = new SceneObject();
             testObj.Transform.Position = testObj.Transform.Forward * 5;
-            testObj.Transform.EulerAngles = new OpenTK.Vector3(0, 90, 0);
+            testObj.Transform.Rotation = new Vector3(0, 90, 0);
             //testObj.Transform.Scale = new OpenTK.Vector3(.5f, .5f, .5f);
-            
+
 
             Trace.WriteLine(testObj.Transform.WorldPosition.Round());
 
             var testObj2 = new SceneObject();
             testObj2.Parent = testObj;
-            testObj2.Transform.Position = testObj2.Transform.Forward * 5;
-            testObj2.Transform.EulerAngles = new OpenTK.Vector3(0, 90, 0);
-            Trace.WriteLine(testObj2.Transform.WorldEulerAngles.Round());
+            testObj2.Transform.Position = Vector3.UnitZ * 5;
+            testObj2.Transform.Rotation = new Vector3(0, 90, 0);
+            Trace.WriteLine(testObj2.Transform.WorldRotation.EulerAngles.Round());
             //testObj2.Transform.WorldPosition = new Vector3(0, 0, 0);
             //Trace.WriteLine(testObj2.Transform.WorldPosition.Round());
             //var testObj3 = new SceneObject();

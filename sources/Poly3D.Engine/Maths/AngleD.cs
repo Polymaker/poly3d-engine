@@ -2,14 +2,14 @@
 
 namespace Poly3D.Maths
 {
-    public struct Angle
+    public struct AngleD
     {
-        public static readonly Angle Zero = new Angle();
+        public static readonly AngleD Zero = new AngleD();
         public static AngleUnit DefaultConvertionUnit = AngleUnit.Degrees;
 
-        private float angleDeg;
+        private double angleDeg;
 
-        public float Degrees
+        public double Degrees
         {
             get { return angleDeg; }
             set
@@ -18,7 +18,7 @@ namespace Poly3D.Maths
             }
         }
 
-        public float Radians
+        public double Radians
         {
             get { return ToRadians(Degrees); }
             set
@@ -29,89 +29,89 @@ namespace Poly3D.Maths
 
         #region Static Ctors
 
-        public static Angle FromDegrees(float degrees)
+        public static AngleD FromDegrees(double degrees)
         {
-            return new Angle { Degrees = degrees };
+            return new AngleD { Degrees = degrees };
         }
 
-        public static Angle FromRadians(float radians)
+        public static AngleD FromRadians(double radians)
         {
-            return new Angle { Radians = radians };
+            return new AngleD { Radians = radians };
         }
 
         #endregion
 
         #region Operators
 
-        public static explicit operator float(Angle angle)
+        public static explicit operator double(AngleD angle)
         {
             return DefaultConvertionUnit == AngleUnit.Degrees ? angle.Degrees : angle.Radians;
         }
 
-        public static explicit operator Angle(float angle)
+        public static explicit operator AngleD(double angle)
         {
             return DefaultConvertionUnit == AngleUnit.Degrees ? FromDegrees(angle) : FromRadians(angle);
         }
 
-        public static Angle operator +(Angle a1, Angle a2)
+        public static AngleD operator +(AngleD a1, AngleD a2)
         {
             return FromDegrees(a1.Degrees + a2.Degrees);
         }
 
-        public static Angle operator -(Angle a1, Angle a2)
+        public static AngleD operator -(AngleD a1, AngleD a2)
         {
             return FromDegrees(a1.Degrees - a2.Degrees);
         }
 
-        public static Angle operator *(Angle a1, float value)
+        public static AngleD operator *(AngleD a1, double value)
         {
             return FromDegrees(a1.Degrees * value);
         }
 
-        public static Angle operator /(Angle a1, float value)
+        public static AngleD operator /(AngleD a1, double value)
         {
             return FromDegrees(a1.Degrees / value);
         }
 
-        public static Angle operator %(Angle a1, float value)
+        public static AngleD operator %(AngleD a1, double value)
         {
             return FromDegrees(a1.Degrees % value);
         }
 
-        public static bool operator ==(Angle a1, Angle a2)
+        public static bool operator ==(AngleD a1, AngleD a2)
         {
             return a1.Degrees == a2.Degrees;
         }
 
-        public static bool operator !=(Angle a1, Angle a2)
+        public static bool operator !=(AngleD a1, AngleD a2)
         {
             return a1.Degrees != a2.Degrees;
         }
 
-        public static bool operator >(Angle a1, Angle a2)
+        public static bool operator >(AngleD a1, AngleD a2)
         {
             return a1.Degrees > a2.Degrees;
         }
 
-        public static bool operator <(Angle a1, Angle a2)
+        public static bool operator <(AngleD a1, AngleD a2)
         {
             return a1.Degrees < a2.Degrees;
         }
 
-        public static bool operator >=(Angle a1, Angle a2)
+        public static bool operator >=(AngleD a1, AngleD a2)
         {
             return a1.Degrees >= a2.Degrees;
         }
 
-        public static bool operator <=(Angle a1, Angle a2)
+        public static bool operator <=(AngleD a1, AngleD a2)
         {
             return a1.Degrees <= a2.Degrees;
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is Angle)
-                return Degrees.Equals(((Angle)obj).Degrees);
+            if (obj is AngleD)
+                return Degrees.Equals(((AngleD)obj).Degrees);
             return base.Equals(obj);
         }
 
@@ -130,42 +130,42 @@ namespace Poly3D.Maths
             angleDeg = ClampDegrees(angleDeg);
         }
 
-        public Angle Clamped()
+        public AngleD Clamped()
         {
-            return Angle.FromDegrees(ClampDegrees(angleDeg));
+            return AngleD.FromDegrees(ClampDegrees(angleDeg));
         }
 
         //assuming this is the minimum
-        public Angle Diff(Angle other)//clockwise
+        public AngleD Diff(AngleD other)//clockwise
         {
             var angle1 = ClampDegrees(Degrees);
             var angle2 = ClampDegrees(other.Degrees);
             if (angle2 > angle1)
             {
-                return Angle.FromDegrees(angle2 - angle1);
+                return AngleD.FromDegrees(angle2 - angle1);
             }
-            return Angle.FromDegrees((360f - angle1) + angle2);
+            return AngleD.FromDegrees((360d - angle1) + angle2);
         }
 
         #region Convertion
 
-        public static float ToDegrees(float radians)
+        public static double ToDegrees(double radians)
         {
-            return (radians * 180.0f) / (float)Math.PI;
+            return (radians * 180.0d) / Math.PI;
         }
 
-        public static float ToRadians(float degrees)
+        public static double ToRadians(double degrees)
         {
-            return (float)Math.PI * degrees / 180.0f;
+            return Math.PI * degrees / 180.0d;
         }
 
         #endregion
 
-        public static float ClampDegrees(float degrees)
+        public static double ClampDegrees(double degrees)
         {
-            degrees = degrees % 360f;
+            degrees = degrees % 360d;
             if (degrees < 0)
-                degrees += 360f;
+                degrees += 360d;
             return degrees;
         }
 

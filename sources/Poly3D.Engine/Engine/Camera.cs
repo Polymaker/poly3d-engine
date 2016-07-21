@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK;
-using Poly3D.Engine.Maths;
+
 using Poly3D.Maths;
 
 namespace Poly3D.Engine
@@ -46,7 +46,10 @@ namespace Poly3D.Engine
             {
                 if (_ViewRectangle == value)
                     return;
+                //if (_ViewRectangle.Left < 0 || _ViewRectangle.Right > 1 || _ViewRectangle.Top < 0 || _ViewRectangle.Bottom > 1)
+                //    throw new Exception("");
                 _ViewRectangle = value;
+
                 isPMatrixDirty = true;
             }
         }
@@ -58,10 +61,10 @@ namespace Poly3D.Engine
         {
             get
             {
-                if(Scene == null || Scene.DisplayTarget == null)
+                if(Scene == null || Scene.Viewport == null)
                     return new Rect(0, 0, 1, 1);
 
-                var displaySize = new Vector2(Scene.DisplayTarget.Width, Scene.DisplayTarget.Height);
+                var displaySize = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
                 return new Rect(
                     displaySize.X * ViewRectangle.X, 
                     displaySize.Y * ViewRectangle.Y, 
@@ -99,7 +102,7 @@ namespace Poly3D.Engine
             get { return _NearClipDistance; }
             set
             {
-                value = value > 0 ? value : 0;
+                value = Math.Max(0.0001f, Math.Min(FarClipDistance, value));
                 if (_NearClipDistance == value)
                     return;
                 _NearClipDistance = value;
@@ -115,7 +118,7 @@ namespace Poly3D.Engine
             get { return _FarClipDistance; }
             set
             {
-                value = value > 0 ? value : 0;
+                value = Math.Max(NearClipDistance, value);
                 if (_FarClipDistance == value)
                     return;
                 _FarClipDistance = value;
@@ -158,7 +161,6 @@ namespace Poly3D.Engine
 
         public Camera()
         {
-            //_FieldOfView = Angle.FromRadians(MathHelper.PiOver4);
             _FieldOfView = Angle.FromDegrees(60);
             _NearClipDistance = 0.3f;
             _FarClipDistance = 1000f;
