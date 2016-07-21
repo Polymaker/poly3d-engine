@@ -49,7 +49,7 @@ namespace Poly3D.Engine
         }
 
         /// <summary>
-        /// The rotation of the transform in world space stored as a Quaternion.
+        /// The rotation of the transform in local space stored as a Quaternion.
         /// </summary>
         public Quaternion Rotation
         {
@@ -101,9 +101,24 @@ namespace Poly3D.Engine
         {
             get
             {
-                return LocalToWorldMatrix.ExtractTranslation();
 
-                //return Vector3.Transform(Position, LocalToWorldMatrix);
+                //return LocalToWorldMatrix.ExtractTranslation();
+
+                return Vector3.Transform(Position, LocalToWorldMatrix);
+            }
+            set
+            {
+                _Position = Vector3.Transform(value, LocalToWorldMatrix.Inverted());
+            }
+        }
+
+        public Quaternion WorldRotation
+        {
+            get
+            {
+                var rot = LocalToWorldMatrix.ExtractRotation();
+                return Quaternion.Multiply(rot, Rotation.Inverted());
+                //return Vector3.Multiply(LocalToWorldMatrix.ExtractScale(), Scale);
             }
             //set
             //{
@@ -111,12 +126,21 @@ namespace Poly3D.Engine
             //}
         }
 
+        public Vector3 WorldEulerAngles
+        {
+            get { return GLMath.EulerAnglesFromQuaternion(WorldRotation) * GLMath.TO_DEG; }
+            set
+            {
+                //Rotation = GLMath.QuaternionFromEulerAngles(value * GLMath.TO_RAD);
+            }
+        }
+
         public Vector3 WorldScale
         {
             get
             {
-                return LocalToWorldMatrix.ExtractScale();
-                //return Vector3.Multiply(LocalToWorldMatrix.ExtractScale(), Scale);
+                //return LocalToWorldMatrix.ExtractScale();
+                return Vector3.Multiply(LocalToWorldMatrix.ExtractScale(), Scale);
             }
             //set
             //{
@@ -158,8 +182,7 @@ namespace Poly3D.Engine
             var finalMat = Matrix4.Identity;
             
             finalMat = Matrix4.Mult(finalMat, Matrix4.CreateScale(Scale));
-            
-            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateFromQuaternion(Rotation));
+            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateFromQuaternion(Rotation.Inverted()));
             finalMat = Matrix4.Mult(finalMat, Matrix4.CreateTranslation(Position));
             return finalMat;
         }
@@ -174,7 +197,7 @@ namespace Poly3D.Engine
             if (SceneObject == null)
                 return;
             _LocalToWorldMatrix = Matrix4.Identity;
-            foreach (var node in SceneObject.GetHierarchy().Reverse())
+            foreach (var node in SceneObject.GetHierarchy(false).Reverse())
             {
                 var transformMatrix = node.Transform.GetLocalMatrix();
                 _LocalToWorldMatrix = Matrix4.Mult(_LocalToWorldMatrix, transformMatrix);

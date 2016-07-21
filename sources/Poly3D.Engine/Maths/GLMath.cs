@@ -10,6 +10,12 @@ namespace Poly3D.Engine.Maths
     {
         #region Quaternion Extensions
 
+
+        public static Vector3 Round(this Vector3 vector)
+        {
+            return new Vector3((float)Math.Truncate(vector.X * 10f) / 10f, (float)Math.Round(vector.Y * 10f) / 10f, (float)Math.Round(vector.Z * 10f) / 10f);
+        }
+
         public static Vector3 Mult(this Quaternion rotation, Vector3 point)
         {
             float num = rotation.X * 2f;
