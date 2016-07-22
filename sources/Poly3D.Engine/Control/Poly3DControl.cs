@@ -17,6 +17,7 @@ namespace Poly3D.Control
     public partial class Poly3DControl : GLControl, IViewPort
     {
         // Fields...
+        private Scene _Scene;
         private double _RenderPeriod;
         private double _UpdatePeriod;
         private RenderSettings _RenderSettings;
@@ -44,6 +45,19 @@ namespace Poly3D.Control
         {
             get { return !DesignMode && Context != null && Context.IsCurrent; }
         }
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Scene Scene
+        {
+            get { return _Scene; }
+            set
+            {
+                _Scene = value;
+                _Scene.Viewport = this;
+            }
+        }
+        
 
         #region Render & update Stats
 
@@ -166,7 +180,7 @@ namespace Poly3D.Control
             _RenderSettings = new RenderSettings();
             _BackColor = Color.Empty;
             AutoSwapBuffers = true;
-
+            SetStyle(ControlStyles.ResizeRedraw, false);
             dirtyFlags = new FlagList();
 
             InitializeComponent();
@@ -175,6 +189,8 @@ namespace Poly3D.Control
 
             _RenderBehavior.PropertyChanged += Behavior_PropertyChanged;
             _RenderSettings.PropertyChanged += RenderSettings_PropertyChanged;
+
+            _Scene = new Scene(this);
 
             dirtyFlags.Set("BackColor");
         }
@@ -428,11 +444,16 @@ namespace Poly3D.Control
         {
             if (!IsDisposed && IsHandleCreated)
             {
+                if (Width == 0 || Height == 0)
+                    return;
                 if (!Context.IsCurrent)
                     MakeCurrent();
 
                 CheckSetGLBackColor();
-                OnRenderFrame(e);
+                if (Scene != null)
+                    Scene.RenderScene();
+                else
+                    OnRenderFrame(e);
                 if(AutoSwapBuffers)
                     SwapBuffers();
             }

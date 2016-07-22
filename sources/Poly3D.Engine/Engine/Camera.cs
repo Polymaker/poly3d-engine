@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 using Poly3D.Maths;
+using Poly3D.Graphics;
+using OpenTK.Graphics;
 
 namespace Poly3D.Engine
 {
 	public class Camera : SceneObject
     {
         // Fields...
+        private Color _BackColor;
         private bool _Active;
         private Rect _ViewRectangle;
         private float _OrthographicSize;
@@ -159,6 +163,15 @@ namespace Poly3D.Engine
             }
         }
 
+        public Color BackColor
+        {
+            get { return _BackColor; }
+            set
+            {
+                _BackColor = value;
+            }
+        }
+
         public Camera()
         {
             _FieldOfView = Angle.FromDegrees(60);
@@ -166,7 +179,9 @@ namespace Poly3D.Engine
             _FarClipDistance = 1000f;
             _OrthographicSize = 10f;
             _Projection = ProjectionType.Perspective;
+            _BackColor = Color.FromArgb(0.5f, 0.5f, 0.5f);
             _ViewRectangle = new Rect(0, 0, 1, 1);
+            isPMatrixDirty = true;
         }
 
         protected void ComputeProjectionMatrix()
@@ -195,8 +210,84 @@ namespace Poly3D.Engine
                     _ProjectionMatrix = Matrix4.CreateOrthographic(OrthographicSize * AspectRatio, OrthographicSize, NearClipDistance, FarClipDistance);
                 }
             }
-            
+            //lastViewPort = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
             isPMatrixDirty = false;
+        }
+
+        private Vector2 lastViewPort = Vector2.Zero;
+
+        internal void Render()
+        {
+            var curViewport = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
+            if (curViewport != lastViewPort)
+            {
+
+                var viewRect = DisplayRectangle;
+                GL.Viewport((int)viewRect.X, (int)viewRect.Y, (int)viewRect.Width, (int)viewRect.Height);
+                lastViewPort = curViewport;
+                isPMatrixDirty = true;
+            }
+
+            GL.ClearColor((Color4)BackColor);
+            GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
+
+            GL.Enable(EnableCap.DepthTest);
+
+            GL.MatrixMode(MatrixMode.Projection);
+            
+            if (isPMatrixDirty)
+                ComputeProjectionMatrix();
+
+            GL.LoadMatrix(ref _ProjectionMatrix);
+            
+            GL.MatrixMode(MatrixMode.Modelview);
+
+            var viewMatrix = Transform.GetFinalMatrix();
+
+            viewMatrix.Invert();
+            GL.LoadMatrix(ref viewMatrix);
+
+            //GL.Rotate(0.5f, Vector3.UnitY);
+            GL.Translate(0, 0, -2);
+            DrawPyramid();
+            GL.LoadMatrix(ref viewMatrix);
+            GL.Translate(2f, 0, 0);
+            GL.Rotate(45f, Vector3.UnitY);
+            DrawPyramid();
+
+            GL.LoadMatrix(ref viewMatrix);
+
+            GL.Translate(-2f, 0, 0);
+            GL.Rotate(-45f, Vector3.UnitY);
+            DrawPyramid();
+            //GL.Color3(Color.Black);
+            //GL.Begin(BeginMode.Lines);
+            //GL.Vertex3(Transform.WorldPosition);
+            //GL.Vertex3(Transform.WorldPosition + Transform.Right * 4);
+            //GL.End();
+        }
+
+        private void DrawPyramid()
+        {
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+
+            GL.Begin(BeginMode.Triangles);
+            GL.Color3(Color.Blue);
+            GL.Vertex3(0f, -0.5f, -1f);
+            GL.Vertex3(0.866f, -0.5f, 0.5f);
+            GL.Vertex3(0f, 1f, 0f);
+
+            GL.Color3(Color.Red);
+            GL.Vertex3(0.866f, -0.5f, 0.5f);
+            GL.Vertex3(-0.866f, -0.5f, 0.5f);
+            GL.Vertex3(0f, 1f, 0f);
+
+            GL.Color3(Color.Yellow);
+            GL.Vertex3(-0.866f, -0.5f, 0.5f);
+            GL.Vertex3(0f, -0.5f, -1f);
+            GL.Vertex3(0f, 1f, 0f);
+
+            GL.End();
         }
     }
 }

@@ -16,51 +16,67 @@ namespace Poly3D.Test
         static void Main(string[] args)
         {
             //var angle = Angle.FromDegrees(45);
+            //var testRot = new Rotation() { Pitch = 45, Yaw = 0 };
+            //var eulerAngles = new Vector3(testRot.Yaw.Radians, testRot.Pitch.Radians, testRot.Roll.Radians);
+            //var test1 = GLMath.QuaternionFromEulerAngles(eulerAngles);
+            //var test2 = GLMath.EulerAnglesFromQuaternion(test1);
 
-            //var testq = Quaternion.FromAxisAngle(Vector3.UnitY*-1f, (float)angle.Radians);
-            ////testq.Invert();
-            //Trace.WriteLine(Vector3.Transform(new Vector3(5, 0, 0), testq));
-            //Trace.WriteLine(testq.Mult(new Vector3(5, 0, 0)));
+            //Trace.WriteLine(string.Format("{0} == {1} ?", eulerAngles, test2));
 
+            //Trace.WriteLine("Pitch:");
+            //var myRot = new Rotation() { Pitch = 45 };
+            //var myRot2 = (Rotation)myRot.Quaternion;
+            //Trace.WriteLine(myRot);
+            //Trace.WriteLine(myRot2);
+            //Trace.WriteLine("Roll:");
+            //myRot = new Rotation() { Roll = 45 };
+            //myRot2 = (Rotation)myRot.Quaternion;
+            //Trace.WriteLine(myRot);
+            //Trace.WriteLine(myRot2);
+
+            //var rotMat = Matrix4.CreateFromQuaternion(myRot.Quaternion);
+            //Trace.WriteLine(Vector3.Transform(new Vector3(5f, 0f, 0f), rotMat));
+            //rotMat = Matrix4.CreateFromQuaternion(myRot2.Quaternion);
+            //Trace.WriteLine(Vector3.Transform(new Vector3(5f, 0f, 0f), rotMat));
+            
+            //Trace.WriteLine("Yaw:");
+            //myRot = new Rotation() { Yaw = 45 };
+            //myRot2 = (Rotation)myRot.Quaternion;
+            //Trace.WriteLine(myRot);
+            //Trace.WriteLine(myRot2);
+            //var rotMat = Matrix4.CreateFromQuaternion(myRot.Quaternion);
+            //Trace.WriteLine(Vector3.Transform(new Vector3(0f, 0f, 5f), rotMat));
+            //var myRot2 = (Rotation)myRot.Quaternion;
+
+
+            
             var testObj = new SceneObject();
-            testObj.Transform.Position = testObj.Transform.Forward * 5;
-            testObj.Transform.Rotation = new Vector3(0, 90, 0);
+            //testObj.Transform.Position = Vector3.UnitZ * 5;
+            testObj.Transform.Rotation = new Vector3(45f, 0, 0);
             //testObj.Transform.Scale = new OpenTK.Vector3(.5f, .5f, .5f);
 
-
-            Trace.WriteLine(testObj.Transform.WorldPosition.Round());
+            Trace.WriteLine(" world pos:" + testObj.Transform.WorldPosition.Round());
+            Trace.WriteLine(" local rot:" + testObj.Transform.Rotation);
+            Trace.WriteLine(" world rot:" + testObj.Transform.WorldRotation);
 
             var testObj2 = new SceneObject();
             testObj2.Parent = testObj;
             testObj2.Transform.Position = Vector3.UnitZ * 5;
-            testObj2.Transform.Rotation = new Vector3(0, 90, 0);
-            Trace.WriteLine(testObj2.Transform.WorldRotation.EulerAngles.Round());
-            //testObj2.Transform.WorldPosition = new Vector3(0, 0, 0);
-            //Trace.WriteLine(testObj2.Transform.WorldPosition.Round());
-            //var testObj3 = new SceneObject();
-            //testObj3.Parent = testObj2;
-            //testObj3.Transform.Position = testObj3.Transform.Forward * 5;
-            //Trace.WriteLine(testObj3.Transform.WorldPosition.Round());
+            testObj2.Transform.Rotation = new Vector3(-90, 0, 0);
 
+            Trace.WriteLine(" world pos:" + testObj2.Transform.WorldPosition.Round());
+            Trace.WriteLine(" local rot:" + testObj2.Transform.Rotation);
+            Trace.WriteLine(" world rot:" + testObj2.Transform.WorldRotation);
 
-            //var testObj4 = new SceneObject();
-            //testObj4.Parent = testObj3;
-            //testObj4.Transform.Position = testObj4.Transform.Forward * 5;
-            //Trace.WriteLine(testObj4.Transform.WorldPosition);
-            //var timer = new Stopwatch();
-            //timer.Start();
-            //var objMesh = Poly3D.Engine.Data.WavefrontMeshLoader.LoadWavefrontObj(@"C:\Users\jturner\Documents\32496.obj");
-            //timer.Stop();
-            //Trace.WriteLine("Mesh loaded in " + timer.Elapsed);
-            //timer.Restart();
-            //objMesh.ComputeSurfaces();
-            //timer.Stop();
-            //Trace.WriteLine("Surfaces computed in " + timer.Elapsed);
-            //timer.Restart();
-            //foreach (var surf in objMesh.Surfaces)
-            //    surf.ComputeBoundingEdges();
-            //timer.Stop();
-            //Trace.WriteLine("Surfaces' bounding edges computed in " + timer.Elapsed);
+            var testObj3 = new SceneObject();
+            testObj3.Parent = testObj2;
+            testObj3.Transform.Position = Vector3.UnitZ * 5;
+            //testObj2.Transform.Rotation = new Vector3(0, 90, 0);
+
+            Trace.WriteLine(" world pos:" + testObj3.Transform.WorldPosition.Round());
+            Trace.WriteLine(" local rot:" + testObj3.Transform.Rotation);
+            Trace.WriteLine(" world rot:" + testObj3.Transform.WorldRotation);
+
         }
     }
 }

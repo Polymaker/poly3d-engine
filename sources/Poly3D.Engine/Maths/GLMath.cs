@@ -47,24 +47,40 @@ namespace Poly3D.Maths
 
         public static Quaternion QuaternionFromEulerAngles(Vector3 angles)
         {
-            return QuaternionFromEulerAngles(angles.X, angles.Y, angles.Z);
+            return QuaternionFromEulerAngles(angles.Y, angles.X, angles.Z);
         }
 
         /// <summary>
         /// 
-        /// </summary>
+        /// </summary
         /// <param name="yaw">Yaw in radians</param>
         /// <param name="pitch">Pitch in radians</param>
         /// <param name="roll">Roll in radians</param>
         /// <returns></returns>
         public static Quaternion QuaternionFromEulerAngles(float yaw, float pitch, float roll)
         {
-            Quaternion rotateX = Quaternion.FromAxisAngle(Vector3.UnitX, yaw);
-            Quaternion rotateY = Quaternion.FromAxisAngle(Vector3.UnitY, pitch);
-            Quaternion rotateZ = Quaternion.FromAxisAngle(Vector3.UnitZ, roll);
-            Quaternion.Multiply(ref rotateZ, ref rotateY, out rotateY);
-            Quaternion.Multiply(ref rotateX, ref rotateY, out rotateY);
-            return rotateY;
+            float rollOver2 = roll * 0.5f;
+            float sinRollOver2 = (float)Math.Sin((double)rollOver2);
+            float cosRollOver2 = (float)Math.Cos((double)rollOver2);
+            float pitchOver2 = pitch * 0.5f;
+            float sinPitchOver2 = (float)Math.Sin((double)pitchOver2);
+            float cosPitchOver2 = (float)Math.Cos((double)pitchOver2);
+            float yawOver2 = yaw * 0.5f;
+            float sinYawOver2 = (float)Math.Sin((double)yawOver2);
+            float cosYawOver2 = (float)Math.Cos((double)yawOver2);
+            Quaternion result = new Quaternion();
+            result.W = cosYawOver2 * cosPitchOver2 * cosRollOver2 + sinYawOver2 * sinPitchOver2 * sinRollOver2;
+            result.X = cosYawOver2 * sinPitchOver2 * cosRollOver2 + sinYawOver2 * cosPitchOver2 * sinRollOver2;
+            result.Y = sinYawOver2 * cosPitchOver2 * cosRollOver2 - cosYawOver2 * sinPitchOver2 * sinRollOver2;
+            result.Z = cosYawOver2 * cosPitchOver2 * sinRollOver2 - sinYawOver2 * sinPitchOver2 * cosRollOver2;
+
+            return result;
+            //Quaternion rotateX = Quaternion.FromAxisAngle(Vector3.UnitX, pitch);
+            //Quaternion rotateY = Quaternion.FromAxisAngle(Vector3.UnitY, yaw);
+            //Quaternion rotateZ = Quaternion.FromAxisAngle(Vector3.UnitZ, roll);
+            //Quaternion.Multiply(ref rotateZ, ref rotateY, out rotateY);
+            //Quaternion.Multiply(ref rotateX, ref rotateY, out rotateY);
+            //return rotateY;
         }
 
         public static Vector3 EulerAnglesFromQuaternion(Quaternion q)
@@ -101,7 +117,10 @@ namespace Poly3D.Maths
             pitchYawRoll.X = (float)Math.Asin(2 * test / unit);                                             // Pitch
             pitchYawRoll.Z = (float)Math.Atan2(2 * q.X * q.W - 2 * q.Y * q.Z, -sqx + sqy - sqz + sqw);      // Roll
 
-            return pitchYawRoll;
+            return new Vector3(
+                Angle.NormalizeRadians(pitchYawRoll.Z),
+                Angle.NormalizeRadians(pitchYawRoll.Y),
+                Angle.NormalizeRadians(pitchYawRoll.X));
         }
 
     }

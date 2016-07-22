@@ -162,6 +162,21 @@ namespace Poly3D.Graphics
 
         #region Convertion operators
 
+        public static explicit operator OpenTK.Graphics.Color4(Color color)
+        {
+            return System.Drawing.Color.FromArgb((int)(color.A * 255f), (int)(color.R * 255f), (int)(color.G * 255f), (int)(color.B * 255f));
+        }
+
+        public static implicit operator OpenTK.Vector3(Color color)
+        {
+            return new OpenTK.Vector3(color.R, color.G, color.B);
+        }
+
+        public static explicit operator OpenTK.Vector4(Color color)
+        {
+            return new OpenTK.Vector4(color.A, color.R, color.G, color.B);
+        }
+
         public static implicit operator Color(System.Drawing.Color color)
         {
             return new Color(color.A, color.R, color.G, color.B);
@@ -206,6 +221,31 @@ namespace Poly3D.Graphics
         #region pre-defined colors
 
         public static readonly Color Empty = default(Color);
+
+        private static Color GetKnownColor(System.Drawing.KnownColor color)
+        {
+            return (Color)System.Drawing.Color.FromKnownColor(color);
+        }
+
+        public static Color Black
+        {
+            get { return GetKnownColor(System.Drawing.KnownColor.Black); }
+        }
+
+        public static Color Red
+        {
+            get { return GetKnownColor(System.Drawing.KnownColor.Red); }
+        }
+
+        public static Color Blue
+        {
+            get { return GetKnownColor(System.Drawing.KnownColor.Blue); }
+        }
+
+        public static Color Yellow
+        {
+            get { return GetKnownColor(System.Drawing.KnownColor.Yellow); }
+        }
 
         #endregion
     }

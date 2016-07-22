@@ -45,9 +45,10 @@
             // 
             // poly3DControl1
             // 
-            this.poly3DControl1.Location = new System.Drawing.Point(12, 12);
+            this.poly3DControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.poly3DControl1.Location = new System.Drawing.Point(0, 0);
             this.poly3DControl1.Name = "poly3DControl1";
-            this.poly3DControl1.Size = new System.Drawing.Size(277, 231);
+            this.poly3DControl1.Size = new System.Drawing.Size(301, 255);
             this.poly3DControl1.TabIndex = 0;
             this.poly3DControl1.VSync = false;
             this.poly3DControl1.RenderFrame += new System.EventHandler<OpenTK.FrameEventArgs>(this.poly3DControl1_RenderFrame);

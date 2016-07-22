@@ -18,6 +18,10 @@ namespace Poly3D.Engine
         public Scene Scene
         {
             get { return _Scene; }
+            internal set
+            {
+                _Scene = value;
+            }
         }
 
         public SceneObject Parent
@@ -88,7 +92,7 @@ namespace Poly3D.Engine
             _Childs = new SceneObjectChildCollection(this);
             //_Transform.SetParent(this, false);
             _Parent = null;
-            _Scene = new Scene();
+            _Scene = null;
         }
 
         private void OnHierarchyChangedInternal()

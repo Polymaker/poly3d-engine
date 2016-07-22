@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Poly3D.Maths;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -14,6 +16,10 @@ namespace Poly3D.Engine
         public IViewPort Viewport
         {
             get { return _Viewport; }
+            internal set
+            {
+                _Viewport = value;
+            }
         }
 
         public IEnumerable<SceneObject> Objects
@@ -35,6 +41,39 @@ namespace Poly3D.Engine
         {
             _Objects = new List<SceneObject>();
             _Viewport = null;
+            InitMainCamera();
+        }
+
+        public Scene(IViewPort viewport)
+        {
+            _Viewport = viewport;
+            _Objects = new List<SceneObject>();
+            InitMainCamera();
+        }
+
+        private void InitMainCamera()
+        {
+            var camera = AddObject<Camera>();
+            camera.Active = true;
+            camera.Transform.Position = new OpenTK.Vector3(0, 4, 3);
+            //camera.Transform.Rotation = new Rotation(-90, 90, 0);
+            camera.Transform.LookAt(new OpenTK.Vector3(0, 0f, 0));
+            Trace.WriteLine(camera.Transform.Rotation);
+
+        }
+
+        public T AddObject<T>() where T : SceneObject
+        {
+            T sceneObj = Activator.CreateInstance<T>();
+            sceneObj.Scene = this;
+            _Objects.Add(sceneObj);
+            return sceneObj;
+        }
+
+        internal void RenderScene()
+        {
+            foreach (var camera in ActiveCameras)
+                camera.Render();
         }
     }
 }

@@ -75,7 +75,7 @@ namespace Poly3D.Graphics
             get { return _H * 360f; }
             set
             {
-                var clamped = (float)Angle.ClampDegrees(value);
+                var clamped = (float)Angle.NormalizeDegrees(value);
                 if (clamped == 0 && value >= 360)
                     clamped = 360f;
                 _H = clamped / 360f;

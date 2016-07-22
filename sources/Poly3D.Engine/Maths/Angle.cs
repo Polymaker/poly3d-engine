@@ -6,7 +6,7 @@ namespace Poly3D.Maths
     {
         public static readonly Angle Zero = new Angle();
         public static AngleUnit DefaultConvertionUnit = AngleUnit.Degrees;
-
+        public const float PI = 3.1415926535897931f;
         private float angleDeg;
 
         public float Degrees
@@ -48,7 +48,7 @@ namespace Poly3D.Maths
             return DefaultConvertionUnit == AngleUnit.Degrees ? angle.Degrees : angle.Radians;
         }
 
-        public static explicit operator Angle(float angle)
+        public static implicit operator Angle(float angle)
         {
             return DefaultConvertionUnit == AngleUnit.Degrees ? FromDegrees(angle) : FromRadians(angle);
         }
@@ -125,21 +125,21 @@ namespace Poly3D.Maths
         /// <summary>
         /// Clamps the angle between 0-360
         /// </summary>
-        public void Clamp()
+        public void Normalize()
         {
-            angleDeg = ClampDegrees(angleDeg);
+            angleDeg = NormalizeDegrees(angleDeg);
         }
 
-        public Angle Clamped()
+        public Angle Normalized()
         {
-            return Angle.FromDegrees(ClampDegrees(angleDeg));
+            return Angle.FromDegrees(NormalizeDegrees(angleDeg));
         }
 
         //assuming this is the minimum
         public Angle Diff(Angle other)//clockwise
         {
-            var angle1 = ClampDegrees(Degrees);
-            var angle2 = ClampDegrees(other.Degrees);
+            var angle1 = NormalizeDegrees(Degrees);
+            var angle2 = NormalizeDegrees(other.Degrees);
             if (angle2 > angle1)
             {
                 return Angle.FromDegrees(angle2 - angle1);
@@ -161,12 +161,20 @@ namespace Poly3D.Maths
 
         #endregion
 
-        public static float ClampDegrees(float degrees)
+        public static float NormalizeDegrees(float degrees)
         {
             degrees = degrees % 360f;
-            if (degrees < 0)
+            if (degrees < 0f)
                 degrees += 360f;
             return degrees;
+        }
+
+        public static float NormalizeRadians(float radians)
+        {
+            radians = radians % (PI * 2f);
+            if (radians < 0f)
+                radians += PI * 2f;
+            return radians;
         }
 
         public override string ToString()

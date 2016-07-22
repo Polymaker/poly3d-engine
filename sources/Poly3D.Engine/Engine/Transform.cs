@@ -110,7 +110,7 @@ namespace Poly3D.Engine
             get
             {
                 var rot = LocalToWorldMatrix.ExtractRotation();
-                return Quaternion.Multiply(rot, Rotation.Quaternion.Inverted());
+                return Quaternion.Multiply(Rotation.Quaternion, rot);
             }
             //set
             //{
@@ -162,12 +162,21 @@ namespace Poly3D.Engine
             isWorldMatrixDirty = true;
         }
 
+        public void LookAt(Vector3 target, bool localPos = false)
+        {
+
+            var rotation = Matrix4.LookAt(WorldPosition, target, Up);
+            rotation.Invert();
+            
+            Rotation = rotation.ExtractRotation();
+        }
+
         public Matrix4 GetLocalMatrix()
         {
             var finalMat = Matrix4.Identity;
             
             finalMat = Matrix4.Mult(finalMat, Matrix4.CreateScale(Scale));
-            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateFromQuaternion(Rotation.Quaternion.Inverted()));
+            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateFromQuaternion(Rotation.Quaternion/*.Inverted()*/));
             finalMat = Matrix4.Mult(finalMat, Matrix4.CreateTranslation(Position));
 
             return finalMat;
