@@ -11,6 +11,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using Poly3D.Engine.OpenGL;
 using Poly3D.Engine;
+using Poly3D.Maths;
 
 namespace Poly3D.Test
 {
@@ -81,6 +82,24 @@ namespace Poly3D.Test
         private void poly3DControl1_UpdateFrame(object sender, FrameEventArgs e)
         {
             //rotAngle += (float)(90d * e.Time);
+        }
+
+        private void poly3DControl1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (poly3DControl1.Scene != null)
+            {
+                var raycast = poly3DControl1.Scene.ActiveCameras.First().RaycastFromScreen(new Vector2(e.X, e.Y));
+                var rayAngle = Rotation.FromDirection(raycast.Direction);
+                Trace.WriteLine("rayAngle = " + rayAngle);
+                var plane = new Plane(Vector3.UnitY, 0f);
+                float hitDist = 0;
+                if (plane.Raycast(raycast, out hitDist))
+                {
+                    var hitPos = raycast.GetPoint(hitDist);
+                    Trace.WriteLine("clicked pos = " + hitPos);
+                }
+                
+            }
         }
     }
 }

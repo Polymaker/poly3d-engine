@@ -51,8 +51,17 @@ namespace Poly3D.Test
 
             
             var testObj = new SceneObject();
-            //testObj.Transform.Position = Vector3.UnitZ * 5;
-            testObj.Transform.Rotation = new Vector3(45f, 0, 0);
+            testObj.Transform.Position = new Vector3(0, 3, 6);
+            testObj.Transform.LookAt(Vector3.Zero);
+
+            var testPlane = new Plane(Vector3.UnitY, 0);
+            var testRay = Ray.FromPoints(testObj.Transform.Position, Vector3.Zero);
+            float hitDist = 0;
+            if (testPlane.Raycast(testRay, out hitDist))
+            {
+                var hitPos = testRay.GetPoint(hitDist);
+            }
+
             //testObj.Transform.Scale = new OpenTK.Vector3(.5f, .5f, .5f);
 
             Trace.WriteLine(" world pos:" + testObj.Transform.WorldPosition.Round());

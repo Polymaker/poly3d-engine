@@ -164,14 +164,17 @@ namespace Poly3D.Engine
 
         public void LookAt(Vector3 target, bool localPos = false)
         {
-
-            var rotation = Matrix4.LookAt(WorldPosition, target, Up);
+            //in opengl Z+ (forward) is away from camera, but our forward is toward camera so we need to invert Z;
+            var worldPos = WorldPosition;
+            //worldPos.Z *= -1f;
+            //target.Z *= -1f;
+            var rotation = Matrix4.LookAt(worldPos, target, Up);
             rotation.Invert();
-            
+
             Rotation = rotation.ExtractRotation();
         }
 
-        public Matrix4 GetLocalMatrix()
+        public Matrix4 GetLocalTransformMatrix()
         {
             var finalMat = Matrix4.Identity;
 
@@ -182,9 +185,9 @@ namespace Poly3D.Engine
             return finalMat;
         }
 
-        public Matrix4 GetFinalMatrix()
+        public Matrix4 GetTransformMatrix()
         {
-            return Matrix4.Mult(LocalToWorldMatrix, GetLocalMatrix());
+            return Matrix4.Mult(LocalToWorldMatrix, GetLocalTransformMatrix());
         }
 
         public void BuildConvertionMatrices()
@@ -195,7 +198,7 @@ namespace Poly3D.Engine
 
             foreach (var node in SceneObject.GetHierarchy(false).Reverse())
             {
-                var transformMatrix = node.Transform.GetLocalMatrix();
+                var transformMatrix = node.Transform.GetLocalTransformMatrix();
                 _LocalToWorldMatrix = Matrix4.Mult(_LocalToWorldMatrix, transformMatrix);
             }
 

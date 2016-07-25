@@ -158,6 +158,16 @@ namespace Poly3D.Maths
         public Rotation(Angle pitch, Angle yaw, Angle roll)
             : this(new Vector3(pitch.Degrees, yaw.Degrees, roll.Degrees)) { }
 
+        public static Rotation FromDirection(Vector3 dir)
+        {
+            //in opengl Z+ (forward) is away from camera, but our forward is toward camera so we need to invert Z;
+            dir.Z *= -1f;
+            var rotation = Matrix4.LookAt(Vector3.Zero, dir, Vector3.UnitY);
+            //rotation.Invert();
+            return new Rotation(rotation);
+        }
+
+
         public static implicit operator Rotation(Quaternion quat)
         {
             return new Rotation(quat);

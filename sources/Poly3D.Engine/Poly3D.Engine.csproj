@@ -60,7 +60,9 @@
     <Compile Include="Engine\Material.cs" />
     <Compile Include="Engine\ObjectBehaviour.cs" />
     <Compile Include="Engine\ObjectComponent.cs" />
-    <Compile Include="Engine\Ray.cs" />
+    <Compile Include="Engine\ObjectMesh.cs" />
+    <Compile Include="Maths\Plane.cs" />
+    <Compile Include="Maths\Ray.cs" />
     <Compile Include="Engine\Scene.cs" />
     <Compile Include="Engine\SceneObject.cs" />
     <Compile Include="Engine\SceneObjectChildCollection.cs" />

@@ -213,6 +213,11 @@ namespace Poly3D.Maths
 
         #endregion
 
+        public bool Contains(Vector2 point)
+        {
+            return point.X >= X && point.X <= Right && point.Y >= Y && point.Y <= Bottom;
+        }
+
         public static implicit operator Rect(System.Drawing.Rectangle rec)
         {
             return new Rect(rec.X, rec.Y, rec.Width, rec.Height);

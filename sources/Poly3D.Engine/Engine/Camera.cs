@@ -8,6 +8,7 @@ using OpenTK.Graphics.OpenGL;
 using Poly3D.Maths;
 using Poly3D.Graphics;
 using OpenTK.Graphics;
+using System.Diagnostics;
 
 namespace Poly3D.Engine
 {
@@ -230,6 +231,18 @@ namespace Poly3D.Engine
             ComputeProjectionMatrix();
         }
 
+        private Matrix4 GetModelviewMatrix()
+        {
+            var viewMatrix = Transform.GetTransformMatrix();
+            //viewMatrix = Matrix4.Mult(viewMatrix, Matrix4.CreateScale(1f, 1f, -1f));
+            //viewMatrix = Matrix4.Mult(viewMatrix, Transform.GetTransformMatrix());
+            viewMatrix = Matrix4.Mult(Matrix4.CreateScale(1f, 1f, -1f), viewMatrix);
+            viewMatrix.Invert();
+            //viewMatrix = Matrix4.Mult(viewMatrix, Matrix4.CreateScale(1f, 1f, -1f));
+            
+            return viewMatrix;
+        }
+
         internal void Render()
         {
             var curViewport = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
@@ -258,36 +271,85 @@ namespace Poly3D.Engine
             
             GL.MatrixMode(MatrixMode.Modelview);
 
-            var viewMatrix = Transform.GetFinalMatrix();
+            var viewMatrix = GetModelviewMatrix();
 
-            viewMatrix.Invert();
             GL.LoadMatrix(ref viewMatrix);
 
-            foreach (var so in Scene.Objects)
-            {
-                //restore view matrix
-                //apply object transform
-                //render object
-            }
+            //foreach (var so in Scene.Objects)
+            //{
+            //    //restore view matrix
+            //    //apply object transform
+            //    //render object
+            //}
 
             //GL.Rotate(0.5f, Vector3.UnitY);
-            GL.Translate(0, 0, -2);
+            //GL.Translate(0, 0, 3);
+            //GL.Translate(0, 0, 3);
             DrawPyramid();
+
             GL.LoadMatrix(ref viewMatrix);
             GL.Translate(2f, 0, 0);
             GL.Rotate(45f, Vector3.UnitY);
             DrawPyramid();
 
             GL.LoadMatrix(ref viewMatrix);
-
             GL.Translate(-2f, 0, 0);
             GL.Rotate(-45f, Vector3.UnitY);
             DrawPyramid();
-            //GL.Color3(Color.Black);
-            //GL.Begin(BeginMode.Lines);
-            //GL.Vertex3(Transform.WorldPosition);
-            //GL.Vertex3(Transform.WorldPosition + Transform.Right * 4);
-            //GL.End();
+            
+        }
+
+        public Ray RaycastFromScreen(Vector2 point)
+        {
+            var viewRect = DisplayRectangle;
+            if (!viewRect.Contains(point))
+                return null;
+
+            // Normalize screen poin
+            var normalizedPoint = new Vector2((point.X - viewRect.X) / viewRect.Width, (point.Y - viewRect.Y) / viewRect.Height);
+
+            return Raycast(normalizedPoint);
+        }
+
+        public Ray Raycast(Vector2 point)
+        {
+            var transformMatrix = Matrix4.Mult(GetModelviewMatrix(), ProjectionMatrix).Inverted();
+            
+            // Transformation of normalized coordinates (from [0.0, 1.0] to [-1.0, 1.0]).
+            var startVector = new Vector4(
+                point.X * 2f - 1f,
+                point.Y * 2f - 1f,
+                -1f,//near
+                1f);
+            
+            var endVector = new Vector4(
+                startVector.X,
+                startVector.Y,
+                1f,//far
+                1f);
+
+            var origin = Vector4.Transform(startVector, transformMatrix);
+            if (origin.W == 0)
+                return null;
+
+            origin.X /= origin.W;
+            origin.Y /= origin.W;
+            origin.Z /= origin.W;
+
+            var end = Vector4.Transform(endVector, transformMatrix);
+
+            if (end.W == 0)
+                return null;
+
+            end.X /= end.W;
+            end.Y /= end.W;
+            end.Z /= end.W;
+
+            Trace.WriteLine("Origin = " + origin);
+            Trace.WriteLine("End = " + end);
+            Trace.WriteLine("=======================");
+
+            return Ray.FromPoints(origin.Xyz, end.Xyz);
         }
 
         private void DrawPyramid()
@@ -295,17 +357,17 @@ namespace Poly3D.Engine
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
 
             GL.Begin(BeginMode.Triangles);
-            GL.Color3(Color.Blue);
+            GL.Color4(Color.Blue);
             GL.Vertex3(0f, -0.5f, -1f);
             GL.Vertex3(0.866f, -0.5f, 0.5f);
             GL.Vertex3(0f, 1f, 0f);
-
-            GL.Color3(Color.Red);
+            
+            GL.Color4(Color.Red);
             GL.Vertex3(0.866f, -0.5f, 0.5f);
             GL.Vertex3(-0.866f, -0.5f, 0.5f);
             GL.Vertex3(0f, 1f, 0f);
 
-            GL.Color3(Color.Yellow);
+            GL.Color4(Color.Yellow);
             GL.Vertex3(-0.866f, -0.5f, 0.5f);
             GL.Vertex3(0f, -0.5f, -1f);
             GL.Vertex3(0f, 1f, 0f);

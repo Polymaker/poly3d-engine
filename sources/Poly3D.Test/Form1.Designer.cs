@@ -53,6 +53,7 @@
             this.poly3DControl1.VSync = false;
             this.poly3DControl1.RenderFrame += new System.EventHandler<OpenTK.FrameEventArgs>(this.poly3DControl1_RenderFrame);
             this.poly3DControl1.UpdateFrame += new System.EventHandler<OpenTK.FrameEventArgs>(this.poly3DControl1_UpdateFrame);
+            this.poly3DControl1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.poly3DControl1_MouseClick);
             // 
             // button2
             // 
