@@ -15,13 +15,23 @@ namespace Poly3D.Engine
             get { return _Enabled; }
             set
             {
+                if (_Enabled == value)
+                    return;
                 _Enabled = value;
+                if (value)
+                    OnEnable();
+                else
+                    OnDisable();
             }
         }
 
-        protected virtual void OnUpdate(float deltaTime)
-        {
+        protected virtual void OnUpdate(float deltaTime) { }
 
-        }
+        protected virtual void OnRender(float deltaTime) { }
+
+        protected virtual void OnEnable() { }
+
+        protected virtual void OnDisable() { }
+
     }
 }

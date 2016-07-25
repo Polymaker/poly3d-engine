@@ -27,6 +27,11 @@ namespace Poly3D.Engine
             get { return _Objects.AsReadOnly(); }
         }
 
+        public IEnumerable<SceneObject> RootObjects
+        {
+            get { return Objects.Where(o => o.Parent == null); }
+        }
+
         public IEnumerable<Camera> ActiveCameras
         {
             get { return Objects.OfType<Camera>().Where(c => c.Active); }

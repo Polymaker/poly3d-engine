@@ -8,7 +8,10 @@ namespace Poly3D.Maths
     {
         private Quaternion _Quaternion;
         private Vector3 _EulerAngles;
+        private Matrix3 _Matrix;
         private bool isEulerDirty;
+        private bool isMatrixDirty;
+
 
         /// <summary>
         /// Gets or sets the rotation along the X axis.
@@ -46,13 +49,17 @@ namespace Poly3D.Maths
             }
         }
 
+
+        /// <summary>
+        /// Gets or sets the rotation angles. Vector3(Pitch, Yaw, Roll)
+        /// </summary>
         public Vector3 EulerAngles
         {
             get
             {
                 if (isEulerDirty)
                 {
-                    _EulerAngles = (GLMath.EulerAnglesFromQuaternion(_Quaternion) * GLMath.TO_DEG);
+                    _EulerAngles = GLMath.EulerAnglesFromQuaternion(_Quaternion) * GLMath.TO_DEG;
                     NormalizeEulers();
                     isEulerDirty = false;
                 }
@@ -60,10 +67,10 @@ namespace Poly3D.Maths
             }
             set
             {
-                
                 _EulerAngles = value;
                 NormalizeEulers();
                 _Quaternion = GLMath.QuaternionFromEulerAngles(_EulerAngles * GLMath.TO_RAD);
+                isMatrixDirty = true;
                 isEulerDirty = false;
             }
         }
@@ -76,7 +83,28 @@ namespace Poly3D.Maths
                 if (_Quaternion == value)
                     return;
                 _Quaternion = value;
+                isMatrixDirty = true;
                 isEulerDirty = true;
+            }
+        }
+
+        public Matrix3 Matrix
+        {
+            get
+            {
+                if (isMatrixDirty)
+                {
+                    _Matrix = Matrix3.CreateFromQuaternion(Quaternion);
+                    isMatrixDirty = false;
+                }
+                return _Matrix;
+            }
+            set
+            {
+                _Matrix = value;
+                _Quaternion = Quaternion.FromMatrix(value);
+                isEulerDirty = true;
+                isMatrixDirty = false;
             }
         }
 
@@ -84,27 +112,51 @@ namespace Poly3D.Maths
         {
             _Quaternion = Quaternion.Identity;
             _EulerAngles = Vector3.Zero;
+            _Matrix = Matrix3.Identity;
             isEulerDirty = false;
+            isMatrixDirty = false;
         }
 
         public Rotation(Quaternion quaternion)
         {
             _Quaternion = quaternion;
+            _Matrix = Matrix3.CreateFromQuaternion(quaternion);
             _EulerAngles = Vector3.Zero;
             isEulerDirty = Quaternion.Identity != quaternion;
+            isMatrixDirty = false;
         }
-
 
         public Rotation(Vector3 eulerAngles)
         {
             _EulerAngles = eulerAngles;
             _Quaternion = GLMath.QuaternionFromEulerAngles(_EulerAngles * GLMath.TO_RAD);
+            _Matrix = Matrix3.Identity;
+            isMatrixDirty = true;
             isEulerDirty = false;
+        }
+
+        public Rotation(Matrix3 matrix)
+        {
+            
+            _EulerAngles = Vector3.Zero;
+            _Matrix = matrix;
+            _Quaternion = Quaternion.FromMatrix(matrix);
+            isEulerDirty = true;
+            isMatrixDirty = false;
+        }
+
+        public Rotation(Matrix4 matrix)
+        {
+
+            _EulerAngles = Vector3.Zero;
+            _Matrix = new Matrix3(matrix);
+            _Quaternion = Quaternion.FromMatrix(_Matrix);
+            isEulerDirty = true;
+            isMatrixDirty = false;
         }
 
         public Rotation(Angle pitch, Angle yaw, Angle roll)
             : this(new Vector3(pitch.Degrees, yaw.Degrees, roll.Degrees)) { }
-
 
         public static implicit operator Rotation(Quaternion quat)
         {
@@ -116,12 +168,38 @@ namespace Poly3D.Maths
             return new Rotation(euler);
         }
 
+        public static implicit operator Rotation(Matrix3 mat)
+        {
+            return new Rotation(mat);
+        }
+
+        public static implicit operator Rotation(Matrix4 mat)
+        {
+            return new Rotation(mat);
+        }
+
         public static explicit operator Quaternion(Rotation rot)
         {
             return rot.Quaternion;
         }
 
+        public static explicit operator Matrix3(Rotation rot)
+        {
+            return rot.Matrix;
+        }
+
+        public static explicit operator Matrix4(Rotation rot)
+        {
+            return new Matrix4(
+                new Vector4(rot.Matrix.Row0),
+                new Vector4(rot.Matrix.Row1),
+                new Vector4(rot.Matrix.Row2),
+                Vector4.UnitW
+                );
+        }
+
         public static readonly Rotation Identity = new Rotation(Quaternion.Identity);
+
 
         public override string ToString()
         {

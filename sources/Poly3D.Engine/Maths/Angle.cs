@@ -179,7 +179,10 @@ namespace Poly3D.Maths
 
         public override string ToString()
         {
-            return string.Format("{0}°", Degrees);
+            if (DefaultConvertionUnit == AngleUnit.Degrees)
+                return string.Format("{0}°", Degrees);
+            else
+                return string.Format("{0}ᶜ", Radians);
         }
     }
 }

@@ -149,6 +149,7 @@ namespace Poly3D.Engine.OpenGL
         {
             if (Target != TextureTarget.Texture2D)
                 return;
+            
             using (var tmpBind = new TempAssign<TextureUnit>(
                 GetActiveTextureUnit(),
                 () => GL.BindTexture(Target, Id),

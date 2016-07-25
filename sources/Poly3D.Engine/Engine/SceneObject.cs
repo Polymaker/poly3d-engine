@@ -36,6 +36,11 @@ namespace Poly3D.Engine
             }
         }
 
+        public int Level
+        {
+            get { return Parent == null ? 0 : Parent.Level + 1; }
+        }
+
         public SceneObject RootObject
         {
             get
@@ -59,8 +64,9 @@ namespace Poly3D.Engine
                     _Components.Remove(_Transform);
                     _Transform.SetOwner(null);
                 }
-                _Transform = value;
-                _Components.Add(value);
+
+                _Transform = value.SceneObject != null ? value.Clone() : value;
+                _Components.Add(_Transform);
                 _Transform.SetOwner(this);
             }
         }
@@ -178,5 +184,6 @@ namespace Poly3D.Engine
                 OnHierarchyChangedInternal();
             }
         }
+
     }
 }

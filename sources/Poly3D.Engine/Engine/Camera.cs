@@ -23,7 +23,8 @@ namespace Poly3D.Engine
         private float _NearClipDistance;
         private ProjectionType _Projection;
         private Angle _FieldOfView;
-        private bool isPMatrixDirty = false;
+        private bool isMatrixDirty;
+        private bool isViewportDirty;
 
         /// <summary>
         /// Gets or sets the vertical field of view of the camera; the Horizontal FOV varies depending on the viewport's aspect ratio.
@@ -36,7 +37,7 @@ namespace Poly3D.Engine
             {
                 _FieldOfView = value;
                 if(Projection == ProjectionType.Perspective)
-                    isPMatrixDirty = true;
+                    isMatrixDirty = true;
             }
         }
 
@@ -54,7 +55,8 @@ namespace Poly3D.Engine
                 //    throw new Exception("");
                 _ViewRectangle = value;
 
-                isPMatrixDirty = true;
+                isMatrixDirty = true;
+                isViewportDirty = true;
             }
         }
 
@@ -86,6 +88,9 @@ namespace Poly3D.Engine
             }
         }
 
+        /// <summary>
+        /// Gets or sets the camera's projection type.
+        /// </summary>
         public ProjectionType Projection
         {
             get { return _Projection; }
@@ -94,7 +99,7 @@ namespace Poly3D.Engine
                 if (_Projection == value)
                     return;
                 _Projection = value;
-                isPMatrixDirty = true;
+                isMatrixDirty = true;
             }
         }
 
@@ -110,7 +115,7 @@ namespace Poly3D.Engine
                 if (_NearClipDistance == value)
                     return;
                 _NearClipDistance = value;
-                isPMatrixDirty = true;
+                isMatrixDirty = true;
             }
         }
 
@@ -126,7 +131,7 @@ namespace Poly3D.Engine
                 if (_FarClipDistance == value)
                     return;
                 _FarClipDistance = value;
-                isPMatrixDirty = true;
+                isMatrixDirty = true;
             }
         }
 
@@ -134,7 +139,7 @@ namespace Poly3D.Engine
         {
             get
             {
-                if (isPMatrixDirty)
+                if (isMatrixDirty)
                     ComputeProjectionMatrix();
                 return _ProjectionMatrix;
             }
@@ -150,7 +155,7 @@ namespace Poly3D.Engine
                     return;
                 _OrthographicSize = value;
                 if (Projection == ProjectionType.Orthographic)
-                    isPMatrixDirty = true;
+                    isMatrixDirty = true;
             }
         }
 
@@ -181,7 +186,8 @@ namespace Poly3D.Engine
             _Projection = ProjectionType.Perspective;
             _BackColor = Color.FromArgb(0.5f, 0.5f, 0.5f);
             _ViewRectangle = new Rect(0, 0, 1, 1);
-            isPMatrixDirty = true;
+            isMatrixDirty = true;
+            isViewportDirty = true;
         }
 
         protected void ComputeProjectionMatrix()
@@ -211,22 +217,32 @@ namespace Poly3D.Engine
                 }
             }
             //lastViewPort = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
-            isPMatrixDirty = false;
+            isMatrixDirty = false;
         }
 
         private Vector2 lastViewPort = Vector2.Zero;
+
+        private void UpdateViewport()
+        {
+            var viewRect = DisplayRectangle;
+            GL.Viewport((int)viewRect.X, (int)viewRect.Y, (int)viewRect.Width, (int)viewRect.Height);
+            isViewportDirty = false;
+            ComputeProjectionMatrix();
+        }
 
         internal void Render()
         {
             var curViewport = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
             if (curViewport != lastViewPort)
             {
-
-                var viewRect = DisplayRectangle;
-                GL.Viewport((int)viewRect.X, (int)viewRect.Y, (int)viewRect.Width, (int)viewRect.Height);
+                isViewportDirty = true;
+                //var viewRect = DisplayRectangle;
+                //GL.Viewport((int)viewRect.X, (int)viewRect.Y, (int)viewRect.Width, (int)viewRect.Height);
                 lastViewPort = curViewport;
-                isPMatrixDirty = true;
+                //isMatrixDirty = true;
             }
+            if (isViewportDirty)
+                UpdateViewport();
 
             GL.ClearColor((Color4)BackColor);
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
@@ -235,7 +251,7 @@ namespace Poly3D.Engine
 
             GL.MatrixMode(MatrixMode.Projection);
             
-            if (isPMatrixDirty)
+            if (isMatrixDirty)
                 ComputeProjectionMatrix();
 
             GL.LoadMatrix(ref _ProjectionMatrix);
@@ -246,6 +262,13 @@ namespace Poly3D.Engine
 
             viewMatrix.Invert();
             GL.LoadMatrix(ref viewMatrix);
+
+            foreach (var so in Scene.Objects)
+            {
+                //restore view matrix
+                //apply object transform
+                //render object
+            }
 
             //GL.Rotate(0.5f, Vector3.UnitY);
             GL.Translate(0, 0, -2);

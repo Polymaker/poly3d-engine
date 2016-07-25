@@ -174,11 +174,11 @@ namespace Poly3D.Engine
         public Matrix4 GetLocalMatrix()
         {
             var finalMat = Matrix4.Identity;
-            
-            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateScale(Scale));
-            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateFromQuaternion(Rotation.Quaternion/*.Inverted()*/));
-            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateTranslation(Position));
 
+            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateScale(Scale));
+            finalMat = Matrix4.Mult(finalMat, (Matrix4)Rotation);
+            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateTranslation(Position));
+            
             return finalMat;
         }
 
@@ -192,6 +192,7 @@ namespace Poly3D.Engine
             if (SceneObject == null)
                 return;
             _LocalToWorldMatrix = Matrix4.Identity;
+
             foreach (var node in SceneObject.GetHierarchy(false).Reverse())
             {
                 var transformMatrix = node.Transform.GetLocalMatrix();
@@ -199,6 +200,16 @@ namespace Poly3D.Engine
             }
 
             isWorldMatrixDirty = false;
+        }
+
+        public Transform Clone()
+        {
+            return new Transform()
+            {
+                _Rotation = Rotation,
+                _Position = Position,
+                _Scale = Scale
+            };
         }
     }
 }

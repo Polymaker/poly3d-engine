@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace Poly3D.Engine
 {
-    public abstract class EngineObject
+    public abstract class EngineObject : IDisposable
     {
         private static long CurrentID = 0;
         private readonly long InstanceID = Interlocked.Increment(ref CurrentID);
@@ -16,6 +16,17 @@ namespace Poly3D.Engine
         static EngineObject()
         {
             //InstancesList = new TSDictionary<long, EngineObject>();
+        }
+
+        public void Dispose()
+        {
+            OnDestroy();
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void OnDestroy()
+        {
+
         }
 
         public long GetInstanceID()

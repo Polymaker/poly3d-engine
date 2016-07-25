@@ -60,19 +60,22 @@ namespace Poly3D.Maths
         public static Quaternion QuaternionFromEulerAngles(float yaw, float pitch, float roll)
         {
             float rollOver2 = roll * 0.5f;
-            float sinRollOver2 = (float)Math.Sin((double)rollOver2);
-            float cosRollOver2 = (float)Math.Cos((double)rollOver2);
+            float sinRollOver2 = (float)Math.Sin(rollOver2);
+            float cosRollOver2 = (float)Math.Cos(rollOver2);
             float pitchOver2 = pitch * 0.5f;
-            float sinPitchOver2 = (float)Math.Sin((double)pitchOver2);
-            float cosPitchOver2 = (float)Math.Cos((double)pitchOver2);
+            float sinPitchOver2 = (float)Math.Sin(pitchOver2);
+            float cosPitchOver2 = (float)Math.Cos(pitchOver2);
             float yawOver2 = yaw * 0.5f;
-            float sinYawOver2 = (float)Math.Sin((double)yawOver2);
-            float cosYawOver2 = (float)Math.Cos((double)yawOver2);
-            Quaternion result = new Quaternion();
-            result.W = cosYawOver2 * cosPitchOver2 * cosRollOver2 + sinYawOver2 * sinPitchOver2 * sinRollOver2;
-            result.X = cosYawOver2 * sinPitchOver2 * cosRollOver2 + sinYawOver2 * cosPitchOver2 * sinRollOver2;
-            result.Y = sinYawOver2 * cosPitchOver2 * cosRollOver2 - cosYawOver2 * sinPitchOver2 * sinRollOver2;
-            result.Z = cosYawOver2 * cosPitchOver2 * sinRollOver2 - sinYawOver2 * sinPitchOver2 * cosRollOver2;
+            float sinYawOver2 = (float)Math.Sin(yawOver2);
+            float cosYawOver2 = (float)Math.Cos(yawOver2);
+
+            Quaternion result = new Quaternion()
+            {
+                W = cosYawOver2 * cosPitchOver2 * cosRollOver2 + sinYawOver2 * sinPitchOver2 * sinRollOver2,
+                X = cosYawOver2 * sinPitchOver2 * cosRollOver2 + sinYawOver2 * cosPitchOver2 * sinRollOver2,
+                Y = sinYawOver2 * cosPitchOver2 * cosRollOver2 - cosYawOver2 * sinPitchOver2 * sinRollOver2,
+                Z = cosYawOver2 * cosPitchOver2 * sinRollOver2 - sinYawOver2 * sinPitchOver2 * cosRollOver2
+            };
 
             return result;
             //Quaternion rotateX = Quaternion.FromAxisAngle(Vector3.UnitX, pitch);
