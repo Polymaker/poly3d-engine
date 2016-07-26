@@ -167,13 +167,6 @@ namespace Poly3D.Engine
 
         public void LookAt(Vector3 target, bool localPos = false)
         {
-            //in opengl Z+ (forward) is away from camera, but our forward is toward camera so we need to invert Z;
-            //var worldPos = WorldPosition;
-            ////worldPos.Z *= -1f;
-            ////target.Z *= -1f;
-            //Rotation = Matrix4.LookAt(worldPos, target, Up).Inverted();
-            //rotation.Invert();
-            //Rotation = rotation;
             Rotation = Rotation.FromDirection((target - WorldPosition).Normalized());
         }
 

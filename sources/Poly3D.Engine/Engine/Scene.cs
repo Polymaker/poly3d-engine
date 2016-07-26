@@ -60,7 +60,7 @@ namespace Poly3D.Engine
         {
             var camera = AddObject<Camera>();
             camera.Active = true;
-            camera.Transform.Position = new OpenTK.Vector3(0, 2, 6);
+            camera.Transform.Position = new OpenTK.Vector3(5, 5, 5);
             //camera.Transform.Rotation = new Rotation(315, 180, 0);
             //Trace.WriteLine(camera.Transform.Rotation.Matrix);
             //Trace.WriteLine(string.Empty);

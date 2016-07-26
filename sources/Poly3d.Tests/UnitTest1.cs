@@ -15,8 +15,6 @@ namespace Poly3d.Tests
         [TestMethod]
         public void TestYaw()
         {
-            //var rotation = new Rotation(0, 90, 0);
-
             var point = new Vector3(1f, 0f, 1f);
 
             Vector3 eulerAngles = new Vector3(0, 90, 0).ToRadians();
@@ -67,7 +65,6 @@ namespace Poly3d.Tests
         [TestMethod]
         public void TestYawPitch()
         {
-
             var point = new Vector3(0f, 0f, 1f);
 
             Vector3 eulerAngles = new Vector3(315, 180, 0).ToRadians();
@@ -117,24 +114,6 @@ namespace Poly3d.Tests
 
         }
 
-        private bool TestConvertion(Rotation rotation)
-        {
-            var rotation2 = new Rotation(rotation.Quaternion);
-            var point = new Vector3(1f, 1f, 1f);
-            rotation2 = new Rotation(rotation2.EulerAngles);
-            var result = Vector3.Transform(point, rotation2.Quaternion);
-            var expectedResult = Vector3.Transform(point, rotation.Quaternion);
-            try
-            {
-                AssertVectors(result, expectedResult);
-            }
-            catch
-            {
-                Trace.WriteLine(string.Format("Rotation ({0}) failed to convert. (result = {1})", result, expectedResult));
-                return false;
-            }
-            return true;
-        }
 
         private bool TestConvertion(Vector3 eulerAngles)
         {

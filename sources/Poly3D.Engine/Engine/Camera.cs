@@ -70,7 +70,7 @@ namespace Poly3D.Engine
             {
                 if(Scene == null || Scene.Viewport == null)
                     return new Rect(0, 0, 1, 1);
-
+                
                 var displaySize = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
                 return new Rect(
                     displaySize.X * ViewRectangle.X, 
@@ -235,24 +235,7 @@ namespace Poly3D.Engine
 
         private Matrix4 GetModelviewMatrix()
         {
-            //var forwardVector = Transform.Forward;
-            
-
             return Matrix4.LookAt(Transform.WorldPosition, Transform.Forward * 4, Transform.Up);
-            //return Matrix4.Mult(Transform.GetTransformMatrix(), Matrix4.CreateScale(-1f, 1f, -1f)).Inverted();
-            //return Transform.GetTransformMatrix().Inverted();
-            /*
-            var viewMatrix = Matrix4.Identity;
-            //viewMatrix = Matrix4.Mult(viewMatrix, Matrix4.CreateTranslation(Transform.WorldPosition));
-            viewMatrix = Matrix4.LookAt(Transform.WorldPosition, Vector3.Zero, Transform.Up);
-            //viewMatrix = Matrix4.Mult(viewMatrix, Transform.GetTransformMatrix());
-            //viewMatrix = Matrix4.Mult(Transform.GetTransformMatrix(), Matrix4.CreateScale(-1f, 1f, -1f));
-            //viewMatrix = Matrix4.Mult(viewMatrix, Matrix4.CreateScale(-1f, 1f, -1
-             * f));
-            //viewMatrix.Invert();
-            //viewMatrix = Matrix4.Mult(viewMatrix, Matrix4.CreateScale(-1f, 1f, -1f));
-            
-            return viewMatrix;*/
         }
 
         internal void Render()
@@ -324,34 +307,17 @@ namespace Poly3D.Engine
             return Raycast(normalizedPoint);
         }
 
-        public static Vector4 UnProject(Matrix4 projection, Matrix4 view, Vector4 vec)
-        {
-            vec = Vector4.Transform(vec, Matrix4.Mult(view, projection).Inverted());
-            //Matrix4 viewInv = Matrix4.Invert(view);
-            //Matrix4 projInv = Matrix4.Invert(projection);
-
-            //Vector4.Transform(ref vec, ref projInv, out vec);
-            //Vector4.Transform(ref vec, ref viewInv, out vec);
-
-            if (vec.W > float.Epsilon || vec.W < float.Epsilon)
-            {
-                vec.X /= vec.W;
-                vec.Y /= vec.W;
-                vec.Z /= vec.W;
-            }
-
-            return vec;
-        }
-
         public Ray Raycast(Vector2 point)
         {
+            if (point.X < 0f || point.X > 1f || point.Y < 0f || point.Y > 1f)
+                return null;
 
             var transformMatrix = Matrix4.Mult(GetModelviewMatrix(), ProjectionMatrix).Inverted();
-            //var viewMat = GetModelviewMatrix();
+
             // Transformation of normalized coordinates (from [0.0, 1.0] to [-1.0, 1.0]).
             var startVector = new Vector4(
-                point.X * 2f - 1f,
-                1f - point.Y * 2f,
+                point.X * 2f - 1f,//-1 = left, so 0->1 = -1->+1
+                1f - point.Y * 2f,//-1 = bottom, so 0->1 = +1->-1
                 -1f,//near
                 1f);
             
@@ -377,10 +343,6 @@ namespace Poly3D.Engine
             end.X /= end.W;
             end.Y /= end.W;
             end.Z /= end.W;
-
-            Trace.WriteLine("Origin = " + origin.Xyz);
-            Trace.WriteLine("End = " + end.Xyz);
-            Trace.WriteLine("=======================\r\n");
 
             return Ray.FromPoints(origin.Xyz, end.Xyz);
         }
@@ -417,7 +379,7 @@ namespace Poly3D.Engine
             GL.Vertex3(Vector3.Zero);
             GL.Vertex3(Vector3.UnitX * 2);
 
-            GL.Color4(Color.Green);
+            GL.Color4(Color.LimeGreen);
             GL.Vertex3(Vector3.Zero);
             GL.Vertex3(Vector3.UnitY * 2);
 
