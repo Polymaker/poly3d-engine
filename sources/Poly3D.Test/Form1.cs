@@ -35,7 +35,7 @@ namespace Poly3D.Test
             poly3DControl1.SetGraphicsMode(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 4));
         }
 
-        float rotAngle = 0f;
+        //float rotAngle = 0f;
 
         private void poly3DControl1_RenderFrame(object sender, OpenTK.FrameEventArgs e)
         {

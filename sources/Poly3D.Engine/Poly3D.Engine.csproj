@@ -62,6 +62,7 @@
     <Compile Include="Engine\ObjectComponent.cs" />
     <Compile Include="Engine\ObjectMesh.cs" />
     <Compile Include="Maths\Plane.cs" />
+    <Compile Include="Maths\QuaternionExtensions.cs" />
     <Compile Include="Maths\Ray.cs" />
     <Compile Include="Engine\Scene.cs" />
     <Compile Include="Engine\SceneObject.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Maths\GLMath.cs" />
     <Compile Include="Maths\Rect.cs" />
     <Compile Include="Maths\Rotation.cs" />
+    <Compile Include="Maths\Vector3Extensions.cs" />
     <Compile Include="Meshes\Edge.cs" />
     <Compile Include="Meshes\Face.cs" />
     <Compile Include="Meshes\FaceQuad.cs" />

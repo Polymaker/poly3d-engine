@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 
 using System;
+using System.Diagnostics;
 
 namespace Poly3D.Maths
 {
@@ -59,7 +60,7 @@ namespace Poly3D.Maths
             {
                 if (isEulerDirty)
                 {
-                    _EulerAngles = GLMath.EulerAnglesFromQuaternion(_Quaternion.Inverted()) * GLMath.TO_DEG;
+                    _EulerAngles = GLMath.QuatToEuler(_Quaternion).ToDegrees();
                     NormalizeEulers();
                     isEulerDirty = false;
                 }
@@ -69,7 +70,7 @@ namespace Poly3D.Maths
             {
                 _EulerAngles = value;
                 NormalizeEulers();
-                _Quaternion = GLMath.QuaternionFromEulerAngles(_EulerAngles * GLMath.TO_RAD).Inverted();
+                _Quaternion = GLMath.EulerToQuat(_EulerAngles.ToRadians());
                 isMatrixDirty = true;
                 isEulerDirty = false;
             }
@@ -130,7 +131,7 @@ namespace Poly3D.Maths
         {
             _EulerAngles = eulerAngles;
             NormalizeEulers();
-            _Quaternion = GLMath.QuaternionFromEulerAngles(_EulerAngles * GLMath.TO_RAD).Inverted();
+            _Quaternion = GLMath.EulerToQuat(_EulerAngles.ToRadians());
             _Matrix = Matrix3.Identity;
             isMatrixDirty = true;
             isEulerDirty = false;
@@ -161,15 +162,10 @@ namespace Poly3D.Maths
 
         public static Rotation FromDirection(Vector3 dir)
         {
-            //in opengl Z+ (forward) is away from camera, but our forward is toward camera so we need to invert Z;
-            dir.Z *= -1f;
 
-            var rotation = Matrix4.LookAt(Vector3.Zero, dir, Vector3.UnitY);
+            var rotation = Matrix4.LookAt(dir, Vector3.Zero, Vector3.UnitY);
 
-            //var rotation = Matrix4.LookAt(dir, Vector3.Zero, Vector3.UnitY);
-            //rotation.Invert();
-
-            return new Rotation(rotation);
+            return rotation;
         }
 
 

@@ -15,102 +15,57 @@ namespace Poly3D.Test
     {
         static void Main(string[] args)
         {
-            //var angle = Angle.FromDegrees(45);
-            //var testRot = new Rotation() { Pitch = 45, Yaw = 0 };
-            //var eulerAngles = new Vector3(testRot.Yaw.Radians, testRot.Pitch.Radians, testRot.Roll.Radians);
-            //var test1 = GLMath.QuaternionFromEulerAngles(eulerAngles);
-            //var test2 = GLMath.EulerAnglesFromQuaternion(test1);
+            Vector3 eulerAngles = new Vector3(45, 45, 0).ToRadians();
+            var rotQuat = GLMath.EulerToQuat(eulerAngles);
 
-            //Trace.WriteLine(string.Format("{0} == {1} ?", eulerAngles, test2));
+            Trace.WriteLine("In Euler: " + eulerAngles.ToDegrees());
+            Trace.WriteLine("In Quat: " + rotQuat);
 
-            //Trace.WriteLine("Pitch:");
-            //var myRot = new Rotation() { Pitch = 45 };
-            //var myRot2 = (Rotation)myRot.Quaternion;
-            //Trace.WriteLine(myRot);
-            //Trace.WriteLine(myRot2);
-            //Trace.WriteLine("Roll:");
-            //myRot = new Rotation() { Roll = 45 };
-            //myRot2 = (Rotation)myRot.Quaternion;
-            //Trace.WriteLine(myRot);
-            //Trace.WriteLine(myRot2);
+            eulerAngles = GLMath.QuatToEuler(rotQuat);
+            rotQuat = GLMath.EulerToQuat(eulerAngles);
 
-            //var rotMat = Matrix4.CreateFromQuaternion(myRot.Quaternion);
-            //Trace.WriteLine(Vector3.Transform(new Vector3(5f, 0f, 0f), rotMat));
-            //rotMat = Matrix4.CreateFromQuaternion(myRot2.Quaternion);
-            //Trace.WriteLine(Vector3.Transform(new Vector3(5f, 0f, 0f), rotMat));
-            
-            //Trace.WriteLine("Yaw:");
-            //myRot = new Rotation() { Yaw = 45 };
-            //myRot2 = (Rotation)myRot.Quaternion;
-            //Trace.WriteLine(myRot);
-            //Trace.WriteLine(myRot2);
-            //var rotMat = Matrix4.CreateFromQuaternion(myRot.Quaternion);
-            //Trace.WriteLine(Vector3.Transform(new Vector3(0f, 0f, 5f), rotMat));
-            //var myRot2 = (Rotation)myRot.Quaternion;
+            Trace.WriteLine("Out Euler: " + eulerAngles.ToDegrees());
+            Trace.WriteLine("Out Quat: " + rotQuat);
+            Trace.WriteLine(string.Empty);
 
-            var rotMat = Matrix4.CreateRotationX(Angle.ToRadians(45));
+            eulerAngles = new Vector3(0, 45, 45).ToRadians();
+            rotQuat = GLMath.EulerToQuat(eulerAngles);
 
-            rotMat = Matrix4.Mult(Matrix4.CreateRotationX(Angle.ToRadians(45)), Matrix4.CreateRotationY(Angle.ToRadians(180)));
-            Trace.WriteLine(Vector3.Transform(Vector3.UnitZ, rotMat));
-            Trace.WriteLine((Rotation)rotMat);
+            Trace.WriteLine("In Euler: " + eulerAngles.ToDegrees());
+            Trace.WriteLine("In Quat: " + rotQuat);
 
-            rotMat = Matrix4.Mult(Matrix4.CreateRotationY(Angle.ToRadians(180)), Matrix4.CreateRotationX(Angle.ToRadians(45)));
-            Trace.WriteLine(Vector3.Transform(Vector3.UnitZ, rotMat));
-            Trace.WriteLine((Rotation)rotMat);
-            
+            eulerAngles = GLMath.QuatToEuler(rotQuat);
+            rotQuat = GLMath.EulerToQuat(eulerAngles);
 
-            //var rotMat2 = Matrix4.CreateRotationZ(Angle.ToRadians(90));
+            Trace.WriteLine("Out Euler: " + eulerAngles.ToDegrees());
+            Trace.WriteLine("Out Quat: " + rotQuat);
+            Trace.WriteLine(string.Empty);
 
-            //var asdasdf = Quaternion.FromAxisAngle(Vector3.UnitX, Angle.ToRadians(90));
-            ////rotMat = Matrix4.Mult(rotMat, Matrix4.CreateRotationX(Angle.ToRadians(-45)));
-            //var testPT = Vector3.Transform(new Vector3(0f, 0, 1f), asdasdf);
-            //Trace.WriteLine(new Rotation(asdasdf));
-            //Trace.WriteLine(testPT);
+            eulerAngles = new Vector3(0, 45, 45).ToRadians();
+            rotQuat = GLMath.EulerToQuat(eulerAngles);
 
-            //asdasdf = Quaternion.FromAxisAngle(Vector3.UnitZ, Angle.ToRadians(90));
-            //testPT = Vector3.Transform(new Vector3(0f, 0, 1f), asdasdf);
-            //Trace.WriteLine(new Rotation(asdasdf));
-            //Trace.WriteLine(testPT);
+            Trace.WriteLine("In Euler: " + eulerAngles.ToDegrees());
+            Trace.WriteLine("In Quat: " + rotQuat);
 
+            eulerAngles = GLMath.QuatToEuler(rotQuat);
+            rotQuat = GLMath.EulerToQuat(eulerAngles);
 
+            Trace.WriteLine("Out Euler: " + eulerAngles.ToDegrees());
+            Trace.WriteLine("Out Quat: " + rotQuat);
+            Trace.WriteLine(string.Empty);
 
-            /*
-            var testObj = new SceneObject();
-            testObj.Transform.Position = new Vector3(0, 3, 6);
-            testObj.Transform.LookAt(Vector3.Zero);
+            eulerAngles = new Vector3(90, 90, 0).ToRadians();
+            rotQuat = GLMath.EulerToQuat(eulerAngles);
 
-            var testPlane = new Plane(Vector3.UnitY, 0);
-            var testRay = Ray.FromPoints(testObj.Transform.Position, Vector3.Zero);
-            float hitDist = 0;
-            if (testPlane.Raycast(testRay, out hitDist))
-            {
-                var hitPos = testRay.GetPoint(hitDist);
-            }
+            Trace.WriteLine("In Euler: " + eulerAngles.ToDegrees());
+            Trace.WriteLine("In Quat: " + rotQuat);
 
-            //testObj.Transform.Scale = new OpenTK.Vector3(.5f, .5f, .5f);
+            eulerAngles = GLMath.QuatToEuler(rotQuat);
+            rotQuat = GLMath.EulerToQuat(eulerAngles);
 
-            Trace.WriteLine(" world pos:" + testObj.Transform.WorldPosition.Round());
-            Trace.WriteLine(" local rot:" + testObj.Transform.Rotation);
-            Trace.WriteLine(" world rot:" + testObj.Transform.WorldRotation);
-
-            var testObj2 = new SceneObject();
-            testObj2.Parent = testObj;
-            testObj2.Transform.Position = Vector3.UnitZ * 5;
-            testObj2.Transform.Rotation = new Vector3(-90, 0, 0);
-
-            Trace.WriteLine(" world pos:" + testObj2.Transform.WorldPosition.Round());
-            Trace.WriteLine(" local rot:" + testObj2.Transform.Rotation);
-            Trace.WriteLine(" world rot:" + testObj2.Transform.WorldRotation);
-
-            var testObj3 = new SceneObject();
-            testObj3.Parent = testObj2;
-            testObj3.Transform.Position = Vector3.UnitZ * 5;
-            //testObj2.Transform.Rotation = new Vector3(0, 90, 0);
-
-            Trace.WriteLine(" world pos:" + testObj3.Transform.WorldPosition.Round());
-            Trace.WriteLine(" local rot:" + testObj3.Transform.Rotation);
-            Trace.WriteLine(" world rot:" + testObj3.Transform.WorldRotation);*/
-
+            Trace.WriteLine("Out Euler: " + eulerAngles.ToDegrees());
+            Trace.WriteLine("Out Quat: " + rotQuat);
+            Trace.WriteLine(string.Empty);
         }
     }
 }

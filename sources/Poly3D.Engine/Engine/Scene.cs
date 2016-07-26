@@ -60,17 +60,18 @@ namespace Poly3D.Engine
         {
             var camera = AddObject<Camera>();
             camera.Active = true;
-            camera.Transform.Position = new OpenTK.Vector3(0, 6, 6);
-            //
-            //camera.Transform.LookAt(new OpenTK.Vector3(0, 0f, 0));
-            //Trace.WriteLine(camera.Transform.Rotation.Quaternion);
-            camera.Transform.Rotation = new Rotation(315, 180, 0);
+            camera.Transform.Position = new OpenTK.Vector3(0, 2, 6);
+            //camera.Transform.Rotation = new Rotation(315, 180, 0);
+            //Trace.WriteLine(camera.Transform.Rotation.Matrix);
+            //Trace.WriteLine(string.Empty);
+
+            camera.Transform.LookAt(new OpenTK.Vector3(0, 0f, 0));
+
+
             Trace.WriteLine(camera.Transform.Rotation);
-            Trace.WriteLine(camera.Transform.Rotation.Quaternion);
-            camera.Transform.Rotation = camera.Transform.Rotation.Quaternion;
-            Trace.WriteLine(camera.Transform.Rotation);
+            Trace.WriteLine(camera.Transform.Forward);
             //camera.Transform.Rotation.Yaw += Angle.FromDegrees(-180);
-            
+
 
         }
 

@@ -235,10 +235,10 @@ namespace Poly3D.Engine
 
         private Matrix4 GetModelviewMatrix()
         {
-            var forwardVector = Transform.Forward;
+            //var forwardVector = Transform.Forward;
             
 
-            return Matrix4.LookAt(Transform.WorldPosition, Vector3.Zero, Vector3.UnitY);
+            return Matrix4.LookAt(Transform.WorldPosition, Transform.Forward * 4, Transform.Up);
             //return Matrix4.Mult(Transform.GetTransformMatrix(), Matrix4.CreateScale(-1f, 1f, -1f)).Inverted();
             //return Transform.GetTransformMatrix().Inverted();
             /*
@@ -286,6 +286,7 @@ namespace Poly3D.Engine
             var viewMatrix = GetModelviewMatrix();
 
             GL.LoadMatrix(ref viewMatrix);
+            DrawAxeCoord();
 
             //foreach (var so in Scene.Objects)
             //{
@@ -403,6 +404,26 @@ namespace Poly3D.Engine
             GL.Vertex3(-0.866f, -0.5f, 0.5f);
             GL.Vertex3(0f, -0.5f, -1f);
             GL.Vertex3(0f, 1f, 0f);
+
+            GL.End();
+        }
+
+        private void DrawAxeCoord()
+        {
+            GL.LineWidth(3);
+            GL.Begin(BeginMode.Lines);
+
+            GL.Color4(Color.Red);
+            GL.Vertex3(Vector3.Zero);
+            GL.Vertex3(Vector3.UnitX * 2);
+
+            GL.Color4(Color.Green);
+            GL.Vertex3(Vector3.Zero);
+            GL.Vertex3(Vector3.UnitY * 2);
+
+            GL.Color4(Color.Blue);
+            GL.Vertex3(Vector3.Zero);
+            GL.Vertex3(Vector3.UnitZ * 2);
 
             GL.End();
         }

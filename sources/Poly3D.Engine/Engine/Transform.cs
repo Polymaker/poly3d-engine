@@ -22,7 +22,6 @@ namespace Poly3D.Engine
             get 
             {
                 return Vector3.Transform(Vector3.UnitZ, WorldRotation.Quaternion);
-                //return WorldRotation.Quaternion.Mult(Vector3.UnitZ); 
             }
         }
 
@@ -31,7 +30,7 @@ namespace Poly3D.Engine
         /// </summary>
         public Vector3 Up
         {
-            get { return WorldRotation.Quaternion.Mult(Vector3.UnitY); }
+            get { return Vector3.Transform(Vector3.UnitY, WorldRotation.Quaternion); }
         }
 
         /// <summary>
@@ -39,7 +38,7 @@ namespace Poly3D.Engine
         /// </summary>
         public Vector3 Right
         {
-            get { return WorldRotation.Quaternion.Mult(Vector3.UnitX); }
+            get { return Vector3.Transform(Vector3.UnitX, WorldRotation.Quaternion); }
         }
 
         /// <summary>
