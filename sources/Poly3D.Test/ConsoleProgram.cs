@@ -48,8 +48,33 @@ namespace Poly3D.Test
             //Trace.WriteLine(Vector3.Transform(new Vector3(0f, 0f, 5f), rotMat));
             //var myRot2 = (Rotation)myRot.Quaternion;
 
+            var rotMat = Matrix4.CreateRotationX(Angle.ToRadians(45));
 
+            rotMat = Matrix4.Mult(Matrix4.CreateRotationX(Angle.ToRadians(45)), Matrix4.CreateRotationY(Angle.ToRadians(180)));
+            Trace.WriteLine(Vector3.Transform(Vector3.UnitZ, rotMat));
+            Trace.WriteLine((Rotation)rotMat);
+
+            rotMat = Matrix4.Mult(Matrix4.CreateRotationY(Angle.ToRadians(180)), Matrix4.CreateRotationX(Angle.ToRadians(45)));
+            Trace.WriteLine(Vector3.Transform(Vector3.UnitZ, rotMat));
+            Trace.WriteLine((Rotation)rotMat);
             
+
+            //var rotMat2 = Matrix4.CreateRotationZ(Angle.ToRadians(90));
+
+            //var asdasdf = Quaternion.FromAxisAngle(Vector3.UnitX, Angle.ToRadians(90));
+            ////rotMat = Matrix4.Mult(rotMat, Matrix4.CreateRotationX(Angle.ToRadians(-45)));
+            //var testPT = Vector3.Transform(new Vector3(0f, 0, 1f), asdasdf);
+            //Trace.WriteLine(new Rotation(asdasdf));
+            //Trace.WriteLine(testPT);
+
+            //asdasdf = Quaternion.FromAxisAngle(Vector3.UnitZ, Angle.ToRadians(90));
+            //testPT = Vector3.Transform(new Vector3(0f, 0, 1f), asdasdf);
+            //Trace.WriteLine(new Rotation(asdasdf));
+            //Trace.WriteLine(testPT);
+
+
+
+            /*
             var testObj = new SceneObject();
             testObj.Transform.Position = new Vector3(0, 3, 6);
             testObj.Transform.LookAt(Vector3.Zero);
@@ -84,7 +109,7 @@ namespace Poly3D.Test
 
             Trace.WriteLine(" world pos:" + testObj3.Transform.WorldPosition.Round());
             Trace.WriteLine(" local rot:" + testObj3.Transform.Rotation);
-            Trace.WriteLine(" world rot:" + testObj3.Transform.WorldRotation);
+            Trace.WriteLine(" world rot:" + testObj3.Transform.WorldRotation);*/
 
         }
     }

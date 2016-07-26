@@ -19,7 +19,11 @@ namespace Poly3D.Engine
         /// </summary>
         public Vector3 Forward
         {
-            get { return WorldRotation.Quaternion.Mult(Vector3.UnitZ); }
+            get 
+            {
+                return Vector3.Transform(Vector3.UnitZ, WorldRotation.Quaternion);
+                //return WorldRotation.Quaternion.Mult(Vector3.UnitZ); 
+            }
         }
 
         /// <summary>
@@ -165,13 +169,13 @@ namespace Poly3D.Engine
         public void LookAt(Vector3 target, bool localPos = false)
         {
             //in opengl Z+ (forward) is away from camera, but our forward is toward camera so we need to invert Z;
-            var worldPos = WorldPosition;
-            //worldPos.Z *= -1f;
-            //target.Z *= -1f;
-            var rotation = Matrix4.LookAt(worldPos, target, Up);
-            rotation.Invert();
-
-            Rotation = rotation.ExtractRotation();
+            //var worldPos = WorldPosition;
+            ////worldPos.Z *= -1f;
+            ////target.Z *= -1f;
+            //Rotation = Matrix4.LookAt(worldPos, target, Up).Inverted();
+            //rotation.Invert();
+            //Rotation = rotation;
+            Rotation = Rotation.FromDirection((target - WorldPosition).Normalized());
         }
 
         public Matrix4 GetLocalTransformMatrix()
