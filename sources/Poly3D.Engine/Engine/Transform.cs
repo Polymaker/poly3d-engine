@@ -177,13 +177,7 @@ namespace Poly3D.Engine
             isWorldMatrixDirty = true;
         }
 
-        public void LookAt(Vector3 target, bool targetInLocalSpace = false)
-        {
-            if(targetInLocalSpace)
-                Rotation = Rotation.FromDirection((target - Position).Normalized());
-            else
-                WorldRotation = Rotation.FromDirection((target - WorldPosition).Normalized());
-        }
+        #region Matrices
 
         public Matrix4 GetLocalTransformMatrix()
         {
@@ -192,7 +186,7 @@ namespace Poly3D.Engine
             finalMat = Matrix4.Mult(finalMat, Matrix4.CreateScale(Scale));
             finalMat = Matrix4.Mult(finalMat, (Matrix4)Rotation);
             finalMat = Matrix4.Mult(finalMat, Matrix4.CreateTranslation(Position));
-            
+
             return finalMat;
         }
 
@@ -215,6 +209,69 @@ namespace Poly3D.Engine
 
             isWorldMatrixDirty = false;
         }
+
+        #endregion
+
+        #region Transform operations
+
+        public void LookAt(Transform target)
+        {
+            WorldRotation = Rotation.FromDirection((target.WorldPosition - WorldPosition).Normalized());
+        }
+
+        public void LookAt(Vector3 target, bool targetInLocalSpace = false)
+        {
+            if (targetInLocalSpace)
+                Rotation = Rotation.FromDirection((target - Position).Normalized());
+            else
+                WorldRotation = Rotation.FromDirection((target - WorldPosition).Normalized());
+        }
+
+        public void Translate(Vector3 translation)
+        {
+            Translate(translation, Space.Parent);
+        }
+
+        public void Translate(Vector3 translation, Space relativeTo)
+        {
+            if (relativeTo == Space.World || (relativeTo == Space.Parent && ParentTransform == null))
+            {
+                WorldPosition += translation;
+            }
+            else if (relativeTo == Space.Parent)
+            {
+                Position += translation;
+            }
+            else if (relativeTo == Space.Self)//the difference between Parent and Self is that self include local rotation
+            {
+                Position += Vector3.Transform(translation, Rotation.Quaternion);
+            }
+        }
+
+        public void Rotate(Rotation rotation)
+        {
+            Rotate(rotation, Space.Self);
+        }
+
+        public void Rotate(Rotation rotation, Space relativeTo)
+        {
+            if (relativeTo == Space.World || (relativeTo == Space.Parent && ParentTransform == null))
+            {
+                
+                WorldRotation = Quaternion.Multiply(rotation.Quaternion, WorldRotation.Quaternion);
+            }
+            else if (relativeTo == Space.Parent || relativeTo == Space.Self)
+            {
+                Rotation = Quaternion.Multiply(rotation.Quaternion, Rotation.Quaternion);
+            }
+        }
+
+        public Vector3 ToLocalSpace(Vector3 worldPosition)
+        {
+            return Vector3.Transform(worldPosition, LocalToWorldMatrix.Inverted());
+        }
+
+        #endregion
 
         public Transform Clone()
         {

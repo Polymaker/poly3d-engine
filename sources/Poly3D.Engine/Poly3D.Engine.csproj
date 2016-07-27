@@ -56,11 +56,15 @@
     <Compile Include="Control\RenderStrategy.cs" />
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\EngineObject.cs" />
+    <Compile Include="Engine\InputManager.cs" />
     <Compile Include="Engine\IViewPort.cs" />
     <Compile Include="Engine\Material.cs" />
     <Compile Include="Engine\ObjectBehaviour.cs" />
     <Compile Include="Engine\ObjectComponent.cs" />
     <Compile Include="Engine\ObjectMesh.cs" />
+    <Compile Include="Engine\Space.cs" />
+    <Compile Include="Maths\BoundingBox.cs" />
+    <Compile Include="Maths\BoundingSphere.cs" />
     <Compile Include="Maths\Plane.cs" />
     <Compile Include="Maths\Ray.cs" />
     <Compile Include="Engine\Scene.cs" />
@@ -91,6 +95,8 @@
     <Compile Include="Meshes\MeshBuilder.cs" />
     <Compile Include="Meshes\MeshElement.cs" />
     <Compile Include="Meshes\MeshElementCollection.cs" />
+    <Compile Include="Meshes\MeshGroup.cs" />
+    <Compile Include="Meshes\MeshMaterial.cs" />
     <Compile Include="Meshes\Surface.cs" />
     <Compile Include="Meshes\Vertex.cs" />
     <Compile Include="Data\WavefrontMeshLoader.cs" />

@@ -13,9 +13,8 @@ namespace Poly3D.Maths
         private bool isEulerDirty;
         private bool isMatrixDirty;
 
-
         /// <summary>
-        /// Gets or sets the rotation along the X axis.
+        /// Gets or sets the rotation along the X axis (in degrees).
         /// </summary>
         public Angle Pitch
         {
@@ -27,7 +26,7 @@ namespace Poly3D.Maths
         }
 
         /// <summary>
-        /// Gets or sets the rotation along the Y axis.
+        /// Gets or sets the rotation along the Y axis (in degrees).
         /// </summary>
         public Angle Yaw
         {
@@ -39,7 +38,7 @@ namespace Poly3D.Maths
         }
 
         /// <summary>
-        /// Gets or sets the rotation along the Z axis.
+        /// Gets or sets the rotation along the Z axis (in degrees).
         /// </summary>
         public Angle Roll
         {
@@ -50,9 +49,8 @@ namespace Poly3D.Maths
             }
         }
 
-
         /// <summary>
-        /// Gets or sets the rotation angles. Vector3(Pitch, Yaw, Roll)
+        /// Gets or sets the rotation angles in degrees. Vector3(Pitch, Yaw, Roll)
         /// </summary>
         public Vector3 EulerAngles
         {
@@ -76,6 +74,9 @@ namespace Poly3D.Maths
             }
         }
 
+        /// <summary>
+        /// Gets or sets a quaternion representing this rotation.
+        /// </summary>
         public Quaternion Quaternion
         {
             get { return _Quaternion; }
@@ -89,6 +90,9 @@ namespace Poly3D.Maths
             }
         }
 
+        /// <summary>
+        /// Gets or sets a matrix representing this rotation.
+        /// </summary>
         public Matrix3 Matrix
         {
             get
@@ -162,12 +166,13 @@ namespace Poly3D.Maths
 
         public static Rotation FromDirection(Vector3 dir)
         {
-
-            var rotation = Matrix4.LookAt(dir, Vector3.Zero, Vector3.UnitY);
-
-            return rotation;
+            return FromDirection(dir,  Vector3.UnitY);
         }
 
+        public static Rotation FromDirection(Vector3 dir, Vector3 up)
+        {
+            return Matrix4.LookAt(dir, Vector3.Zero, up);
+        }
 
         public static implicit operator Rotation(Quaternion quat)
         {
@@ -210,7 +215,6 @@ namespace Poly3D.Maths
         }
 
         public static readonly Rotation Identity = new Rotation(Quaternion.Identity);
-
 
         public override string ToString()
         {

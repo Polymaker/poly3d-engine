@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Poly3D.Maths
 {
@@ -7,8 +8,9 @@ namespace Poly3D.Maths
         public static readonly Angle Zero = new Angle();
         public static AngleUnit DefaultConvertionUnit = AngleUnit.Degrees;
         public const float PI = 3.1415926535897931f;
-        private float angleDeg;
 
+        private float angleDeg;
+        
         public float Degrees
         {
             get { return angleDeg; }
@@ -17,7 +19,7 @@ namespace Poly3D.Maths
                 angleDeg = value;
             }
         }
-
+        
         public float Radians
         {
             get { return ToRadians(Degrees); }
