@@ -17,6 +17,10 @@ namespace Poly3D.Engine.Data
             /// </summary>
             public List<Tuple<int, int, int>> Vertices { get; private set; }
 
+            public MeshGroup Group { get; set; }
+
+            public MeshMaterial Material { get; set; }
+
             public int Count { get { return Vertices.Count; } }
 
             public FaceHelper()
@@ -24,10 +28,18 @@ namespace Poly3D.Engine.Data
                 Vertices = new List<Tuple<int, int, int>>();
             }
 
+            public FaceHelper(MeshGroup group, MeshMaterial material)
+            {
+                Group = group;
+                Material = material;
+                Vertices = new List<Tuple<int, int, int>>();
+            }
+
             public FaceHelper(IEnumerable<Tuple<int, int, int>> verts)
             {
                 Vertices = new List<Tuple<int, int, int>>(verts);
             }
+
             public static Tuple<int, int, int> GetIndices(string argStr)
             {
                 int[] indices = new int[] { 0, -1, -1 };
@@ -63,7 +75,9 @@ namespace Poly3D.Engine.Data
             var normals = new List<Vector3>();
             var uvs = new List<Vector2>();
             var faces = new List<FaceHelper>();
-
+            var currentGroup = MeshGroup.Default;
+            var currentMat = MeshMaterial.Default;
+            int groupId = 0, matId = 0;
             using (var sr = new StreamReader(stream))
             {
                 string line;
@@ -74,6 +88,12 @@ namespace Poly3D.Engine.Data
                     var args = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     switch (args[0])
                     {
+                        case "usemtl":
+                            currentMat = new MeshMaterial(++matId, args[1]);
+                            break;
+                        case "g":
+                            currentGroup = new MeshGroup(++groupId, args[1]);
+                            break;
                         case "v":
                             if (args.Length >= 4)
                                 vertices.Add(new Vector3(float.Parse(args[1]), float.Parse(args[2]), float.Parse(args[3])));
@@ -87,7 +107,7 @@ namespace Poly3D.Engine.Data
                                 uvs.Add(new Vector2(float.Parse(args[1]), float.Parse(args[2])));
                             break;
                         case "f":
-                            var faceInfo = new FaceHelper();
+                            var faceInfo = new FaceHelper(currentGroup, currentMat);
                             for (int i = 1; i < args.Length; i++)
                                 faceInfo.Vertices.Add(FaceHelper.GetIndices(args[i]));
                             faces.Add(faceInfo);
@@ -106,13 +126,20 @@ namespace Poly3D.Engine.Data
                 vntDict.Add(vntIdx, vert);
             }
             var faceList = new List<Face>();
+
             foreach (var faceInfo in faces)
             {
+                Face newFace = null;
+
                 if (faceInfo.Count == 3)
-                    faceList.Add(new FaceTriangle(faceInfo.Vertices.Select(vnt => vntDict[vnt])));
+                    newFace = new FaceTriangle(faceInfo.Vertices.Select(vnt => vntDict[vnt]));
                 else if (faceInfo.Count == 4)
-                    faceList.Add(new FaceQuad(faceInfo.Vertices.Select(vnt => vntDict[vnt])));
+                    newFace = new FaceQuad(faceInfo.Vertices.Select(vnt => vntDict[vnt]));
+
+                newFace.Group = faceInfo.Group;
+                faceList.Add(newFace);
             }
+
             return new Mesh(faceList);
         }
 

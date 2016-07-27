@@ -8,6 +8,7 @@ namespace Poly3D.Engine.Meshes
 {
     public class Mesh : IMesh
     {
+        private MeshMaterial _Material;
         private MeshElementCollection<Face> _Faces;
         private MeshElementCollection<Vertex> _Vertices;
         private List<Surface> _Surfaces;
@@ -25,6 +26,26 @@ namespace Poly3D.Engine.Meshes
         public IList<Surface> Surfaces
         {
             get { return _Surfaces.AsReadOnly(); }
+        }
+
+        public MeshMaterial Material
+        {
+            get { return _Material; }
+            set
+            {
+                value = value ?? MeshMaterial.Default;
+                if (value == _Material)
+                    return;
+                _Material = value;
+            }
+        }
+
+        public IEnumerable<MeshMaterial> Materials
+        {
+            get
+            {
+                return Faces.Select(f => f.Material).Distinct();
+            }
         }
 
         #region IMesh properties
@@ -57,6 +78,7 @@ namespace Poly3D.Engine.Meshes
             _Vertices = new MeshElementCollection<Vertex>(this);
             _Surfaces = new List<Surface>();
             _Vertices.CollectionChanged += Vertices_CollectionChanged;
+            _Material = MeshMaterial.Default;
         }
 
         public Mesh(IEnumerable<Face> faces)
@@ -65,6 +87,7 @@ namespace Poly3D.Engine.Meshes
             _Faces = new MeshElementCollection<Face>(this, faces);
             _Surfaces = new List<Surface>();
             _Vertices.CollectionChanged += Vertices_CollectionChanged;
+            _Material = MeshMaterial.Default;
         }
 
         public Mesh(IEnumerable<Vertex> vertices)
@@ -73,6 +96,7 @@ namespace Poly3D.Engine.Meshes
             _Faces = new MeshElementCollection<Face>(this);
             _Surfaces = new List<Surface>();
             _Vertices.CollectionChanged += Vertices_CollectionChanged;
+            _Material = MeshMaterial.Default;
         }
 
         private void Vertices_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -93,9 +117,9 @@ namespace Poly3D.Engine.Meshes
         internal IList GetElements(Type elemType)
         {
             if (elemType == typeof(Vertex))
-                return (IList)Vertices;
-            else if (elemType == typeof(Face))
-                return (IList)Faces;
+                return Vertices;
+            else if (elemType == typeof(Face) || elemType.IsSubclassOf(typeof(Face)))
+                return Faces;
             return null;
         }
 

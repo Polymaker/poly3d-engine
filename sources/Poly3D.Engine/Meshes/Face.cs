@@ -7,6 +7,9 @@ namespace Poly3D.Engine.Meshes
 {
     public /*abstract*/ class Face : MeshElement, IFace
     {
+        private MeshMaterial _Material;
+        private Surface _Surface;
+        private MeshGroup _Group;
         private bool _IsNormalComputed;
         private Vector3 _Normal = Vector3.Zero;
         protected Vertex[] _Vertices;
@@ -28,6 +31,46 @@ namespace Poly3D.Engine.Meshes
             {
                 if (SetVertexValue(value, index))
                     _IsNormalComputed = false;
+            }
+        }
+
+        public Surface Surface
+        {
+            get { return _Surface; }
+            internal set
+            {
+                _Surface = value;
+            }
+        }
+
+        public MeshGroup Group
+        {
+            get { return _Group; }
+            set
+            {
+                value = value ?? MeshGroup.Default;
+
+                if (_Group == value)
+                    return;
+                
+                _Group = value;
+            }
+        }
+
+        public MeshMaterial Material
+        {
+            get
+            {
+                if (_Material == MeshMaterial.Default && Surface != null)
+                    return Surface.Material;
+                return _Material;
+            }
+            set
+            {
+                value = value ?? MeshMaterial.Default;
+                if (value == _Material)
+                    return;
+                _Material = value;
             }
         }
 
@@ -67,6 +110,9 @@ namespace Poly3D.Engine.Meshes
         {
             _IsNormalComputed = false;
             _Vertices = null;
+            _Surface = null;
+            _Group = MeshGroup.Default;
+            _Material = MeshMaterial.Default;
         }
 
         public Face(params Vertex[] vertices)
@@ -110,6 +156,8 @@ namespace Poly3D.Engine.Meshes
                 if (vert.Mesh != Mesh)
                     vert.SetParent(Mesh, false);
             }
+            if (Mesh == null)
+                _Surface = null;
         }
 
         protected bool SetVertexValue(Vertex vert, int index)

@@ -8,6 +8,7 @@ namespace Poly3D.Engine.Meshes
     public class Surface : ISurface
     {
         // Fields...
+        private MeshMaterial _Material;
         private bool _IsBoundingEdgesComputed;
         private List<Edge> _BoundingEdges;
         private List<Face> _Faces;
@@ -32,6 +33,24 @@ namespace Poly3D.Engine.Meshes
             get { return Faces.Count > 0 ? Faces[0].Mesh : null; }
         }
 
+        public MeshMaterial Material
+        {
+            get
+            {
+                if (_Material == MeshMaterial.Default && Mesh != null)
+                    return Mesh.Material;
+                return _Material;
+            }
+            set
+            {
+                value = value ?? MeshMaterial.Default;
+                if (value == _Material)
+                    return;
+                _Material = value;
+            }
+        }
+        
+
         public IList<Edge> BoundingEdges
         {
             get { return _BoundingEdges.AsReadOnly(); }
@@ -46,12 +65,15 @@ namespace Poly3D.Engine.Meshes
         {
             _Faces = new List<Face>();
             _BoundingEdges = new List<Edge>();
+            _Material = MeshMaterial.Default;
         }
 
         internal Surface(IEnumerable<Face> faces)
         {
             _Faces = new List<Face>(faces);
+            _Faces.ForEach(f => f.Surface = this);
             _BoundingEdges = new List<Edge>();
+            _Material = MeshMaterial.Default;
         }
 
         public bool Contains(IVertex vertex)
