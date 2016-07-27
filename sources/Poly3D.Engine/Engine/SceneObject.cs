@@ -8,6 +8,7 @@ namespace Poly3D.Engine
     public class SceneObject : EngineObject
     {
         // Fields...
+        private bool _Active;
         private SceneObject _Parent;
         //private ComponentCollection _Components;
         private List<ObjectComponent> _Components;
@@ -24,6 +25,29 @@ namespace Poly3D.Engine
             }
         }
 
+        /// <summary>
+        /// Enables or disables the current scene object.
+        /// </summary>
+        public bool Active
+        {
+            get { return _Active; }
+            set
+            {
+                _Active = value;
+            }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsActive
+        {
+            get
+            {
+                return Active && (Parent == null || Parent.IsActive);
+            }
+        }
+
         public SceneObject Parent
         {
             get { return _Parent; }
@@ -36,9 +60,9 @@ namespace Poly3D.Engine
             }
         }
 
-        public int Level
+        public int HierarchyLevel
         {
-            get { return Parent == null ? 0 : Parent.Level + 1; }
+            get { return Parent == null ? 0 : Parent.HierarchyLevel + 1; }
         }
 
         public SceneObject RootObject
@@ -51,23 +75,17 @@ namespace Poly3D.Engine
             }
         }
 
+        public bool IsRoot
+        {
+            get { return HierarchyLevel == 0; }
+        }
+
         public Transform Transform
         {
             get { return _Transform; }
             set
             {
-                if (_Transform == value)
-                    return;
-
-                if (_Transform != null && _Components.Contains(_Transform))
-                {
-                    _Components.Remove(_Transform);
-                    _Transform.SetOwner(null);
-                }
-
-                _Transform = value.SceneObject != null ? value.Clone() : value;
-                _Components.Add(_Transform);
-                _Transform.SetOwner(this);
+                SetTransform(value, true);
             }
         }
 
@@ -96,7 +114,6 @@ namespace Poly3D.Engine
             _Transform = new Transform(this);
             _Components.Add(_Transform);
             _Childs = new SceneObjectChildCollection(this);
-            //_Transform.SetParent(this, false);
             _Parent = null;
             _Scene = null;
         }
@@ -130,6 +147,31 @@ namespace Poly3D.Engine
             comp.SetOwner(this);
             _Components.Add(comp);
             return comp;
+        }
+
+        public void SetTransform(Transform transform, bool keepWorldPosition)
+        {
+            transform = transform ?? new Transform();
+
+            if (_Transform == transform)
+                return;
+
+            if (_Transform != null && _Components.Contains(_Transform))
+            {
+                _Components.Remove(_Transform);
+                _Transform.SetOwner(null);
+            }
+
+            _Transform = transform.Clone();
+            _Components.Add(_Transform);
+            _Transform.SetOwner(this);
+
+            if (keepWorldPosition)
+            {
+                _Transform.WorldScale = transform.WorldScale;
+                _Transform.WorldPosition = transform.WorldPosition;
+                _Transform.WorldRotation = transform.WorldRotation;
+            }
         }
 
         public IEnumerable<SceneObject> GetHierarchy(bool includeSelf = true)

@@ -34,7 +34,7 @@ namespace Poly3D.Engine
 
         public IEnumerable<Camera> ActiveCameras
         {
-            get { return Objects.OfType<Camera>().Where(c => c.Active); }
+            get { return Objects.OfType<Camera>().Where(c => c.IsActive); }
         }
 
         public IEnumerable<Camera> AllCameras

@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
 using Poly3D.Maths;
 using Poly3D.Graphics;
-using OpenTK.Graphics;
 using System.Diagnostics;
 
 namespace Poly3D.Engine
@@ -16,7 +14,6 @@ namespace Poly3D.Engine
     {
         // Fields...
         private Color _BackColor;
-        private bool _Active;
         private Rect _ViewRectangle;
         private float _OrthographicSize;
         private Matrix4 _ProjectionMatrix;
@@ -36,6 +33,8 @@ namespace Poly3D.Engine
             get { return _FieldOfView; }
             set
             {
+                if (_FieldOfView == value)
+                    return;
                 _FieldOfView = value;
                 if(Projection == ProjectionType.Perspective)
                     isMatrixDirty = true;
@@ -151,21 +150,11 @@ namespace Poly3D.Engine
             get { return _OrthographicSize; }
             set
             {
-                value = Math.Abs(value);
-                if (_OrthographicSize == value)
+                if (value < 0.01f || _OrthographicSize == value)
                     return;
                 _OrthographicSize = value;
                 if (Projection == ProjectionType.Orthographic)
                     isMatrixDirty = true;
-            }
-        }
-
-        public bool Active
-        {
-            get { return _Active; }
-            set
-            {
-                _Active = value;
             }
         }
 
@@ -197,7 +186,7 @@ namespace Poly3D.Engine
             {
                 if (Projection == ProjectionType.Perspective)
                 {
-                    _ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView((float)FieldOfView.Radians, AspectRatio, NearClipDistance, FarClipDistance);
+                    _ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(FieldOfView.Radians, AspectRatio, NearClipDistance, FarClipDistance);
                 }
                 else
                 {
@@ -209,7 +198,7 @@ namespace Poly3D.Engine
                 if (Projection == ProjectionType.Perspective)
                 {
                     //TODO
-                    _ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView((float)FieldOfView.Radians, AspectRatio, NearClipDistance, FarClipDistance);
+                    _ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(FieldOfView.Radians, AspectRatio, NearClipDistance, FarClipDistance);
                 }
                 else
                 {
@@ -217,10 +206,8 @@ namespace Poly3D.Engine
                     _ProjectionMatrix = Matrix4.CreateOrthographic(OrthographicSize * AspectRatio, OrthographicSize, NearClipDistance, FarClipDistance);
                 }
             }
-            //lastViewPort = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
-            //_ProjectionMatrix = Matrix4.Mult(Matrix4.CreateScale(-1f, 1f, -1f), _ProjectionMatrix);
+
             isMatrixDirty = false;
-            Trace.WriteLine("Camrea forward = " + Transform.Forward);
         }
 
         private Vector2 lastViewPort = Vector2.Zero;
@@ -233,7 +220,7 @@ namespace Poly3D.Engine
             ComputeProjectionMatrix();
         }
 
-        private Matrix4 GetModelviewMatrix()
+        public Matrix4 GetModelviewMatrix()
         {
             return Matrix4.LookAt(Transform.WorldPosition, Transform.Forward * 4, Transform.Up);
         }
@@ -241,18 +228,15 @@ namespace Poly3D.Engine
         internal void Render()
         {
             var curViewport = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
+
             if (curViewport != lastViewPort)
             {
                 isViewportDirty = true;
-                //var viewRect = DisplayRectangle;
-                //GL.Viewport((int)viewRect.X, (int)viewRect.Y, (int)viewRect.Width, (int)viewRect.Height);
                 lastViewPort = curViewport;
-                //isMatrixDirty = true;
-            }
-            if (isViewportDirty)
                 UpdateViewport();
+            }
 
-            GL.ClearColor((Color4)BackColor);
+            GL.ClearColor(BackColor);
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
 
             GL.Enable(EnableCap.DepthTest);
@@ -281,6 +265,21 @@ namespace Poly3D.Engine
             //GL.Rotate(0.5f, Vector3.UnitY);
             //GL.Translate(0, 0, 3);
             //GL.Translate(0, 0, 3);
+
+            //GL.Translate(0, -1f, 0);
+            GL.Scale(4f, 4f, 4f);
+            GL.Color4(Color.White);
+            GL.Begin(BeginMode.Triangles);
+            GL.Vertex3(-1f, 0f, 1f);
+            GL.Vertex3(1f, 0f, 1f);
+            GL.Vertex3(1f, 0f, -1f);
+
+            GL.Vertex3(-1f, 0f, 1f);
+            GL.Vertex3(1f, 0f, -1f);
+            GL.Vertex3(-1f, 0f, -1f);
+            GL.End();
+
+            GL.LoadMatrix(ref viewMatrix);
             DrawPyramid();
 
             GL.LoadMatrix(ref viewMatrix);
@@ -373,6 +372,7 @@ namespace Poly3D.Engine
         private void DrawAxeCoord()
         {
             GL.LineWidth(3);
+
             GL.Begin(BeginMode.Lines);
 
             GL.Color4(Color.Red);

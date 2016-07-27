@@ -19,10 +19,7 @@ namespace Poly3D.Engine
         /// </summary>
         public Vector3 Forward
         {
-            get 
-            {
-                return Vector3.Transform(Vector3.UnitZ, WorldRotation.Quaternion);
-            }
+            get { return Vector3.Transform(Vector3.UnitZ, WorldRotation.Quaternion); }
         }
 
         /// <summary>
@@ -73,6 +70,8 @@ namespace Poly3D.Engine
             get { return _Scale; }
             set
             {
+                if (value == Vector3.Zero || value.X == 0f || value.Y == 0f || value.Z == 0f)
+                    return;
                 _Scale = value;
             }
         }
@@ -112,13 +111,14 @@ namespace Poly3D.Engine
         {
             get
             {
-                var rot = LocalToWorldMatrix.ExtractRotation();
-                return Quaternion.Multiply(Rotation.Quaternion, rot);
+                var baseRotation = LocalToWorldMatrix.ExtractRotation();
+                return Quaternion.Multiply(Rotation.Quaternion, baseRotation);
             }
-            //set
-            //{
-            //    //_Position = 
-            //}
+            set
+            {
+                var baseRotation = LocalToWorldMatrix.ExtractRotation();
+                _Rotation = Quaternion.Multiply(value.Quaternion, baseRotation.Inverted());
+            }
         }
 
         /// <summary>
@@ -132,6 +132,8 @@ namespace Poly3D.Engine
             }
             set
             {
+                if (value == Vector3.Zero || value.X == 0f || value.Y == 0f || value.Z == 0f)
+                    return;
                 _Scale = Vector3.Divide(value, LocalToWorldMatrix.ExtractScale());
             }
         }
@@ -155,6 +157,16 @@ namespace Poly3D.Engine
             isWorldMatrixDirty = true;
         }
 
+
+        public Transform(Vector3 position, Rotation rotation, Vector3 scale)
+        {
+            _Rotation = rotation;
+            _Scale = scale;
+            _Position = position;
+            isWorldMatrixDirty = true;
+            _LocalToWorldMatrix = Matrix4.Identity;
+        }
+
         internal Transform(SceneObject sceneObject)
             : base(sceneObject)
         {
@@ -165,9 +177,12 @@ namespace Poly3D.Engine
             isWorldMatrixDirty = true;
         }
 
-        public void LookAt(Vector3 target, bool localPos = false)
+        public void LookAt(Vector3 target, bool targetInLocalSpace = false)
         {
-            Rotation = Rotation.FromDirection((target - WorldPosition).Normalized());
+            if(targetInLocalSpace)
+                Rotation = Rotation.FromDirection((target - Position).Normalized());
+            else
+                WorldRotation = Rotation.FromDirection((target - WorldPosition).Normalized());
         }
 
         public Matrix4 GetLocalTransformMatrix()
@@ -203,12 +218,7 @@ namespace Poly3D.Engine
 
         public Transform Clone()
         {
-            return new Transform()
-            {
-                _Rotation = Rotation,
-                _Position = Position,
-                _Scale = Scale
-            };
+            return new Transform(Position, Rotation, Scale);
         }
     }
 }
