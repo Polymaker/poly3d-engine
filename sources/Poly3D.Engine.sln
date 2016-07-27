@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poly3D.Engine", "Poly3D.Eng
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poly3D.Test", "Poly3D.Test\Poly3D.Test.csproj", "{51B30E82-9CA6-4CF2-808B-E64048BD4E23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poly3d.Tests", "Poly3d.Tests\Poly3d.Tests.csproj", "{7A0B9FB1-081C-4DB9-99F6-204C9C03C07C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poly3D.Tests", "Poly3D.Tests\Poly3D.Tests.csproj", "{7A0B9FB1-081C-4DB9-99F6-204C9C03C07C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
