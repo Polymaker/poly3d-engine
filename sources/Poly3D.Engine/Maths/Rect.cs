@@ -218,6 +218,11 @@ namespace Poly3D.Maths
             return point.X >= X && point.X <= Right && point.Y >= Y && point.Y <= Bottom;
         }
 
+        public bool Overlaps(Rect other)
+        {
+            return other.Right > Left && other.Left < Right && other.Bottom > Top && other.Top < Bottom;
+        }
+
         public static implicit operator Rect(System.Drawing.Rectangle rec)
         {
             return new Rect(rec.X, rec.Y, rec.Width, rec.Height);

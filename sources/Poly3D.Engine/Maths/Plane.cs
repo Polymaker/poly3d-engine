@@ -12,6 +12,8 @@ namespace Poly3D.Maths
 
         public float Distance { get; set; }
 
+        public Vector3 Origin { get; set; }
+
         public Vector3 Normal
         {
             get { return _Normal; }
@@ -25,6 +27,7 @@ namespace Poly3D.Maths
         {
             _Normal = normal;
             Distance = distance;
+            Origin = Vector3.Zero;
         }
 
         public bool Raycast(Ray ray, out float distance)
@@ -32,12 +35,13 @@ namespace Poly3D.Maths
             var denom = Vector3.Dot(Normal, ray.Direction);
             if (Math.Abs(denom) > 0)
             {
-                var center = Normal * Distance;
+                var center = Origin + (Normal * Distance);
                 distance = Vector3.Dot(center - ray.Origin, Normal) / denom;
                 return distance >= 0;
             }
             distance = 0;
             return false;
         }
+
     }
 }
