@@ -163,6 +163,8 @@ namespace Poly3D.Engine
             get { return _BackColor; }
             set
             {
+                if (_BackColor == value)
+                    return;
                 _BackColor = value;
             }
         }
@@ -179,6 +181,8 @@ namespace Poly3D.Engine
             isMatrixDirty = true;
             isViewportDirty = true;
         }
+
+        #region Matrices calculation
 
         protected void ComputeProjectionMatrix()
         {
@@ -210,36 +214,52 @@ namespace Poly3D.Engine
             isMatrixDirty = false;
         }
 
+        public Matrix4 GetModelviewMatrix()
+        {
+            //saves us the trouble of inverting the chain of transformations that the camera has
+            return Matrix4.LookAt(Transform.WorldPosition, Transform.Forward * 4, Transform.Up);
+        }
+
+        #endregion
+
+        #region Viewport handling
+
         private Vector2 lastViewPort = Vector2.Zero;
 
         private void UpdateViewport()
         {
-            var viewRect = DisplayRectangle;
-            GL.Viewport((int)viewRect.X, (int)viewRect.Y, (int)viewRect.Width, (int)viewRect.Height);
-            isViewportDirty = false;
-            ComputeProjectionMatrix();
+            var curViewport = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
+            //if the GL render context size changed or the view rectangle of the camera changed (isViewportDirty)
+            if (curViewport != lastViewPort || isViewportDirty)
+            {
+                var viewRect = DisplayRectangle;
+                GL.Viewport((int)viewRect.X, (int)viewRect.Y, (int)viewRect.Width, (int)viewRect.Height);
+                isViewportDirty = false;
+
+                ComputeProjectionMatrix();
+
+                lastViewPort = curViewport;
+
+                //GL.ClearColor(BackColor);
+            }
         }
 
-        public Matrix4 GetModelviewMatrix()
-        {
-            return Matrix4.LookAt(Transform.WorldPosition, Transform.Forward * 4, Transform.Up);
-        }
+        #endregion
+
+        private Poly3D.OpenGL.Light myLight;
 
         internal void Render()
         {
-            var curViewport = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
+            UpdateViewport();
 
-            if (curViewport != lastViewPort)
-            {
-                isViewportDirty = true;
-                lastViewPort = curViewport;
-                UpdateViewport();
-            }
+            GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.ColorMaterial);
+            GL.Enable(EnableCap.Lighting);
+            GL.Enable(EnableCap.LineSmooth);
+            GL.Enable(EnableCap.Texture2D);
 
             GL.ClearColor(BackColor);
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
-
-            GL.Enable(EnableCap.DepthTest);
 
             GL.MatrixMode(MatrixMode.Projection);
             
@@ -253,7 +273,20 @@ namespace Poly3D.Engine
             var viewMatrix = GetModelviewMatrix();
 
             GL.LoadMatrix(ref viewMatrix);
-            DrawAxeCoord();
+
+            if (myLight == null)
+            {
+                myLight = new Poly3D.OpenGL.Light(0);
+                myLight.Position = new Vector4(20, 12, 6, 0);
+                myLight.Ambient = new OpenTK.Graphics.Color4(0.2f, 0.2f, 0.2f, 1f);
+                myLight.Active = true;
+            }
+
+            if (!myLight.Active)
+                myLight.Active = true;
+
+            RenderHelper.RenderAxes(5f, 0.5f);
+
 
             //foreach (var so in Scene.Objects)
             //{
@@ -267,31 +300,34 @@ namespace Poly3D.Engine
             //GL.Translate(0, 0, 3);
 
             //GL.Translate(0, -1f, 0);
+            //GL.Scale(4f, 4f, 4f);
+            //GL.Color4(Color.White);
+            //GL.Begin(BeginMode.Triangles);
+            //GL.Vertex3(-1f, 0f, 1f);
+            //GL.Vertex3(1f, 0f, 1f);
+            //GL.Vertex3(1f, 0f, -1f);
+
+            //GL.Vertex3(-1f, 0f, 1f);
+            //GL.Vertex3(1f, 0f, -1f);
+            //GL.Vertex3(-1f, 0f, -1f);
+            //GL.End();
+            GL.Disable(EnableCap.Lighting);
+            //GL.LoadMatrix(ref viewMatrix);
             GL.Scale(4f, 4f, 4f);
-            GL.Color4(Color.White);
-            GL.Begin(BeginMode.Triangles);
-            GL.Vertex3(-1f, 0f, 1f);
-            GL.Vertex3(1f, 0f, 1f);
-            GL.Vertex3(1f, 0f, -1f);
-
-            GL.Vertex3(-1f, 0f, 1f);
-            GL.Vertex3(1f, 0f, -1f);
-            GL.Vertex3(-1f, 0f, -1f);
-            GL.End();
-
-            GL.LoadMatrix(ref viewMatrix);
             DrawPyramid();
 
-            GL.LoadMatrix(ref viewMatrix);
-            GL.Translate(2f, 0, 0);
-            GL.Rotate(45f, Vector3.UnitY);
-            DrawPyramid();
+            //GL.LoadMatrix(ref viewMatrix);
+            //GL.Scale(4f, 4f, 4f);
+            //GL.Translate(2f, 0, 0);
+            //GL.Rotate(45f, Vector3.UnitY);
+            //DrawPyramid();
 
-            GL.LoadMatrix(ref viewMatrix);
-            GL.Translate(-2f, 0, 0);
-            GL.Rotate(-45f, Vector3.UnitY);
-            DrawPyramid();
-            
+            //GL.LoadMatrix(ref viewMatrix);
+            //GL.Scale(4f, 4f, 4f);
+            //GL.Translate(-2f, 0, 0);
+            //GL.Rotate(-45f, Vector3.UnitY);
+            //DrawPyramid();
+
         }
 
         public Ray RaycastFromScreen(Vector2 point)
@@ -352,10 +388,11 @@ namespace Poly3D.Engine
 
             GL.Begin(BeginMode.Triangles);
             GL.Color4(Color.Blue);
+
             GL.Vertex3(0f, -0.5f, -1f);
             GL.Vertex3(0.866f, -0.5f, 0.5f);
             GL.Vertex3(0f, 1f, 0f);
-            
+
             GL.Color4(Color.Red);
             GL.Vertex3(0.866f, -0.5f, 0.5f);
             GL.Vertex3(-0.866f, -0.5f, 0.5f);
@@ -369,25 +406,5 @@ namespace Poly3D.Engine
             GL.End();
         }
 
-        private void DrawAxeCoord()
-        {
-            GL.LineWidth(3);
-
-            GL.Begin(BeginMode.Lines);
-
-            GL.Color4(Color.Red);
-            GL.Vertex3(Vector3.Zero);
-            GL.Vertex3(Vector3.UnitX * 2);
-
-            GL.Color4(Color.LimeGreen);
-            GL.Vertex3(Vector3.Zero);
-            GL.Vertex3(Vector3.UnitY * 2);
-
-            GL.Color4(Color.Blue);
-            GL.Vertex3(Vector3.Zero);
-            GL.Vertex3(Vector3.UnitZ * 2);
-
-            GL.End();
-        }
     }
 }

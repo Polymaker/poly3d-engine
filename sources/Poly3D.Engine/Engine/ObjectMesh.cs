@@ -30,13 +30,21 @@ namespace Poly3D.Engine
             }
         }
 
+        public int MeshMaterialCount
+        {
+            get
+            {
+                if (Mesh == null)
+                    return 0;
+                return Mesh.Materials.Count();
+            }
+        }
+
         public ObjectMesh()
         {
             _Material = new Material();
             _Mesh = null;
         }
-
-
         
     }
 }

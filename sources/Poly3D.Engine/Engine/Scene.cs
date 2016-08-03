@@ -60,19 +60,8 @@ namespace Poly3D.Engine
         {
             var camera = AddObject<Camera>();
             camera.Active = true;
-            camera.Transform.Position = new OpenTK.Vector3(5, 5, 5);
-            //camera.Transform.Rotation = new Rotation(315, 180, 0);
-            //Trace.WriteLine(camera.Transform.Rotation.Matrix);
-            //Trace.WriteLine(string.Empty);
-
+            camera.Transform.Position = new OpenTK.Vector3(10, 10, 10);
             camera.Transform.LookAt(new OpenTK.Vector3(0, 0f, 0));
-
-
-            Trace.WriteLine(camera.Transform.Rotation);
-            Trace.WriteLine(camera.Transform.Forward);
-            //camera.Transform.Rotation.Yaw += Angle.FromDegrees(-180);
-
-
         }
 
         public T AddObject<T>() where T : SceneObject
@@ -85,6 +74,11 @@ namespace Poly3D.Engine
 
         internal void RenderScene()
         {
+            if (!ActiveCameras.Any())
+            {
+                Trace.WriteLine("Nothing to render, no active camera!");
+                return;
+            }
             foreach (var camera in ActiveCameras)
                 camera.Render();
         }

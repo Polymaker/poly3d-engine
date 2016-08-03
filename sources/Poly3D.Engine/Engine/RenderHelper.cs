@@ -14,28 +14,33 @@ namespace Poly3D.Engine
         public static void RenderAxes(float length, float thickness)
         {
             var rad = thickness / 2f;
-            RenderAxe(Vector3.UnitX, rad, length, Color.Red);
-            RenderAxe(Vector3.UnitY, rad, length, Color.LawnGreen);
-            RenderAxe(Vector3.UnitZ, rad, length, Color.Blue);
+            RenderAxis(Vector3.UnitX, rad, length, Color.Red);
+            RenderAxis(Vector3.UnitY, rad, length, Color.LawnGreen);
+            RenderAxis(Vector3.UnitZ, rad, length, Color.FromArgb(0x00, 0x66, 0xFF));
         }
 
-        private static void RenderAxe(Vector3 axis, float radius, float length, Color color, bool arrow = true)
+        private static void RenderAxis(Vector3 axis, float radius, float length, Color color, bool arrow = true)
         {
             GL.PushMatrix();
-            //var rotation = Rotation.FromDirection(axis);
 
             var rotMat = GLMath.RotationFromTo(Vector3.UnitY, axis);
+
             GL.Translate(axis * length * 0.5f);
             GL.MultMatrix(ref rotMat);
+
             DrawCylinder(radius, length, color, true);
+
             GL.PopMatrix();
 
             if (arrow)
             {
                 GL.PushMatrix();
+
                 GL.Translate(axis * length);
                 GL.MultMatrix(ref rotMat);
+
                 DrawCone(radius * 2f, radius * 6f, color);
+
                 GL.PopMatrix();
             }
         }
@@ -56,21 +61,23 @@ namespace Poly3D.Engine
             for (int i = 1; i <= resolution; i++)
             {
                 var nextAngle = Matrix4.CreateFromAxisAngle(cylAxis, stepAngle.Radians * i);
-                var normal = Vector3.Transform(basePoint, Matrix4.CreateFromAxisAngle(cylAxis, stepAngle.Radians * (i + 0.5f)));
-                normal.Normalize();
 
                 var pt1 = Vector3.Transform(basePoint, curAngle);
                 var pt2 = Vector3.Transform(basePoint, nextAngle);
+                var normal1 = pt1.Normalized();
+                var normal2 = pt2.Normalized();
 
                 //triangle 1
-                GL.Normal3(normal);
+                GL.Normal3(normal1);
                 GL.Vertex3(pt1 + bottom);
                 GL.Vertex3(pt1 + top);
+                GL.Normal3(normal2);
                 GL.Vertex3(pt2 + top);
 
                 //triangle 2
-                GL.Normal3(normal);
+                GL.Normal3(normal1);
                 GL.Vertex3(pt1 + bottom);
+                GL.Normal3(normal2);
                 GL.Vertex3(pt2 + top);
                 GL.Vertex3(pt2 + bottom);
 
@@ -119,11 +126,13 @@ namespace Poly3D.Engine
                 var v = pt3 - pt1;
                 var normal = new Vector3((u.Y * v.Z) - (u.Z * v.Y), (u.Z * v.X) - (u.X * v.Z), (u.X * v.Y) - (u.Y * v.X));
                 normal.Normalize();
-                //side (cone)
 
+                //side (cone)
                 GL.Normal3(normal);
                 GL.Vertex3(pt1);
+                GL.Normal3(pt2.Normalized());
                 GL.Vertex3(pt2);
+                GL.Normal3(pt3.Normalized());
                 GL.Vertex3(pt3);
                 //bottom
                 GL.Normal3(cylAxis * -1f);
@@ -253,5 +262,6 @@ namespace Poly3D.Engine
             FillPolygon(color, Vector3.UnitY * -1f, faceDist, 5, outerRadius);
             //DrawPolygon(Color.Black, Vector3.UnitY * -1f, faceDist, 5, outerRadius);
         }
+
     }
 }

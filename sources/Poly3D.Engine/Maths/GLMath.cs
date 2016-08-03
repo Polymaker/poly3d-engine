@@ -94,5 +94,11 @@ namespace Poly3D.Maths
 
         #endregion
 
+        public static Vector3 ComputeNormal(params Vector3[] vertices)
+        {
+            var u = vertices[1] - vertices[0];
+            var v = vertices[2] - vertices[0];
+            return new Vector3((u.Y * v.Z) - (u.Z * v.Y), (u.Z * v.X) - (u.X * v.Z), (u.X * v.Y) - (u.Y * v.X));
+        }
     }
 }

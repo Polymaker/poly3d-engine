@@ -149,6 +149,15 @@ namespace Poly3D.Engine
             return comp;
         }
 
+        public T AddObject<T>() where T : SceneObject
+        {
+            if (Scene == null)
+                return default(T);
+            var newObject = Scene.AddObject<T>();
+            _Childs.Add(newObject);
+            return newObject;
+        }
+
         public void SetTransform(Transform transform, bool keepWorldPosition)
         {
             transform = transform ?? new Transform();

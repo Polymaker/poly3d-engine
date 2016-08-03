@@ -29,7 +29,7 @@ namespace Poly3D.Test
 
         private void button1_Click(object sender, EventArgs e)
         {
-            poly3DControl1.SetGraphicsMode(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 4));
+            poly3DControl1.SetGraphicsMode(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -45,21 +45,22 @@ namespace Poly3D.Test
 
         private void poly3DControl1_MouseClick(object sender, MouseEventArgs e)
         {
-            if (poly3DControl1.Scene != null)
-            {
-                var raycast = poly3DControl1.Scene.ActiveCameras.First().RaycastFromScreen(new Vector2(e.X, e.Y));
-                var rayAngle = Rotation.FromDirection(raycast.Direction);
-                Trace.WriteLine("rayAngle = " + rayAngle);
 
-                var plane = new Plane(Vector3.UnitY, 0f);
-                float hitDist = 0;
-                if (plane.Raycast(raycast, out hitDist))
-                {
-                    var hitPos = raycast.GetPoint(hitDist);
-                    Trace.WriteLine("clicked pos = " + hitPos);
-                }
-                Trace.WriteLine("=======================\r\n");
-            }
+            //if (poly3DControl1.Scene != null)
+            //{
+            //    var raycast = poly3DControl1.Scene.ActiveCameras.First().RaycastFromScreen(new Vector2(e.X, e.Y));
+            //    var rayAngle = Rotation.FromDirection(raycast.Direction);
+            //    Trace.WriteLine("rayAngle = " + rayAngle);
+
+            //    var plane = new Plane(Vector3.UnitY, 0f);
+            //    float hitDist = 0;
+            //    if (plane.Raycast(raycast, out hitDist))
+            //    {
+            //        var hitPos = raycast.GetPoint(hitDist);
+            //        Trace.WriteLine("clicked pos = " + hitPos);
+            //    }
+            //    Trace.WriteLine("=======================\r\n");
+            //}
         }
     }
 }
