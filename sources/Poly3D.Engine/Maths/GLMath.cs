@@ -16,6 +16,7 @@ namespace Poly3D.Maths
         /// <returns></returns>
         public static Quaternion EulerToQuat(Vector3 angles)
         {
+            //I multiply the axises by -1 because the default rotation seems counter-clockwise
             var roll = Quaternion.FromAxisAngle(Vector3.UnitZ * -1f, angles.Z);
             var pitch = Quaternion.FromAxisAngle(Vector3.UnitX * -1f, angles.X);
             var yaw = Quaternion.FromAxisAngle(Vector3.UnitY * -1f, angles.Y);
@@ -31,6 +32,7 @@ namespace Poly3D.Maths
         public static Vector3 QuatToEuler(Quaternion quat)
         {
             Vector3 pitchYawRoll = new Vector3();
+            //don't ask me why, but after a million tries, doing this will return the result I expected, and can convert back and forth from euler to quat
             quat = new Quaternion(-quat.Z, -quat.Y, -quat.X, quat.W);
 
             double sqw = quat.W * quat.W;
@@ -76,6 +78,18 @@ namespace Poly3D.Maths
         public static Vector3 ToDegrees(this Vector3 v)
         {
             return new Vector3(Angle.ToDegrees(v.X), Angle.ToDegrees(v.Y), Angle.ToDegrees(v.Z));
+        }
+
+        public static Matrix4 RotationFromTo(this Vector3 v1, Vector3 v2)
+        {
+            if (v1 == v2)
+                return Matrix4.Identity;
+            var axis = Vector3.Cross(v1, v2);
+
+            float d = Vector3.Dot(v1, v2);
+            var angle = (float)Math.Acos(d);
+
+            return Matrix4.CreateFromAxisAngle(axis, angle);
         }
 
         #endregion

@@ -166,6 +166,8 @@ namespace Poly3D.Maths
 
         public static Rotation FromDirection(Vector3 dir)
         {
+            if(dir == Vector3.UnitY)
+                return FromDirection(dir, Vector3.UnitZ * -1f);
             return FromDirection(dir,  Vector3.UnitY);
         }
 
