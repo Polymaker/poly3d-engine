@@ -6,6 +6,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using Poly3D.Graphics;
 using Poly3D.Maths;
+using Poly3D.Engine.Meshes;
 
 namespace Poly3D.Engine
 {
@@ -263,5 +264,33 @@ namespace Poly3D.Engine
             //DrawPolygon(Color.Black, Vector3.UnitY * -1f, faceDist, 5, outerRadius);
         }
 
+
+        public static void DrawMesh(Color color, Mesh mesh)
+        {
+            DrawMesh(color, mesh, Vector3.One);
+        }
+
+        public static void DrawMesh(Color color, Mesh mesh, Vector3 normalScale)
+        {
+            var triangles = mesh.Faces.OfType<FaceTriangle>();
+            if (triangles.Any())
+            {
+                GL.Color4(color);
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+                GL.Begin(BeginMode.Triangles);
+                foreach (var triangle in triangles)
+                {
+                    var textured = triangle.IsTextured;
+                    foreach (var vert in triangle.Vertices)
+                    {
+                        GL.Normal3(Vector3.Multiply(vert.Normal, normalScale));
+                        if (textured)
+                            GL.TexCoord2(vert.UV.Value);
+                        GL.Vertex3(vert.Position);
+                    }
+                }
+                GL.End();
+            }
+        }
     }
 }

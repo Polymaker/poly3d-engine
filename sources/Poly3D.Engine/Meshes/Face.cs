@@ -93,6 +93,11 @@ namespace Poly3D.Engine.Meshes
         {
             get { return _IsNormalComputed; }
         }
+
+        public bool IsTextured
+        {
+            get { return Vertices.All(v => v.IsTextured); }
+        }
         
         public virtual FaceType Type
         {

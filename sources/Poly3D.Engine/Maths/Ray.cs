@@ -32,9 +32,9 @@ namespace Poly3D.Maths
             return Origin + Direction * distance;
         }
 
-        public static Ray FromPoints(Vector3 near, Vector3 far)
+        public static Ray FromPoints(Vector3 pt1, Vector3 pt2)
         {
-            return new Ray(near, (far - near).Normalized());
+            return new Ray(pt1, (pt2 - pt1).Normalized());
         }
     }
 }

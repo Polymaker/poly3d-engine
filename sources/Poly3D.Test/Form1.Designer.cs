@@ -51,6 +51,7 @@
             this.poly3DControl1.Size = new System.Drawing.Size(301, 255);
             this.poly3DControl1.TabIndex = 0;
             this.poly3DControl1.VSync = false;
+            this.poly3DControl1.UpdateFrame += new System.EventHandler<OpenTK.FrameEventArgs>(this.poly3DControl1_UpdateFrame);
             this.poly3DControl1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.poly3DControl1_MouseClick);
             // 
             // button2

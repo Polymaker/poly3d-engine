@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Poly3D.Engine
 {
-    public class ObjectMesh : ObjectComponent
+    public class ObjectMesh : SceneObject
     {
         // Fields...
         private Material _Material;

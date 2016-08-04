@@ -257,7 +257,7 @@ namespace Poly3D.Engine
             GL.Enable(EnableCap.Lighting);
             GL.Enable(EnableCap.LineSmooth);
             GL.Enable(EnableCap.Texture2D);
-
+            //GL.Enable(EnableCap.Normalize);
             GL.ClearColor(BackColor);
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
 
@@ -285,15 +285,23 @@ namespace Poly3D.Engine
             if (!myLight.Active)
                 myLight.Active = true;
 
-            RenderHelper.RenderAxes(5f, 0.5f);
+            RenderHelper.RenderAxes(5f, 0.25f);
 
 
-            //foreach (var so in Scene.Objects)
-            //{
-            //    //restore view matrix
-            //    //apply object transform
-            //    //render object
-            //}
+            foreach (var so in Scene.Objects)
+            {
+                if (so is ObjectMesh)
+                {
+                    GL.PushMatrix();
+                    var objTransMat = so.Transform.GetTransformMatrix();
+                    GL.MultMatrix(ref objTransMat);
+                    RenderHelper.DrawMesh(Color.Gray, (so as ObjectMesh).Mesh, so.Transform.WorldScale);
+                    GL.PopMatrix();
+                }
+                //restore view matrix
+                //apply object transform
+                //render object
+            }
 
             //GL.Rotate(0.5f, Vector3.UnitY);
             //GL.Translate(0, 0, 3);
@@ -311,10 +319,10 @@ namespace Poly3D.Engine
             //GL.Vertex3(1f, 0f, -1f);
             //GL.Vertex3(-1f, 0f, -1f);
             //GL.End();
-            GL.Disable(EnableCap.Lighting);
-            //GL.LoadMatrix(ref viewMatrix);
-            GL.Scale(4f, 4f, 4f);
-            DrawPyramid();
+            //GL.Disable(EnableCap.Lighting);
+            ////GL.LoadMatrix(ref viewMatrix);
+            //GL.Scale(4f, 4f, 4f);
+            //DrawPyramid();
 
             //GL.LoadMatrix(ref viewMatrix);
             //GL.Scale(4f, 4f, 4f);

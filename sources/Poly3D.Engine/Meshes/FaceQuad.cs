@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Poly3D.Engine.Meshes
 {
-    public class FaceQuad : Face
+    public sealed class FaceQuad : Face
     {
         public override FaceType Type
         {

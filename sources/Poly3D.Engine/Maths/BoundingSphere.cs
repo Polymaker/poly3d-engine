@@ -5,9 +5,26 @@ namespace Poly3D.Maths
     public struct BoundingSphere
     {
 
-        public Vector3 Center { get; set; }
+        private Vector3 _Center;
+        private float _Radius;
 
-        public float Radius { get; set; }
+        public Vector3 Center
+        {
+            get { return _Center; }
+            set
+            {
+                _Center = value;
+            }
+        }
+        
+        public float Radius
+        {
+            get { return _Radius; }
+            set
+            {
+                _Radius = value;
+            }
+        }
 
         public float Diameter
         {
@@ -20,8 +37,8 @@ namespace Poly3D.Maths
 
         public BoundingSphere(Vector3 center, float radius)
         {
-            Center = center;
-            Radius = radius;
+            _Center = center;
+            _Radius = radius;
         }
     }
 }

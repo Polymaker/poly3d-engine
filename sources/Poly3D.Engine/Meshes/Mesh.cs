@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Poly3D.Maths;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace Poly3D.Engine.Meshes
     public class Mesh : IMesh
     {
         private MeshMaterial _Material;
+        //private List<MeshMaterial> _Materials;
         private MeshElementCollection<Face> _Faces;
         private MeshElementCollection<Vertex> _Vertices;
         private List<Surface> _Surfaces;
@@ -45,6 +47,14 @@ namespace Poly3D.Engine.Meshes
             get
             {
                 return Faces.Select(f => f.Material).Distinct();
+            }
+        }
+
+        public BoundingBox BoundingBox
+        {
+            get
+            {
+                return BoundingBox.FromPoints(Vertices.Select(v => v.Position));
             }
         }
 

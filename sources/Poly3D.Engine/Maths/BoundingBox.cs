@@ -1,4 +1,6 @@
 ﻿using OpenTK;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Poly3D.Maths
 {
@@ -142,6 +144,19 @@ namespace Poly3D.Maths
         public bool Intersects(BoundingBox other)
         {
             return Min.X <= other.Max.X && Max.X >= other.Min.X && Min.Y <= other.Max.Y && Max.Y >= other.Min.Y && Min.Z <= other.Max.Z && Max.Z >= other.Min.Z;
+        }
+
+        public static BoundingBox FromPoints(IEnumerable<Vector3> points)
+        {
+            var minx = points.Min(p => p.X);
+            var miny = points.Min(p => p.Y);
+            var minz = points.Min(p => p.Z);
+            var maxx = points.Max(p => p.X);
+            var maxy = points.Max(p => p.Y);
+            var maxz = points.Max(p => p.Z);
+            var bb = new BoundingBox();
+            bb.SetMinMax(new Vector3(minx, miny, minz), new Vector3(maxx, maxy, maxz));
+            return bb;
         }
     }
 }

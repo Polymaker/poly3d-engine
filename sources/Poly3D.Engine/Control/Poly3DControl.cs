@@ -313,6 +313,7 @@ namespace Poly3D.Control
         {
             if (!IsContextValid)
                 return;
+            
             GL.Viewport(Size);
         }
 

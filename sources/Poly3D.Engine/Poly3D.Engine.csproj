@@ -56,7 +56,6 @@
     <Compile Include="Control\RenderStrategy.cs" />
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\EngineObject.cs" />
-    <Compile Include="Engine\InputManager.cs" />
     <Compile Include="Engine\IViewPort.cs" />
     <Compile Include="Engine\Material.cs" />
     <Compile Include="Engine\ObjectBehaviour.cs" />

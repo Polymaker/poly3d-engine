@@ -46,7 +46,10 @@ namespace Poly3D.Engine
             get { return _Position; }
             set
             {
+                if (_Position == value)
+                    return;
                 _Position = value;
+                NotifyParentChanged();
             }
         }
 
@@ -58,7 +61,10 @@ namespace Poly3D.Engine
             get { return _Rotation; }
             set
             {
+                if (_Rotation == value)
+                    return;
                 _Rotation = value;
+                NotifyParentChanged();
             }
         }
 
@@ -72,7 +78,10 @@ namespace Poly3D.Engine
             {
                 if (value == Vector3.Zero || value.X == 0f || value.Y == 0f || value.Z == 0f)
                     return;
+                if (_Scale == value)
+                    return;
                 _Scale = value;
+                NotifyParentChanged();
             }
         }
 
@@ -179,6 +188,15 @@ namespace Poly3D.Engine
 
         #region Matrices
 
+        private void NotifyParentChanged()
+        {
+            if (SceneObject != null && SceneObject.Childs.Count > 0)
+            {
+                foreach (var childObj in SceneObject.AllChilds)
+                    childObj.Transform.isWorldMatrixDirty = true;
+            }
+        }
+
         public Matrix4 GetLocalTransformMatrix()
         {
             var finalMat = Matrix4.Identity;
@@ -192,7 +210,8 @@ namespace Poly3D.Engine
 
         public Matrix4 GetTransformMatrix()
         {
-            return Matrix4.Mult(LocalToWorldMatrix, GetLocalTransformMatrix());
+            return Matrix4.Mult(GetLocalTransformMatrix(), LocalToWorldMatrix);
+            //return Matrix4.Mult(LocalToWorldMatrix, GetLocalTransformMatrix());
         }
 
         public void BuildConvertionMatrices()
