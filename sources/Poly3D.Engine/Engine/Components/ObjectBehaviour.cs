@@ -33,14 +33,6 @@ namespace Poly3D.Engine
 
         protected virtual void OnDisable() { }
 
-        internal void DoUpdate(float deltaTime)
-        {
-            OnUpdate(deltaTime);
-        }
 
-        internal void DoRender(float deltaTime)
-        {
-            OnRender(deltaTime);
-        }
     }
 }

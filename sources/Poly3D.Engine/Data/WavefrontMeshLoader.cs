@@ -100,7 +100,7 @@ namespace Poly3D.Engine.Data
                             break;
                         case "vn":
                             if (args.Length >= 4)
-                                normals.Add(new Vector3(float.Parse(args[1]), float.Parse(args[2]), float.Parse(args[3])));
+                                normals.Add(new Vector3(float.Parse(args[1]), float.Parse(args[2]), float.Parse(args[3])).Normalized());
                             break;
                         case "vt":
                             if (args.Length >= 3)

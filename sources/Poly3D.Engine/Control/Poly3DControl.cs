@@ -168,10 +168,10 @@ namespace Poly3D.Control
         #region Ctors
 
         public Poly3DControl()
-            : this(GraphicsMode.Default) { }
+            : this(/*GraphicsMode.Default*/new GraphicsMode(32,24,8,4)) { }
 
         public Poly3DControl(GraphicsMode mode)
-            : this(mode, 1, 0, GraphicsContextFlags.Default) { }
+            : this(mode, 3, 0, GraphicsContextFlags.Default) { }
 
         public Poly3DControl(GraphicsMode mode, int major, int minor, GraphicsContextFlags flags)
             : base(mode, major, minor, flags)
@@ -249,7 +249,8 @@ namespace Poly3D.Control
         private void ParentForm_Move(object sender, EventArgs e)
         {
             if (UpdateTimer != null && 
-                UpdateTimer.IsRunning && 
+                UpdateTimer.IsRunning &&
+                loopRunning &&
                 RenderSettings.Strategy == RenderStrategy.OnIdle)
             {
                 RaiseUpdateFrame(UpdateTimer, ref NextUpdate);
@@ -263,6 +264,8 @@ namespace Poly3D.Control
             formatField.SetValue(this, mode);
             if (IsHandleCreated)
             {
+                loopRunning = false;
+                Application.Idle -= Application_Idle;
                 RecreateHandle();
                 InitializeComponent();
                 dirtyFlags.Set("BackColor");
@@ -306,7 +309,7 @@ namespace Poly3D.Control
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            UpdateViewPort();
+            //UpdateViewPort();
         }
 
         private void UpdateViewPort()
@@ -333,14 +336,21 @@ namespace Poly3D.Control
                 return;
 
             loopRunning = false;
+            Application.Idle -= Application_Idle;
+
+            NextUpdate = 0;
+            NextRender = 0;
 
             if (UpdateTimer == null)
             {
                 UpdateTimer = Stopwatch.StartNew();
                 RenderTimer = Stopwatch.StartNew();
             }
-            
-            Application.Idle -= Application_Idle;
+            else
+            {
+                UpdateTimer.Restart();
+                RenderTimer.Restart();
+            }
 
             if (RenderSettings.Strategy == RenderStrategy.OnIdle)
             {
@@ -409,36 +419,55 @@ namespace Poly3D.Control
 
         private void RaiseUpdateFrame(Stopwatch update_watch, ref double next_update)
         {
-            int num = 0;
-            double num2 = 0.0;
-            double num3 = update_watch.Elapsed.TotalSeconds;
+            
+            //double num2 = 0.0;
+            double elapsed = update_watch.Elapsed.TotalSeconds;
 
-            if (num3 <= 0.0)
+            if (elapsed <= 0.0)
             {
                 update_watch.Restart();
                 return;
             }
 
-            num3 = num3 > 1d ? 1d : num3;
-
-            while (next_update - num3 <= 0.0 && num3 > 0.0)
+            if (RenderSettings.UpdateFrequency == 0.0)
             {
-                next_update -= num3;
-                OnUpdateFrameInternal(new FrameEventArgs(num3));
-                num3 = Math.Max(update_watch.Elapsed.TotalSeconds, 0.0) - num3;
+                OnUpdateFrameInternal(new FrameEventArgs(update_watch.Elapsed.TotalSeconds));
+                _UpdatePeriod = elapsed;
                 update_watch.Restart();
-                next_update += RenderSettings.UpdatePeriod;
-                next_update = Math.Max(next_update, -1.0);
-                num2 += num3;
-                if (++num >= 10 || RenderSettings.UpdateFrequency == 0.0)
-                {
-                    break;
-                }
+                return;
             }
-            if (num > 0)
+
+            //elapsed = elapsed > 1d ? 1d : elapsed;
+            //int updateCount = 0;
+
+            //double currentTime = update_watch.Elapsed.TotalSeconds;
+            double delta = next_update - elapsed;
+            if (delta <= 0.0 && elapsed > 0.0)
             {
-                _UpdatePeriod = num2 / (double)num;
+                next_update = delta + RenderSettings.UpdatePeriod;
+                next_update = Math.Max(next_update, -1.0);
+                update_watch.Restart();
+                OnUpdateFrameInternal(new FrameEventArgs(elapsed));
+                _UpdatePeriod = elapsed;
+                //while (next_update - elapsed <= 0.0 && elapsed > 0.0)
+                //{
+                //    next_update = delta + RenderSettings.UpdatePeriod;
+                //    OnUpdateFrameInternal(new FrameEventArgs(elapsed));
+                //    elapsed = Math.Max(update_watch.Elapsed.TotalSeconds, 0.0) - elapsed;
+
+                //    next_update += RenderSettings.UpdatePeriod;
+                //    next_update = Math.Max(next_update, -1.0);
+                //    num2 += elapsed;
+
+                //    if (++updateCount >= 10 || RenderSettings.UpdateFrequency == 0.0)
+                //        break;
+                //}
             }
+            
+            //if (updateCount > 0)
+            //{
+            //    _UpdatePeriod = num2 / (double)updateCount;
+            //}
         }
 
         private void OnRenderFrameInternal(FrameEventArgs e)

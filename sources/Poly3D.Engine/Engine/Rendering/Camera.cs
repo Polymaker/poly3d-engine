@@ -169,6 +169,8 @@ namespace Poly3D.Engine
             }
         }
 
+        public int RenderPriority { get; set; }
+
         public Camera()
         {
             _FieldOfView = Angle.FromDegrees(60);
@@ -226,7 +228,7 @@ namespace Poly3D.Engine
 
         private Vector2 lastViewPort = Vector2.Zero;
 
-        private void UpdateViewport()
+        internal void UpdateViewport()
         {
             var curViewport = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
             //if the GL render context size changed or the view rectangle of the camera changed (isViewportDirty)
@@ -257,6 +259,7 @@ namespace Poly3D.Engine
             GL.Enable(EnableCap.Lighting);
             GL.Enable(EnableCap.LineSmooth);
             GL.Enable(EnableCap.Texture2D);
+            
             //GL.Enable(EnableCap.Normalize);
             GL.ClearColor(BackColor);
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
@@ -285,22 +288,46 @@ namespace Poly3D.Engine
             if (!myLight.Active)
                 myLight.Active = true;
 
-            RenderHelper.RenderAxes(5f, 0.25f);
+            //GL.StencilMask(0);
+            //GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Replace);
 
+            RenderHelper.RenderAxes(5f, 0.25f);
 
             foreach (var so in Scene.Objects)
             {
-                if (so is ObjectMesh)
+                if (!so.Active)
+                    continue;
+                if (so is ObjectMesh && (so as ObjectMesh).Mesh != null)
                 {
                     GL.PushMatrix();
+                    GL.PushAttrib(AttribMask.AllAttribBits);
+
                     var objTransMat = so.Transform.GetTransformMatrix();
                     GL.MultMatrix(ref objTransMat);
+
+                    /*
+                    GL.ClearStencil(0);
+                    GL.Clear(ClearBufferMask.StencilBufferBit);
+                    GL.Enable(EnableCap.StencilTest);
+                    GL.StencilFunc(StencilFunction.Always, 1, 0xFFFF);
+                    GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Replace);
+                    */
+
                     RenderHelper.DrawMesh(Color.Gray, (so as ObjectMesh).Mesh, so.Transform.WorldScale);
+
+                    /*
+                    GL.StencilFunc(StencilFunction.Notequal, 1, 0xFFFF);
+                    GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Replace);
+                    GL.Disable(EnableCap.Lighting);
+
+                    RenderHelper.DrawWireMesh(Color.Black, (so as ObjectMesh).Mesh, 1.5f);
+                    */
+
+                    //RenderHelper.DrawBox(Color.Yellow, (so as ObjectMesh).Mesh.BoundingBox);
+
+                    GL.PopAttrib();
                     GL.PopMatrix();
                 }
-                //restore view matrix
-                //apply object transform
-                //render object
             }
 
             //GL.Rotate(0.5f, Vector3.UnitY);

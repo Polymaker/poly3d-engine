@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace Poly3D.Maths
 {
-    public class Rotation
+    public struct Rotation
     {
         private Quaternion _Quaternion;
         private Vector3 _EulerAngles;
@@ -113,15 +113,6 @@ namespace Poly3D.Maths
             }
         }
 
-        public Rotation()
-        {
-            _Quaternion = Quaternion.Identity;
-            _EulerAngles = Vector3.Zero;
-            _Matrix = Matrix3.Identity;
-            isEulerDirty = false;
-            isMatrixDirty = false;
-        }
-
         public Rotation(Quaternion quaternion)
         {
             _Quaternion = quaternion;
@@ -133,8 +124,7 @@ namespace Poly3D.Maths
 
         public Rotation(Vector3 eulerAngles)
         {
-            _EulerAngles = eulerAngles;
-            NormalizeEulers();
+            _EulerAngles = NormalizeAngles(eulerAngles);
             _Quaternion = GLMath.EulerToQuat(_EulerAngles.ToRadians());
             _Matrix = Matrix3.Identity;
             isMatrixDirty = true;
@@ -143,7 +133,6 @@ namespace Poly3D.Maths
 
         public Rotation(Matrix3 matrix)
         {
-            
             _EulerAngles = Vector3.Zero;
             _Matrix = matrix;
             _Quaternion = Quaternion.FromMatrix(matrix);
@@ -216,7 +205,10 @@ namespace Poly3D.Maths
                 );
         }
 
-        public static readonly Rotation Identity = new Rotation(Quaternion.Identity);
+        public static Rotation Identity
+        {
+            get { return new Rotation(Quaternion.Identity); }
+        }
 
         public override string ToString()
         {
@@ -228,6 +220,14 @@ namespace Poly3D.Maths
             _EulerAngles.X = Angle.NormalizeDegrees(_EulerAngles.X);
             _EulerAngles.Y = Angle.NormalizeDegrees(_EulerAngles.Y);
             _EulerAngles.Z = Angle.NormalizeDegrees(_EulerAngles.Z);
+        }
+
+        private static Vector3 NormalizeAngles(Vector3 angles)
+        {
+            angles.X = Angle.NormalizeDegrees(angles.X);
+            angles.Y = Angle.NormalizeDegrees(angles.Y);
+            angles.Z = Angle.NormalizeDegrees(angles.Z);
+            return angles;
         }
     }
 }

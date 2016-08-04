@@ -5,7 +5,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
-namespace Poly3D.Engine.OpenGL
+namespace OpenTK.Graphics.OpenGL
 {
     public static class GLGet
     {
@@ -28,5 +28,11 @@ namespace Poly3D.Engine.OpenGL
             return val;
         }
 
+        public static bool Boolean(GetPName pname)
+        {
+            bool val;
+            GL.GetBoolean(pname, out val);
+            return val;
+        }
     }
 }

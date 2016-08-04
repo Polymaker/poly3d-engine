@@ -116,6 +116,7 @@ namespace Poly3D.Engine
             _Childs = new SceneObjectChildCollection(this);
             _Parent = null;
             _Scene = null;
+            _Active = true;
         }
 
         private void OnHierarchyChangedInternal()
@@ -232,6 +233,8 @@ namespace Poly3D.Engine
                         newParent._Childs.Add(this);
                 }
                 _Parent = newParent;
+                if (_Scene == null)
+                    _Scene = _Parent.Scene;
                 OnHierarchyChangedInternal();
             }
         }

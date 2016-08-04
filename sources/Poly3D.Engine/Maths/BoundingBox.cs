@@ -158,5 +158,7 @@ namespace Poly3D.Maths
             bb.SetMinMax(new Vector3(minx, miny, minz), new Vector3(maxx, maxy, maxz));
             return bb;
         }
+
+        public static readonly BoundingBox Zero = default(BoundingBox);
     }
 }

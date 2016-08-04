@@ -1,4 +1,5 @@
-﻿using Poly3D.Maths;
+﻿using Poly3D.Engine.Rendering;
+using Poly3D.Maths;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -79,8 +80,10 @@ namespace Poly3D.Engine
                 Trace.WriteLine("Nothing to render, no active camera!");
                 return;
             }
-            foreach (var camera in ActiveCameras)
-                camera.Render();
+            foreach (var camera in ActiveCameras.OrderBy(c => c.RenderPriority))
+            {
+                SceneRenderer.RenderCamera(camera);
+            }
         }
     }
 }

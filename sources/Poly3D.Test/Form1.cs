@@ -30,7 +30,7 @@ namespace Poly3D.Test
         {
             modelRootObj = poly3DControl1.Scene.AddObject<SceneObject>();
 
-            var model = WavefrontMeshLoader.LoadWavefrontObj(@"D:\Development\github\ldd-modder\Modded Bricks\32495 (x872)\32495.obj");
+            var model = WavefrontMeshLoader.LoadWavefrontObj(@"32495.obj");
             var modelBounds = model.BoundingBox;
             var modelScale = 5f / modelBounds.Extents.Length;
 
@@ -38,24 +38,20 @@ namespace Poly3D.Test
             modelObject.Mesh = model;
             modelObject.Transform.WorldScale = new Vector3(modelScale, modelScale, modelScale);
 
-            modelObject.Transform.Translate(Vector3.UnitZ * 2);
-            //modelObject.Transform.Rotation = new Rotation(0f, 0f, -90f);
 
-            model = WavefrontMeshLoader.LoadWavefrontObj(@"D:\Development\github\ldd-modder\Modded Bricks\32496 (x873)\32496.obj");
-            //modelBounds = model.BoundingBox;
-            //modelScale = 5f / modelBounds.Extents.Length;
+            model = WavefrontMeshLoader.LoadWavefrontObj(@"32496.obj");
 
             modelObject2 = modelObject.AddObject<ObjectMesh>();
             modelObject2.Mesh = model;
             
-            var offset = modelObject2.Mesh.BoundingBox.Front - modelObject.Mesh.BoundingBox.Back;
-            modelObject2.Transform.Translate(modelObject2.Transform.Forward * 3f, Space.World);
+            var offset = 13.3f * modelScale;
+            modelObject2.Transform.Translate(modelObject2.Transform.Forward * offset, Space.World);
             modelObject2.Transform.Rotation = new Rotation(0, 180f, 0);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            poly3DControl1.SetGraphicsMode(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
+            poly3DControl1.SetGraphicsMode(new OpenTK.Graphics.GraphicsMode(32, 24, 8, 4));
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -94,9 +90,14 @@ namespace Poly3D.Test
             if (modelRootObj != null)
             {
                 //modelRootObj.Transform.Rotate(new Rotation(0f, 0f, 45f * (float)e.Time));
-                //modelObject.Transform.Rotate(new Rotation(0f, 90f * (float)e.Time, 0f));
-                //modelObject2.Transform.Rotate(new Rotation(0f, 0f, 180f * (float)e.Time));
+                modelObject.Transform.Rotate(new Rotation(0f, 45f * (float)e.Time, 0f));
+                modelObject2.Transform.Rotate(new Rotation(0f, 0f, 90f * (float)e.Time));
             }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            label1.Text = string.Format("{0:0.##} FPS", poly3DControl1.RenderFrequency);
         }
     }
 }

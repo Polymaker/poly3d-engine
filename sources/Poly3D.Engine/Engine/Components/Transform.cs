@@ -61,8 +61,8 @@ namespace Poly3D.Engine
             get { return _Rotation; }
             set
             {
-                if (_Rotation == value)
-                    return;
+                //if (_Rotation == value)
+                //    return;
                 _Rotation = value;
                 NotifyParentChanged();
             }
@@ -165,7 +165,6 @@ namespace Poly3D.Engine
             _Position = Vector3.Zero;
             isWorldMatrixDirty = true;
         }
-
 
         public Transform(Vector3 position, Rotation rotation, Vector3 scale)
         {

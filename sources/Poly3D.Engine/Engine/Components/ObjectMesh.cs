@@ -1,4 +1,6 @@
-﻿using Poly3D.Engine.Meshes;
+﻿using OpenTK;
+using Poly3D.Engine.Meshes;
+using Poly3D.Maths;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +19,8 @@ namespace Poly3D.Engine
             get { return _Mesh; }
             set
             {
+                if (_Mesh == value)
+                    return;
                 _Mesh = value;
             }
         }

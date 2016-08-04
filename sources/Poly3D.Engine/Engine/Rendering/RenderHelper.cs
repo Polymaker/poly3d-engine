@@ -15,9 +15,19 @@ namespace Poly3D.Engine
         public static void RenderAxes(float length, float thickness)
         {
             var rad = thickness / 2f;
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             RenderAxis(Vector3.UnitX, rad, length, Color.Red);
             RenderAxis(Vector3.UnitY, rad, length, Color.LawnGreen);
             RenderAxis(Vector3.UnitZ, rad, length, Color.FromArgb(0x00, 0x66, 0xFF));
+        }
+
+        public static void RenderAxesContour(float length, float thickness)
+        {
+            var rad = thickness / 2f;
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            RenderAxis(Vector3.UnitX, rad, length, Color.Black);
+            RenderAxis(Vector3.UnitY, rad, length, Color.Black);
+            RenderAxis(Vector3.UnitZ, rad, length, Color.Black);
         }
 
         private static void RenderAxis(Vector3 axis, float radius, float length, Color color, bool arrow = true)
@@ -46,6 +56,39 @@ namespace Poly3D.Engine
             }
         }
 
+        public static void DrawBox(Color color, BoundingBox box, float lineThickness = 1f)
+        {
+            GL.PushAttrib(AttribMask.LineBit);
+            GL.LineWidth(lineThickness);
+
+            GL.Color4(color);
+
+            using (GLDraw.Begin(BeginMode.Quads, MaterialFace.FrontAndBack, PolygonMode.Line))
+            {
+                GL.Vertex3(box.Right, box.Top, box.Front);
+                GL.Vertex3(box.Left, box.Top, box.Front);
+                GL.Vertex3(box.Left, box.Bottom, box.Front);
+                GL.Vertex3(box.Right, box.Bottom, box.Front);
+
+                GL.Vertex3(box.Left, box.Top, box.Back);
+                GL.Vertex3(box.Right, box.Top, box.Back);
+                GL.Vertex3(box.Right, box.Bottom, box.Back);
+                GL.Vertex3(box.Left, box.Bottom, box.Back);
+
+                GL.Vertex3(box.Left, box.Top, box.Front);
+                GL.Vertex3(box.Left, box.Top, box.Back);
+                GL.Vertex3(box.Left, box.Bottom, box.Back);
+                GL.Vertex3(box.Left, box.Bottom, box.Front);
+
+                GL.Vertex3(box.Right, box.Top, box.Back);
+                GL.Vertex3(box.Right, box.Top, box.Front);
+                GL.Vertex3(box.Right, box.Bottom, box.Front);
+                GL.Vertex3(box.Right, box.Bottom, box.Back);
+            }
+
+            GL.PopAttrib();
+        }
+
         public static void DrawCylinder(float radius, float length, Color color, bool capped)
         {
             const int resolution = 32;
@@ -54,7 +97,7 @@ namespace Poly3D.Engine
             var curAngle = Matrix4.Identity;
             var basePoint = new Vector3(0, 0, radius);
 
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             GL.Color4(color);
             GL.Begin(BeginMode.Triangles);
             var top = cylAxis * (length * 0.5f);
@@ -110,7 +153,7 @@ namespace Poly3D.Engine
             var curAngle = Matrix4.Identity;
             var basePoint = new Vector3(0, 0, radius);
 
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             GL.Begin(BeginMode.Triangles);
             
             GL.Color4(color);
@@ -264,7 +307,6 @@ namespace Poly3D.Engine
             //DrawPolygon(Color.Black, Vector3.UnitY * -1f, faceDist, 5, outerRadius);
         }
 
-
         public static void DrawMesh(Color color, Mesh mesh)
         {
             DrawMesh(color, mesh, Vector3.One);
@@ -291,6 +333,31 @@ namespace Poly3D.Engine
                 }
                 GL.End();
             }
+        }
+
+        public static void DrawWireMesh(Color color, Mesh mesh, float lineThickness = 1f)
+        {
+            var triangles = mesh.Faces.OfType<FaceTriangle>();
+
+            GL.PushAttrib(AttribMask.LineBit);
+            GL.LineWidth(lineThickness);
+
+            if (triangles.Any())
+            {
+                GL.Color4(color);
+
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+                GL.Begin(BeginMode.Triangles);
+
+                foreach (var triangle in triangles)
+                {
+                    foreach (var vert in triangle.Vertices)
+                        GL.Vertex3(vert.Position + vert.Normal * (0.005f));
+                }
+
+                GL.End();
+            }
+            GL.PopAttrib();
         }
     }
 }
