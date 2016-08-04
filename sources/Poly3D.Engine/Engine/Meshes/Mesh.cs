@@ -14,6 +14,7 @@ namespace Poly3D.Engine.Meshes
         private MeshElementCollection<Face> _Faces;
         private MeshElementCollection<Vertex> _Vertices;
         private List<Surface> _Surfaces;
+        private BoundingBox _BoundingBox;
 
         public MeshElementCollection<Face> Faces
         {
@@ -52,10 +53,7 @@ namespace Poly3D.Engine.Meshes
 
         public BoundingBox BoundingBox
         {
-            get
-            {
-                return BoundingBox.FromPoints(Vertices.Select(v => v.Position));
-            }
+            get { return _BoundingBox; }
         }
 
         #region IMesh properties
@@ -89,6 +87,7 @@ namespace Poly3D.Engine.Meshes
             _Surfaces = new List<Surface>();
             _Vertices.CollectionChanged += Vertices_CollectionChanged;
             _Material = MeshMaterial.Default;
+            _BoundingBox = BoundingBox.Zero;
         }
 
         public Mesh(IEnumerable<Face> faces)
@@ -98,6 +97,7 @@ namespace Poly3D.Engine.Meshes
             _Surfaces = new List<Surface>();
             _Vertices.CollectionChanged += Vertices_CollectionChanged;
             _Material = MeshMaterial.Default;
+            CalculateBoundingBox();
         }
 
         public Mesh(IEnumerable<Vertex> vertices)
@@ -107,6 +107,12 @@ namespace Poly3D.Engine.Meshes
             _Surfaces = new List<Surface>();
             _Vertices.CollectionChanged += Vertices_CollectionChanged;
             _Material = MeshMaterial.Default;
+            CalculateBoundingBox();
+        }
+
+        public void CalculateBoundingBox()
+        {
+            _BoundingBox = BoundingBox.FromPoints(Vertices.Select(v => v.Position));
         }
 
         private void Vertices_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
