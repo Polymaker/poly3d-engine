@@ -85,5 +85,21 @@ namespace Poly3D.Engine
                 SceneRenderer.RenderCamera(camera);
             }
         }
+
+        public void OnUpdate(float deltaTime)
+        {
+            foreach (var so in Objects)
+            {
+                if (!so.IsActive)
+                    continue;
+                foreach (var objBehave in so.Components.OfType< ObjectBehaviour>())
+                {
+                    if (!objBehave.Enabled)
+                        continue;
+
+                    objBehave.DoUpdate(deltaTime);
+                }
+            }
+        }
     }
 }

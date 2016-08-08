@@ -505,6 +505,9 @@ namespace Poly3D.Control
 
         private void OnUpdateFrameInternal(FrameEventArgs e)
         {
+            if (Scene != null)
+                Scene.OnUpdate((float)e.Time);
+
             if (!IsDisposed && IsHandleCreated)
                 OnUpdateFrame(e);
         }

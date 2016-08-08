@@ -62,31 +62,40 @@ namespace Poly3D.Engine
             GL.LineWidth(lineThickness);
 
             GL.Color4(color);
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 
-            using (GLDraw.Begin(BeginMode.Quads, MaterialFace.FrontAndBack, PolygonMode.Line))
-            {
-                GL.Vertex3(box.Right, box.Top, box.Front);
-                GL.Vertex3(box.Left, box.Top, box.Front);
-                GL.Vertex3(box.Left, box.Bottom, box.Front);
-                GL.Vertex3(box.Right, box.Bottom, box.Front);
+            DrawQuad(new Vector3(box.Right, box.Top, box.Front),
+                new Vector3(box.Left, box.Top, box.Front),
+                new Vector3(box.Left, box.Bottom, box.Front),
+                new Vector3(box.Right, box.Bottom, box.Front));
 
-                GL.Vertex3(box.Left, box.Top, box.Back);
-                GL.Vertex3(box.Right, box.Top, box.Back);
-                GL.Vertex3(box.Right, box.Bottom, box.Back);
-                GL.Vertex3(box.Left, box.Bottom, box.Back);
+            DrawQuad(new Vector3(box.Left, box.Top, box.Back),
+                new Vector3(box.Right, box.Top, box.Back),
+                new Vector3(box.Right, box.Bottom, box.Back),
+                new Vector3(box.Left, box.Bottom, box.Back));
 
-                GL.Vertex3(box.Left, box.Top, box.Front);
-                GL.Vertex3(box.Left, box.Top, box.Back);
-                GL.Vertex3(box.Left, box.Bottom, box.Back);
-                GL.Vertex3(box.Left, box.Bottom, box.Front);
+            DrawQuad(new Vector3(box.Left, box.Top, box.Front),
+                new Vector3(box.Left, box.Top, box.Back),
+                new Vector3(box.Left, box.Bottom, box.Back),
+                new Vector3(box.Left, box.Bottom, box.Front));
 
-                GL.Vertex3(box.Right, box.Top, box.Back);
-                GL.Vertex3(box.Right, box.Top, box.Front);
-                GL.Vertex3(box.Right, box.Bottom, box.Front);
-                GL.Vertex3(box.Right, box.Bottom, box.Back);
-            }
+            DrawQuad(new Vector3(box.Right, box.Top, box.Back),
+                new Vector3(box.Right, box.Top, box.Front),
+                new Vector3(box.Right, box.Bottom, box.Front),
+                new Vector3(box.Right, box.Bottom, box.Back));
 
             GL.PopAttrib();
+        }
+
+        private static void DrawQuad(Vector3 pt1, Vector3 pt2, Vector3 pt3, Vector3 pt4)
+        {
+            using (GLDraw.Begin(BeginMode.Lines))
+            {
+                GL.Vertex3(pt1); GL.Vertex3(pt2);
+                GL.Vertex3(pt2); GL.Vertex3(pt3);
+                GL.Vertex3(pt3); GL.Vertex3(pt4);
+                GL.Vertex3(pt4); GL.Vertex3(pt1);
+            }
         }
 
         public static void DrawCylinder(float radius, float length, Color color, bool capped)
@@ -334,7 +343,7 @@ namespace Poly3D.Engine
                 GL.End();
             }
         }
-
+        
         public static void DrawWireMesh(Color color, Mesh mesh, float lineThickness = 1f)
         {
             var triangles = mesh.Faces.OfType<FaceTriangle>();
@@ -356,6 +365,19 @@ namespace Poly3D.Engine
                 }
 
                 GL.End();
+            }
+            GL.PopAttrib();
+        }
+
+        public static void DrawLine(Color color, Vector3 pt1, Vector3 pt2, float lineThickness = 1f)
+        {
+            GL.PushAttrib(AttribMask.LineBit);
+            GL.LineWidth(lineThickness);
+            GL.Color4(color);
+            using (GLDraw.Begin(BeginMode.Lines))
+            {
+                GL.Vertex3(pt1);
+                GL.Vertex3(pt2);
             }
             GL.PopAttrib();
         }

@@ -18,13 +18,15 @@ namespace Poly3D.Test
 {
     public partial class Form1 : Form
     {
+
+        private SceneObject modelRootObj;
+        private ObjectMesh modelObject;
+        private ObjectMesh modelObject2;
+
         public Form1()
         {
             InitializeComponent();
         }
-        private SceneObject modelRootObj;
-        private ObjectMesh modelObject;
-        private ObjectMesh modelObject2;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -38,7 +40,6 @@ namespace Poly3D.Test
             modelObject.Mesh = model;
             modelObject.Transform.WorldScale = new Vector3(modelScale, modelScale, modelScale);
 
-
             model = WavefrontMeshLoader.LoadWavefrontObj(@"32496.obj");
 
             modelObject2 = modelObject.AddObject<ObjectMesh>();
@@ -47,6 +48,16 @@ namespace Poly3D.Test
             var offset = 13.3f * modelScale;
             modelObject2.Transform.Translate(modelObject2.Transform.Forward * offset, Space.World);
             modelObject2.Transform.Rotation = new Rotation(0, 180f, 0);
+            
+
+            var rotater = modelObject2.AddComponent<AnonymousBehaviour>();
+            rotater.Update = (ob, dt) =>
+             {
+                 ob.SceneObject.Transform.Rotate(new Rotation(0f, 0f, 90f * (float)dt));
+             };
+
+            var mainCam = poly3DControl1.Scene.ActiveCameras.First();
+            mainCam.AddComponent<PanOrbitCamera>();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -67,32 +78,7 @@ namespace Poly3D.Test
 
         private void poly3DControl1_MouseClick(object sender, MouseEventArgs e)
         {
-            modelRootObj.Transform.Rotate(new Rotation(22.5f, 0f, 0f));
-            //if (poly3DControl1.Scene != null)
-            //{
-            //    var raycast = poly3DControl1.Scene.ActiveCameras.First().RaycastFromScreen(new Vector2(e.X, e.Y));
-            //    var rayAngle = Rotation.FromDirection(raycast.Direction);
-            //    Trace.WriteLine("rayAngle = " + rayAngle);
 
-            //    var plane = new Plane(Vector3.UnitY, 0f);
-            //    float hitDist = 0;
-            //    if (plane.Raycast(raycast, out hitDist))
-            //    {
-            //        var hitPos = raycast.GetPoint(hitDist);
-            //        Trace.WriteLine("clicked pos = " + hitPos);
-            //    }
-            //    Trace.WriteLine("=======================\r\n");
-            //}
-        }
-
-        private void poly3DControl1_UpdateFrame(object sender, FrameEventArgs e)
-        {
-            if (modelRootObj != null)
-            {
-                //modelRootObj.Transform.Rotate(new Rotation(0f, 0f, 45f * (float)e.Time));
-                modelObject.Transform.Rotate(new Rotation(0f, 45f * (float)e.Time, 0f));
-                modelObject2.Transform.Rotate(new Rotation(0f, 0f, 90f * (float)e.Time));
-            }
         }
 
         private void timer1_Tick(object sender, EventArgs e)

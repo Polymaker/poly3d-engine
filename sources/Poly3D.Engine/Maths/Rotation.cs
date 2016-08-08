@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace Poly3D.Maths
 {
-    public struct Rotation
+    public class Rotation
     {
         private Quaternion _Quaternion;
         private Vector3 _EulerAngles;

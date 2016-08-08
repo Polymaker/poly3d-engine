@@ -15,57 +15,38 @@ namespace Poly3D.Test
     {
         static void Main(string[] args)
         {
-            Vector3 eulerAngles = new Vector3(45, 45, 0).ToRadians();
-            var rotQuat = GLMath.EulerToQuat(eulerAngles);
+            var testObj = new SceneObject();
+            testObj.Transform.Position = Vector3.UnitZ * 5;
+            testObj.Transform.Rotation = new Vector3(45, 0, 0);
 
-            Trace.WriteLine("In Euler: " + eulerAngles.ToDegrees());
-            Trace.WriteLine("In Quat: " + rotQuat);
+            Trace.WriteLine("obj1 local pos: " + testObj.Transform.Position);
+            Trace.WriteLine("obj1 world pos: " + testObj.Transform.WorldPosition);
+            Trace.WriteLine("obj1 local rot: " + testObj.Transform.Rotation);
+            Trace.WriteLine("obj1 world rot: " + testObj.Transform.WorldRotation);
 
-            eulerAngles = GLMath.QuatToEuler(rotQuat);
-            rotQuat = GLMath.EulerToQuat(eulerAngles);
+            var testObj2 = new SceneObject();
+            testObj2.Parent = testObj;
+            testObj2.Transform.Position = Vector3.UnitZ * 5;
+            testObj2.Transform.Rotation = new Vector3(45, 0, 0);
 
-            Trace.WriteLine("Out Euler: " + eulerAngles.ToDegrees());
-            Trace.WriteLine("Out Quat: " + rotQuat);
-            Trace.WriteLine(string.Empty);
+            Trace.WriteLine("obj2 local pos: " + testObj2.Transform.Position);
+            Trace.WriteLine("obj2 world pos: " + testObj2.Transform.WorldPosition);
+            Trace.WriteLine("obj2 local rot: " + testObj2.Transform.Rotation);
+            Trace.WriteLine("obj2 world rot: " + testObj2.Transform.WorldRotation);
 
-            eulerAngles = new Vector3(0, 45, 45).ToRadians();
-            rotQuat = GLMath.EulerToQuat(eulerAngles);
+            var testObj3 = new SceneObject();
+            testObj3.Parent = testObj2;
+            //testObj3.Transform.Rotation = new Vector3(-90, 0, 0);
+            testObj3.Transform.Rotate(new Vector3(0, 45, 0), Space.World);
+            //testObj3.Transform.Translate(Vector3.UnitZ * 5f, Space.Self);
+            //testObj3.Transform = new Transform(new Vector3(0, 0, 5), Rotation.Identity, Vector3.One);
+            //testObj3.Transform.WorldRotation = new Vector3(0, 0, 0);
+            //testObj3.Transform.WorldPosition += testObj3.Transform.Forward * 5;
 
-            Trace.WriteLine("In Euler: " + eulerAngles.ToDegrees());
-            Trace.WriteLine("In Quat: " + rotQuat);
-
-            eulerAngles = GLMath.QuatToEuler(rotQuat);
-            rotQuat = GLMath.EulerToQuat(eulerAngles);
-
-            Trace.WriteLine("Out Euler: " + eulerAngles.ToDegrees());
-            Trace.WriteLine("Out Quat: " + rotQuat);
-            Trace.WriteLine(string.Empty);
-
-            eulerAngles = new Vector3(0, 45, 45).ToRadians();
-            rotQuat = GLMath.EulerToQuat(eulerAngles);
-
-            Trace.WriteLine("In Euler: " + eulerAngles.ToDegrees());
-            Trace.WriteLine("In Quat: " + rotQuat);
-
-            eulerAngles = GLMath.QuatToEuler(rotQuat);
-            rotQuat = GLMath.EulerToQuat(eulerAngles);
-
-            Trace.WriteLine("Out Euler: " + eulerAngles.ToDegrees());
-            Trace.WriteLine("Out Quat: " + rotQuat);
-            Trace.WriteLine(string.Empty);
-
-            eulerAngles = new Vector3(90, 90, 0).ToRadians();
-            rotQuat = GLMath.EulerToQuat(eulerAngles);
-
-            Trace.WriteLine("In Euler: " + eulerAngles.ToDegrees());
-            Trace.WriteLine("In Quat: " + rotQuat);
-
-            eulerAngles = GLMath.QuatToEuler(rotQuat);
-            rotQuat = GLMath.EulerToQuat(eulerAngles);
-
-            Trace.WriteLine("Out Euler: " + eulerAngles.ToDegrees());
-            Trace.WriteLine("Out Quat: " + rotQuat);
-            Trace.WriteLine(string.Empty);
+            Trace.WriteLine("obj3 local pos: " + testObj3.Transform.Position);
+            Trace.WriteLine("obj3 world pos: " + testObj3.Transform.WorldPosition);
+            Trace.WriteLine("obj3 local rot: " + testObj3.Transform.Rotation);
+            Trace.WriteLine("obj3 world rot: " + testObj3.Transform.WorldRotation);
         }
     }
 }

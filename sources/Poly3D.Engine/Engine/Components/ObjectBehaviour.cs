@@ -8,6 +8,7 @@ namespace Poly3D.Engine
     public class ObjectBehaviour : ObjectComponent
     {
         // Fields...
+        private bool _Initialized;
         private bool _Enabled;
 
         public bool Enabled
@@ -25,6 +26,19 @@ namespace Poly3D.Engine
             }
         }
 
+        public ObjectBehaviour()
+        {
+            _Initialized = false;
+            _Enabled = true;
+        }
+
+        public bool Initialized
+        {
+            get { return _Initialized; }
+        }
+
+        protected virtual void OnInitialize() { }
+
         protected virtual void OnUpdate(float deltaTime) { }
 
         protected virtual void OnRender(float deltaTime) { }
@@ -33,6 +47,17 @@ namespace Poly3D.Engine
 
         protected virtual void OnDisable() { }
 
+        internal void DoUpdate(float deltaTime)
+        {
+            if (!Initialized)
+                DoInitialize();
+            OnUpdate(deltaTime);
+        }
 
+        internal void DoInitialize()
+        {
+            OnInitialize();
+            _Initialized = true;
+        }
     }
 }

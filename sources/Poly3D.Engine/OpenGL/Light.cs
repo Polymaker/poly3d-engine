@@ -10,6 +10,7 @@ namespace Poly3D.OpenGL
 {
     public class Light
     {
+        private float _LinearAttenuation;
         private float _SpotCutoff;
         private float _SpotExponent;
         private Vector3 _SpotDirection;
@@ -143,6 +144,21 @@ namespace Poly3D.OpenGL
             }
         }
 
+        public float LinearAttenuation
+        {
+            get { return _LinearAttenuation; }
+            set
+            {
+                value = value > 0 ? value : 0f;
+                if (value != _LinearAttenuation)
+                {
+                    _LinearAttenuation = value;
+                    Apply(LightParameter.LinearAttenuation);
+                }
+            }
+        }
+        
+
         public Light(int id)
         {
             _Id = id;
@@ -193,6 +209,7 @@ namespace Poly3D.OpenGL
                 case LightParameter.ConstantAttenuation:
                     break;
                 case LightParameter.LinearAttenuation:
+                    GL.Light(lName, lParam, LinearAttenuation);
                     break;
                 case LightParameter.QuadraticAttenuation:
                     break;

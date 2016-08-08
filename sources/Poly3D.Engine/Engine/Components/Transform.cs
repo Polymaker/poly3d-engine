@@ -242,7 +242,15 @@ namespace Poly3D.Engine
             if (targetInLocalSpace)
                 Rotation = Rotation.FromDirection((target - Position).Normalized());
             else
-                WorldRotation = Rotation.FromDirection((target - WorldPosition).Normalized());
+                WorldRotation = Rotation.FromDirection((target - WorldPosition).Normalized(), Up);
+        }
+
+        public void LookAt(Vector3 target, bool targetInLocalSpace, Vector3 up)
+        {
+            if (targetInLocalSpace)
+                Rotation = Rotation.FromDirection((target - Position).Normalized(), up);
+            else
+                WorldRotation = Rotation.FromDirection((target - WorldPosition).Normalized(), up);
         }
 
         public void Translate(Vector3 translation)

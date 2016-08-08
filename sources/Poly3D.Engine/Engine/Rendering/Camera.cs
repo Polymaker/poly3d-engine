@@ -219,7 +219,7 @@ namespace Poly3D.Engine
         public Matrix4 GetModelviewMatrix()
         {
             //saves us the trouble of inverting the chain of transformations that the camera has
-            return Matrix4.LookAt(Transform.WorldPosition, Transform.Forward * 4, Transform.Up);
+            return Matrix4.LookAt(Transform.WorldPosition, Transform.WorldPosition + Transform.Forward * 4, Transform.Up);
         }
 
         #endregion
