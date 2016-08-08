@@ -146,6 +146,12 @@ namespace Poly3D.Maths
             return Min.X <= other.Max.X && Max.X >= other.Min.X && Min.Y <= other.Max.Y && Max.Y >= other.Min.Y && Min.Z <= other.Max.Z && Max.Z >= other.Min.Z;
         }
 
+        public bool Intersects(Ray ray)
+        {
+            float dist;
+            return Intersects(ray, out dist);
+        }
+
         public bool Intersects(Ray ray, out float distance)
         {
             var rayInv = Vector3.Divide(Vector3.One, ray.Direction);
@@ -162,11 +168,13 @@ namespace Poly3D.Maths
                 distance = max;
                 return false;
             }
+
             if (min > max)
             {
                 distance = max;
                 return false;
             }
+
             distance = min;
             return true;
         }

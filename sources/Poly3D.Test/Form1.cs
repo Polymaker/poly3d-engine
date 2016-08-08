@@ -80,7 +80,7 @@ namespace Poly3D.Test
         {
             //modelRootObj.Transform.Rotate(new Rotation(22.5f, 0f, 0f));
 
-            if (poly3DControl1.Scene != null)
+            if (poly3DControl1.Scene != null && e.Button == MouseButtons.Left)
             {
                 var mainCam = poly3DControl1.Scene.ActiveCameras.First();
                 var raycast = mainCam.RaycastFromScreen(new Vector2(e.X, e.Y));
@@ -89,20 +89,7 @@ namespace Poly3D.Test
                 {
                     Trace.WriteLine("Selected object id " + selectedObject.GetInstanceID());
                 }
-                //var rayAngle = Rotation.FromDirection(raycast.Direction);
-                //Trace.WriteLine("rayAngle = " + rayAngle);
-
-                //var plane = new Plane(Vector3.UnitY, 0f);
-                //float hitDist = 0;
-                //if (plane.Raycast(raycast, out hitDist))
-                //{
-                //    var hitPos = raycast.GetPoint(hitDist);
-                //    Trace.WriteLine("clicked pos = " + hitPos);
-                //}
-                //Trace.WriteLine("=======================\r\n");
             }
-        }
-
         }
 
         private void timer1_Tick(object sender, EventArgs e)

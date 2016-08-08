@@ -12,6 +12,10 @@ namespace Poly3D.Engine
 {
     public static class RenderHelper
     {
+        private static readonly Color UNIT_X_COLOR = Color.Red;
+        private static readonly Color UNIT_Y_COLOR = Color.LawnGreen;
+        private static readonly Color UNIT_Z_COLOR = Color.FromArgb(0x00, 0x66, 0xFF);
+
         public static void RenderAxes(float length, float thickness)
         {
             var rad = thickness / 2f;
@@ -369,17 +373,208 @@ namespace Poly3D.Engine
             GL.PopAttrib();
         }
 
+        #region Shapes
+
         public static void DrawLine(Color color, Vector3 pt1, Vector3 pt2, float lineThickness = 1f)
+        {
+            GL.Color4(color);
+            DrawLine(pt1, pt2, lineThickness);
+        }
+
+        public static void DrawLine(Vector3 pt1, Vector3 pt2, float lineThickness = 1f)
         {
             GL.PushAttrib(AttribMask.LineBit);
             GL.LineWidth(lineThickness);
-            GL.Color4(color);
+
             using (GLDraw.Begin(BeginMode.Lines))
             {
                 GL.Vertex3(pt1);
                 GL.Vertex3(pt2);
             }
+
             GL.PopAttrib();
         }
+
+        public static void DrawPolygon(Vector3 normal, float distFromCenter, int sides, float radius, Angle startAngle)
+        {
+            if (sides < 3)
+                return;
+
+            var stepAngle = GLMath.PI * 2f / (float)sides;
+            var axisRot = Rotation.FromDirection(normal.Normalized());
+            var up = Vector3.Transform(Vector3.UnitY, axisRot.Quaternion);
+            var transformPoint = up * radius;
+            var basePoint = normal * distFromCenter;
+
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            GL.Begin(BeginMode.TriangleFan);
+
+            GL.Normal3(normal);
+            for (int i = 0; i <= sides; i++)
+            {
+                var pt1 = basePoint + Vector3.Transform(transformPoint, Matrix4.CreateFromAxisAngle(normal, startAngle.Radians + stepAngle * i));
+                GL.Vertex3(pt1);
+            }
+
+            GL.End();
+        }
+
+        //public static void DrawSquare(Color color, Vector3 min, Vector3 max)
+        //{
+        //    GL.Color4(color);
+        //    DrawSquare(min, max);
+        //}
+
+        //public static void DrawSquare(Vector3 min, Vector3 max)
+        //{
+        //    using (GLDraw.Begin(BeginMode.Triangles))
+        //    {
+        //        GL.Vertex3(min);
+        //        GL.Vertex3(max);
+        //    }
+        //}
+
+
+        #endregion
+
+        #region Primitives
+
+        static int CURVE_RES = 30;
+
+        public static void DrawCube(Vector3 size)
+        {
+            var halfSize = size / 2f;
+            var radius = halfSize.Xy.Length;
+            DrawPolygon(Vector3.UnitY, halfSize.Y, 4, radius, 45f);
+            DrawPolygon(Vector3.UnitX, halfSize.X, 4, radius, 45f);
+            DrawPolygon(Vector3.UnitZ, halfSize.Z, 4, radius, 45f);
+            DrawPolygon(Vector3.UnitY * -1f, halfSize.Y, 4, radius, 45f);
+            DrawPolygon(Vector3.UnitX * -1f, halfSize.X, 4, radius, 45f);
+            DrawPolygon(Vector3.UnitZ * -1f, halfSize.Z, 4, radius, 45f);
+            //DrawPolygon(
+            //GL.Begin(BeginMode.TriangleStrip);
+            ////top
+            //GL.Normal3(Vector3.UnitY);
+            //GL.Vertex3(-halfSize.X, halfSize.Y, halfSize.Z);
+            //GL.Vertex3(halfSize.X, halfSize.Y, halfSize.Z);
+            //GL.Vertex3(-halfSize.X, halfSize.Y, -halfSize.Z);
+            //GL.Vertex3(halfSize.X, halfSize.Y, -halfSize.Z);
+            //GL.End();
+        }
+
+        public static void DrawCone(float radius, float height)
+        {
+            float stepAngle = (float)Math.PI * 2f / (float)CURVE_RES;
+            //float normalAngle = (float)Math.Atan(height / radius);
+
+            GL.Begin(BeginMode.Triangles);
+
+            for (int i = 0; i < CURVE_RES; i++)
+            {
+                var p1 = new Vector3((float)Math.Cos(stepAngle * i), 0f, (float)Math.Sin(stepAngle * i)) * radius;
+                var p2 = new Vector3((float)Math.Cos(stepAngle * (i + 1)), 0f, (float)Math.Sin(stepAngle * (i + 1))) * radius;
+
+                GL.Normal3(Vector3.UnitY * -1f);
+                GL.Vertex3(p1);
+                GL.Vertex3(p2);
+                GL.Vertex3(Vector3.Zero);
+
+                GL.Normal3(p1.Normalized());
+                GL.Vertex3(p1);
+                GL.Vertex3(Vector3.UnitY * height);
+                GL.Normal3(p2.Normalized());
+                GL.Vertex3(p2);
+            }
+
+            GL.End();
+        }
+
+        #endregion
+
+        #region Mesh/Models
+
+        #endregion
+
+        #region Other
+
+        public static void RenderManipulator(Camera camera, Manipulator manipulator)
+        {
+            RenderManipulator(camera, manipulator.Target.Transform.WorldPosition, manipulator.Type);
+            //var distFromCam = camera.GetDistanceFromCamera(manipulator.Target);
+            //var viewSize = camera.GetViewSize(distFromCam);
+            //var maniScale = Manipulator.SCREEN_SIZE * viewSize.Y / camera.DisplayRectangle.Height;
+
+            //switch (manipulator.Type)
+            //{
+
+            //    case TransformType.Translation:
+            //        break;
+            //    case TransformType.Rotation:
+            //        break;
+            //    case TransformType.Sacle:
+            //        break;
+            //}
+
+            //RenderHelper.RenderAxes(maniScale, maniScale / 15f);
+        }
+
+        public static void RenderManipulator(Camera camera, Vector3 position, TransformType manipulatorType)
+        {
+            GL.PushAttrib(AttribMask.LightingBit | AttribMask.DepthBufferBit);
+            GL.Clear(ClearBufferMask.DepthBufferBit);
+            GL.Disable(EnableCap.Lighting);
+
+            var distFromCam = camera.GetDistanceFromCamera(position);
+            var viewSize = camera.GetViewSize(distFromCam);
+
+            var maniScale = Manipulator.SCREEN_SIZE * viewSize.Y / camera.DisplayRectangle.Height;
+
+            DrawManipulatorAxis(Vector3.UnitX, UNIT_X_COLOR, manipulatorType, maniScale, false);
+
+            DrawManipulatorAxis(Vector3.UnitY, UNIT_Y_COLOR, manipulatorType, maniScale, false);
+
+            DrawManipulatorAxis(Vector3.UnitZ, UNIT_Z_COLOR, manipulatorType, maniScale, true);
+
+            GL.PopAttrib();
+        }
+
+
+        private static void DrawManipulatorAxis(Vector3 axis, Color color, TransformType manipulatorType, float length, bool selected)
+        {
+            GL.PushMatrix();
+
+            switch (manipulatorType)
+            {
+                case TransformType.Translation:
+                    {
+                        var endSize = length / 6f;
+                        var axisLen = length - endSize;
+                        DrawLine(color, Vector3.Zero, axis * axisLen, selected ? 3 : 1.5f);
+                        var rotMat = GLMath.RotationFromTo(Vector3.UnitY, axis);
+                        GL.Translate(axis * axisLen);
+                        GL.MultMatrix(ref rotMat);
+                        DrawCone(endSize / 3f, endSize);
+                        break;
+                    }
+                case TransformType.Rotation:
+                    break;
+                case TransformType.Scale:
+                    {
+                        var endSize = length / 6f;
+                        var axisLen = length - endSize;
+                        DrawLine(color, Vector3.Zero, axis * axisLen, selected ? 3 : 1.5f);
+                        GL.Translate(axis * (axisLen + endSize / 2f));
+
+                        GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+                        endSize *= selected ? 1.5f : 1f;
+                        DrawCube(Vector3.One * endSize);
+                        break;
+                    }
+            }
+            
+            GL.PopMatrix();
+        }
+
+        #endregion
     }
 }

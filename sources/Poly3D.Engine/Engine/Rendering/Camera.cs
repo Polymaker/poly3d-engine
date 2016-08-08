@@ -7,7 +7,7 @@ using OpenTK.Graphics.OpenGL;
 using Poly3D.Maths;
 using Poly3D.Graphics;
 using System.Diagnostics;
-
+using System.Collections;
 namespace Poly3D.Engine
 {
 	public class Camera : SceneObject
@@ -247,124 +247,7 @@ namespace Poly3D.Engine
         }
 
         #endregion
-
-        private Poly3D.OpenGL.Light myLight;
-
-        internal void Render()
-        {
-            UpdateViewport();
-
-            GL.Enable(EnableCap.DepthTest);
-            GL.Enable(EnableCap.ColorMaterial);
-            GL.Enable(EnableCap.Lighting);
-            GL.Enable(EnableCap.LineSmooth);
-            GL.Enable(EnableCap.Texture2D);
-            
-            //GL.Enable(EnableCap.Normalize);
-            GL.ClearColor(BackColor);
-            GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
-
-            GL.MatrixMode(MatrixMode.Projection);
-            
-            if (isMatrixDirty)
-                ComputeProjectionMatrix();
-
-            GL.LoadMatrix(ref _ProjectionMatrix);
-            
-            GL.MatrixMode(MatrixMode.Modelview);
-
-            var viewMatrix = GetModelviewMatrix();
-
-            GL.LoadMatrix(ref viewMatrix);
-
-            if (myLight == null)
-            {
-                myLight = new Poly3D.OpenGL.Light(0);
-                myLight.Position = new Vector4(20, 12, 6, 0);
-                myLight.Ambient = new OpenTK.Graphics.Color4(0.2f, 0.2f, 0.2f, 1f);
-                myLight.Active = true;
-            }
-
-            if (!myLight.Active)
-                myLight.Active = true;
-
-            //GL.StencilMask(0);
-            //GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Replace);
-
-            RenderHelper.RenderAxes(5f, 0.25f);
-
-            foreach (var so in Scene.Objects)
-            {
-                if (!so.Active)
-                    continue;
-                if (so is ObjectMesh && (so as ObjectMesh).Mesh != null)
-                {
-                    GL.PushMatrix();
-                    GL.PushAttrib(AttribMask.AllAttribBits);
-
-                    var objTransMat = so.Transform.GetTransformMatrix();
-                    GL.MultMatrix(ref objTransMat);
-
-                    /*
-                    GL.ClearStencil(0);
-                    GL.Clear(ClearBufferMask.StencilBufferBit);
-                    GL.Enable(EnableCap.StencilTest);
-                    GL.StencilFunc(StencilFunction.Always, 1, 0xFFFF);
-                    GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Replace);
-                    */
-
-                    RenderHelper.DrawMesh(Color.Gray, (so as ObjectMesh).Mesh, so.Transform.WorldScale);
-
-                    /*
-                    GL.StencilFunc(StencilFunction.Notequal, 1, 0xFFFF);
-                    GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Replace);
-                    GL.Disable(EnableCap.Lighting);
-
-                    RenderHelper.DrawWireMesh(Color.Black, (so as ObjectMesh).Mesh, 1.5f);
-                    */
-
-                    //RenderHelper.DrawBox(Color.Yellow, (so as ObjectMesh).Mesh.BoundingBox);
-
-                    GL.PopAttrib();
-                    GL.PopMatrix();
-                }
-            }
-
-            //GL.Rotate(0.5f, Vector3.UnitY);
-            //GL.Translate(0, 0, 3);
-            //GL.Translate(0, 0, 3);
-
-            //GL.Translate(0, -1f, 0);
-            //GL.Scale(4f, 4f, 4f);
-            //GL.Color4(Color.White);
-            //GL.Begin(BeginMode.Triangles);
-            //GL.Vertex3(-1f, 0f, 1f);
-            //GL.Vertex3(1f, 0f, 1f);
-            //GL.Vertex3(1f, 0f, -1f);
-
-            //GL.Vertex3(-1f, 0f, 1f);
-            //GL.Vertex3(1f, 0f, -1f);
-            //GL.Vertex3(-1f, 0f, -1f);
-            //GL.End();
-            //GL.Disable(EnableCap.Lighting);
-            ////GL.LoadMatrix(ref viewMatrix);
-            //GL.Scale(4f, 4f, 4f);
-            //DrawPyramid();
-
-            //GL.LoadMatrix(ref viewMatrix);
-            //GL.Scale(4f, 4f, 4f);
-            //GL.Translate(2f, 0, 0);
-            //GL.Rotate(45f, Vector3.UnitY);
-            //DrawPyramid();
-
-            //GL.LoadMatrix(ref viewMatrix);
-            //GL.Scale(4f, 4f, 4f);
-            //GL.Translate(-2f, 0, 0);
-            //GL.Rotate(-45f, Vector3.UnitY);
-            //DrawPyramid();
-
-        }
-
+        
         public Ray RaycastFromScreen(Vector2 point)
         {
             var viewRect = DisplayRectangle;
@@ -445,36 +328,58 @@ namespace Poly3D.Engine
                     hits.Add(new Tuple<float, SceneObject>(worldDist, meshObj));
                 }
             }
-
+            
             if (hits.Count > 0)
                 return hits.OrderBy(h => h.Item1).First().Item2;
 
             return null;
         }
 
-        private void DrawPyramid()
+        /// <summary>
+        /// Gets the visible vertical height of the world at the distance specified. 
+        /// </summary>
+        /// <param name="distFromCamera"></param>
+        /// <returns></returns>
+        public float GetViewHeight(float distFromCamera)
         {
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            if(Projection == ProjectionType.Perspective)
+                return (float)Math.Tan(FieldOfView.Radians / 2f) * distFromCamera * 2f;
 
-            GL.Begin(BeginMode.Triangles);
-            GL.Color4(Color.Blue);
-
-            GL.Vertex3(0f, -0.5f, -1f);
-            GL.Vertex3(0.866f, -0.5f, 0.5f);
-            GL.Vertex3(0f, 1f, 0f);
-
-            GL.Color4(Color.Red);
-            GL.Vertex3(0.866f, -0.5f, 0.5f);
-            GL.Vertex3(-0.866f, -0.5f, 0.5f);
-            GL.Vertex3(0f, 1f, 0f);
-
-            GL.Color4(Color.Yellow);
-            GL.Vertex3(-0.866f, -0.5f, 0.5f);
-            GL.Vertex3(0f, -0.5f, -1f);
-            GL.Vertex3(0f, 1f, 0f);
-
-            GL.End();
+            return OrthographicSize;
         }
 
+        /// <summary>
+        /// Gets the visible horizontal width of the world at the distance specified. 
+        /// </summary>
+        /// <param name="distFromCamera"></param>
+        /// <returns></returns>
+        public float GetViewWidth(float distFromCamera)
+        {
+            return GetViewHeight(distFromCamera) * AspectRatio;
+        }
+
+        public Vector2 GetViewSize(float distFromCamera)
+        {
+            var vh = GetViewHeight(distFromCamera);
+            return new Vector2(vh * AspectRatio, vh);
+        }
+
+        public float GetDistanceFromCamera(SceneObject so)
+        {
+            return GetDistanceFromCamera(so.Transform.WorldPosition);
+        }
+
+        public float GetDistanceFromCamera(Vector3 worldPos)
+        {
+            var posOffset = worldPos - Transform.WorldPosition;
+
+            var angleFromFwrd = Vector3.CalculateAngle(posOffset.Normalized(), Transform.Forward);
+
+            if (float.IsNaN(angleFromFwrd))
+                return posOffset.Length;
+
+            //distance from camera is equal to adjacent side on the triangle formed by camera, specified pos and a point along camera foward axis
+            return (float)Math.Cos(angleFromFwrd) * posOffset.Length;
+        }
     }
 }

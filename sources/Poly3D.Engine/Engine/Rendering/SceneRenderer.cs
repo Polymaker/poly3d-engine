@@ -48,64 +48,12 @@ namespace Poly3D.Engine.Rendering
             GL.LoadMatrix(ref viewMatrix);
             GL.Enable(EnableCap.Light0);
 
-            //RenderAxes();
-            
-            
             foreach (var rootObj in scene.RootObjects.Where(o => o.IsActive))
             {
                 OnRenderObject(rootObj);
             }
 
-            RenderAxes(camera);
-        }
-
-        private static void RenderAxes(Camera cam)
-        {
-            GL.PushAttrib(AttribMask.LightingBit | AttribMask.LineBit | AttribMask.StencilBufferBit);
-
-            //SetupStencil();
-
-            //RenderHelper.RenderAxes(5f, 0.25f);
-
-            //ApplyStencil();
-            GL.Disable(EnableCap.DepthTest);
-            GL.Disable(EnableCap.Lighting);
-            float camScale = 1;
-
-            if (cam.Projection == ProjectionType.Perspective)
-            {
-                var camDist = cam.Transform.WorldPosition - Vector3.Zero;
-                camScale = camDist.Length * (float)Math.Tan(cam.FieldOfView.Radians / 2f);//equals half the display size (vertially)
-            }
-            else
-            {
-                camScale = cam.OrthographicSize / 2f;//equals half the display size (vertially)
-            }
-
-            //convert to screen fixed size
-            camScale = 60 * camScale / (cam.DisplayRectangle.Height / 2f);
-
-            GL.LineWidth(2f);
-            GL.Begin(BeginMode.Lines);
-
-            GL.Color4(Color.Red);
-            GL.Vertex3(Vector3.Zero);
-            GL.Vertex3(Vector3.UnitX * camScale);
-
-            GL.Color4(Color.LawnGreen);
-            GL.Vertex3(Vector3.Zero);
-            GL.Vertex3(Vector3.UnitY * camScale);
-
-            GL.Color4(Color.FromArgb(0x00, 0x66, 0xFF));
-            GL.Vertex3(Vector3.Zero);
-            GL.Vertex3(Vector3.UnitZ * camScale);
-
-            GL.End();
-
-            //GL.LineWidth(2f);
-            //RenderHelper.RenderAxesContour(5f, 0.25f);
-            GL.Enable(EnableCap.DepthTest);
-            GL.PopAttrib();
+            RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Translation);
         }
 
         private static void OnRenderObject(SceneObject sceneObject)
@@ -139,9 +87,9 @@ namespace Poly3D.Engine.Rendering
             //ApplyStencil();
             GL.Disable(EnableCap.Lighting);
 
-            //RenderHelper.DrawWireMesh(Color.DarkBlue, meshObj.Mesh);
+            RenderHelper.DrawWireMesh(Color.DarkBlue, meshObj.Mesh);
 
-            RenderHelper.DrawBox(Color.Yellow, meshObj.Mesh.BoundingBox);
+            //RenderHelper.DrawBox(Color.Yellow, meshObj.Mesh.BoundingBox);
 
             GL.PopAttrib();
         }
