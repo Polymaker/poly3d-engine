@@ -48,16 +48,7 @@ namespace Poly3D.Engine.Rendering
             GL.LoadMatrix(ref viewMatrix);
             GL.Enable(EnableCap.Light0);
 
-            //var pt1 = camera.Raycast(new Vector2(0.5f, 0.5f)).Origin;
-            //var pt2 = camera.Raycast(new Vector2(0.5f, 0f)).Origin;
-            //var camScale = (pt2 - pt1).Length;
-
-            //var myLight = new Light(0);
-            //myLight.Position = new Vector4(30, 60, 15, 0);
-            //myLight.Ambient = new OpenTK.Graphics.Color4(0.1f, 0.1f, 0.1f, 1f);
-            //myLight.Active = true;
-
-            //RenderHelper.RenderAxes(5f, 0.25f);
+            //RenderAxes();
             
             
             foreach (var rootObj in scene.RootObjects.Where(o => o.IsActive))
@@ -148,22 +139,10 @@ namespace Poly3D.Engine.Rendering
             //ApplyStencil();
             GL.Disable(EnableCap.Lighting);
 
-            RenderHelper.DrawWireMesh(Color.DarkBlue, meshObj.Mesh/*, 3f*/);
-            /*
-            GL.Disable(EnableCap.DepthTest);
+            //RenderHelper.DrawWireMesh(Color.DarkBlue, meshObj.Mesh);
 
-            var unscaledSize = meshObj.Transform.WorldScale;
-            unscaledSize.X = 1f / unscaledSize.X;
-            unscaledSize.Y = 1f / unscaledSize.Y;
-            unscaledSize.Z = 1f / unscaledSize.Z;
+            RenderHelper.DrawBox(Color.Yellow, meshObj.Mesh.BoundingBox);
 
-            //RenderHelper.DrawLine(Color.Red, Vector3.Zero, Vector3.UnitX * unscaledSize.X, 2f);
-            //RenderHelper.DrawLine(Color.LawnGreen, Vector3.Zero, Vector3.UnitY * unscaledSize.Y, 2f);
-            //RenderHelper.DrawLine(Color.FromArgb(0x00, 0x66, 0xFF), Vector3.Zero, Vector3.UnitZ * unscaledSize.Z, 2f);
-
-            var centerBox = new BoundingBox(Vector3.Zero, unscaledSize);
-            RenderHelper.DrawBox(Color.Yellow, centerBox);
-            */
             GL.PopAttrib();
         }
 

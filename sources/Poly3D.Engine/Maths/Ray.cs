@@ -36,5 +36,13 @@ namespace Poly3D.Maths
         {
             return new Ray(pt1, (pt2 - pt1).Normalized());
         }
+
+
+        public static Ray Transform(Ray ray, Matrix4 transform)
+        {
+            var origin = Vector3.Transform(ray.Origin, transform);
+            var dir = Vector3.Transform(ray.Direction, transform.ExtractRotation());
+            return new Ray(origin, dir);
+        }
     }
 }
