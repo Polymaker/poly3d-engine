@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿
+using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -144,6 +145,14 @@ namespace Poly3D.Engine
                 if (value == Vector3.Zero || value.X == 0f || value.Y == 0f || value.Z == 0f)
                     return;
                 _Scale = Vector3.Divide(value, LocalToWorldMatrix.ExtractScale());
+            }
+        }
+
+        public Matrix4 WorldToLocalMatrix
+        {
+            get
+            {
+                return GetTransformMatrix().Inverted();
             }
         }
 

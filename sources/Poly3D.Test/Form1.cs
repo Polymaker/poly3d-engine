@@ -67,22 +67,29 @@ namespace Poly3D.Test
 
         private void poly3DControl1_MouseClick(object sender, MouseEventArgs e)
         {
-            modelRootObj.Transform.Rotate(new Rotation(22.5f, 0f, 0f));
-            //if (poly3DControl1.Scene != null)
-            //{
-            //    var raycast = poly3DControl1.Scene.ActiveCameras.First().RaycastFromScreen(new Vector2(e.X, e.Y));
-            //    var rayAngle = Rotation.FromDirection(raycast.Direction);
-            //    Trace.WriteLine("rayAngle = " + rayAngle);
+            //modelRootObj.Transform.Rotate(new Rotation(22.5f, 0f, 0f));
 
-            //    var plane = new Plane(Vector3.UnitY, 0f);
-            //    float hitDist = 0;
-            //    if (plane.Raycast(raycast, out hitDist))
-            //    {
-            //        var hitPos = raycast.GetPoint(hitDist);
-            //        Trace.WriteLine("clicked pos = " + hitPos);
-            //    }
-            //    Trace.WriteLine("=======================\r\n");
-            //}
+            if (poly3DControl1.Scene != null)
+            {
+                var mainCam = poly3DControl1.Scene.ActiveCameras.First();
+                var raycast = mainCam.RaycastFromScreen(new Vector2(e.X, e.Y));
+                var selectedObject = mainCam.RaySelect(raycast);
+                if (selectedObject != null)
+                {
+                    Trace.WriteLine("Selected object id " + selectedObject.GetInstanceID());
+                }
+                //var rayAngle = Rotation.FromDirection(raycast.Direction);
+                //Trace.WriteLine("rayAngle = " + rayAngle);
+
+                //var plane = new Plane(Vector3.UnitY, 0f);
+                //float hitDist = 0;
+                //if (plane.Raycast(raycast, out hitDist))
+                //{
+                //    var hitPos = raycast.GetPoint(hitDist);
+                //    Trace.WriteLine("clicked pos = " + hitPos);
+                //}
+                //Trace.WriteLine("=======================\r\n");
+            }
         }
 
         private void poly3DControl1_UpdateFrame(object sender, FrameEventArgs e)
@@ -99,5 +106,6 @@ namespace Poly3D.Test
         {
             label1.Text = string.Format("{0:0.##} FPS", poly3DControl1.RenderFrequency);
         }
+
     }
 }

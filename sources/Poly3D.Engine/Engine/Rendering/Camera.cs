@@ -417,6 +417,41 @@ namespace Poly3D.Engine
             return Ray.FromPoints(origin.Xyz, end.Xyz);
         }
 
+        public Vector2 PointToScreen(Vector3 point)
+        {
+            var transformMatrix = Matrix4.Mult(GetModelviewMatrix(), ProjectionMatrix);
+            var result = Vector4.Transform(new Vector4(point, 1), transformMatrix);
+            var dispRect = DisplayRectangle;
+            result.X = ((result.X / result.W) + 1f) / 2f;
+            result.Y = (1f - (result.Y / result.W)) / 2f;
+            result.X = dispRect.X + result.X * dispRect.Width;
+            result.Y = dispRect.Y + result.Y * dispRect.Height;
+            return result.Xy;
+        }
+
+        public SceneObject RaySelect(Ray ray)
+        {
+            var hits = new List<Tuple<float, SceneObject>>();
+            foreach (var meshObj in Scene.Objects.Where(o => o.IsActive).OfType<ObjectMesh>())
+            {
+                var worldToLocal = meshObj.Transform.WorldToLocalMatrix;
+                var localRay = Ray.Transform(ray, worldToLocal);
+                float dist;
+                if (meshObj.Mesh.BoundingBox.Intersects(localRay, out dist))
+                {
+                    var localPt = localRay.GetPoint(dist);
+                    var worldPt = Vector3.Transform(localPt, meshObj.Transform.GetTransformMatrix());
+                    var worldDist = (worldPt - ray.Origin).Length;
+                    hits.Add(new Tuple<float, SceneObject>(worldDist, meshObj));
+                }
+            }
+
+            if (hits.Count > 0)
+                return hits.OrderBy(h => h.Item1).First().Item2;
+
+            return null;
+        }
+
         private void DrawPyramid()
         {
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);

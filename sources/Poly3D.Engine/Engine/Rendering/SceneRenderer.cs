@@ -94,7 +94,9 @@ namespace Poly3D.Engine.Rendering
 
             GL.Disable(EnableCap.Lighting);
             
-            RenderHelper.DrawWireMesh(Color.Black, meshObj.Mesh/*, 3f*/);
+            //RenderHelper.DrawWireMesh(Color.Black, meshObj.Mesh/*, 3f*/);
+
+            RenderHelper.DrawBox(Color.Yellow, meshObj.Mesh.BoundingBox);
 
             GL.PopAttrib();
         }
