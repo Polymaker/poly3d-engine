@@ -59,20 +59,11 @@ namespace Poly3D.Test
                 //Pan camera
                 if (keyState.IsKeyDown(Key.LShift) || keyState.IsKeyDown(Key.RShift))
                 {
-                    float vPanAmount = 1f;
 
-                    if (Camera.Projection == ProjectionType.Perspective)
-                    {
-                        var camDist = (Camera.Transform.WorldPosition - CameraTarget).Length;
-                        vPanAmount = (float)Math.Tan(Camera.FieldOfView.Radians / 2f) * camDist * 2f;
-                    }
-                    else
-                        vPanAmount = Camera.OrthographicSize;
+                    var viewSize = Camera.GetViewSize(Camera.GetDistanceFromCamera(CameraTarget));
 
-                    float hPanAmount = Camera.AspectRatio * vPanAmount;
-
-                    var panTranslate = Camera.Transform.Up * mouseViewDelta.Y * vPanAmount;
-                    panTranslate += Camera.Transform.Right * mouseViewDelta.X * hPanAmount;
+                    var panTranslate = Camera.Transform.Up * mouseViewDelta.Y * viewSize.Y;
+                    panTranslate += Camera.Transform.Right * mouseViewDelta.X * viewSize.X;
                     CameraTarget += panTranslate;
                     Camera.Transform.Translate(panTranslate, Space.World);
                 }
@@ -82,14 +73,15 @@ namespace Poly3D.Test
                     var cameraDist = Camera.Transform.WorldPosition - CameraTarget;
 
                     var pitchAngle = Angle.FromDegrees(360f * mouseViewDelta.Y);
+
                     var newPos = Vector3.Transform(cameraDist, Matrix4.CreateFromAxisAngle(Camera.Transform.Right, pitchAngle.Radians));
 
                     Camera.Transform.WorldPosition = newPos + CameraTarget;
                     Camera.Transform.LookAt(CameraTarget, false);
 
-                    var yawAngle = Angle.FromDegrees(360f * mouseViewDelta.X);
                     if (Camera.Transform.Up != Vector3.UnitY)
                     {
+                        var yawAngle = Angle.FromDegrees(360f * mouseViewDelta.X);
                         newPos = Vector3.Transform(newPos, Matrix4.CreateFromAxisAngle(Vector3.UnitY, -yawAngle.Radians));
                         Camera.Transform.WorldPosition = newPos + CameraTarget;
                         Camera.Transform.Rotate(new Vector3(0, yawAngle.Degrees, 0), Space.Self);

@@ -419,6 +419,18 @@ namespace Poly3D.Engine
             GL.End();
         }
 
+        public static void DrawCircle(float radius, float lineThickness = 1f)
+        {
+            float stepAngle = (float)Math.PI * 2f / (float)CURVE_RES;
+
+            for (int i = 0; i < CURVE_RES; i++)
+            {
+                var p1 = new Vector3((float)Math.Cos(stepAngle * i), (float)Math.Sin(stepAngle * i), 0f) * radius;
+                var p2 = new Vector3((float)Math.Cos(stepAngle * (i + 1)), (float)Math.Sin(stepAngle * (i + 1)), 0f) * radius;
+                DrawLine(p1, p2, lineThickness);
+            }
+        }
+
         //public static void DrawSquare(Color color, Vector3 min, Vector3 max)
         //{
         //    GL.Color4(color);
@@ -468,22 +480,22 @@ namespace Poly3D.Engine
             //float normalAngle = (float)Math.Atan(height / radius);
 
             GL.Begin(BeginMode.Triangles);
-
+            var bottom = Vector3.UnitY * (-height / 2f);
             for (int i = 0; i < CURVE_RES; i++)
             {
                 var p1 = new Vector3((float)Math.Cos(stepAngle * i), 0f, (float)Math.Sin(stepAngle * i)) * radius;
                 var p2 = new Vector3((float)Math.Cos(stepAngle * (i + 1)), 0f, (float)Math.Sin(stepAngle * (i + 1))) * radius;
 
                 GL.Normal3(Vector3.UnitY * -1f);
-                GL.Vertex3(p1);
-                GL.Vertex3(p2);
-                GL.Vertex3(Vector3.Zero);
+                GL.Vertex3(p1 + bottom);
+                GL.Vertex3(p2 + bottom);
+                GL.Vertex3(bottom);
 
                 GL.Normal3(p1.Normalized());
-                GL.Vertex3(p1);
-                GL.Vertex3(Vector3.UnitY * height);
+                GL.Vertex3(p1 + bottom);
+                GL.Vertex3(bottom + Vector3.UnitY * height);
                 GL.Normal3(p2.Normalized());
-                GL.Vertex3(p2);
+                GL.Vertex3(p2 + bottom);
             }
 
             GL.End();
@@ -495,45 +507,28 @@ namespace Poly3D.Engine
 
         #endregion
 
-        #region Other
+        #region Manipulators
 
         public static void RenderManipulator(Camera camera, Manipulator manipulator)
         {
             RenderManipulator(camera, manipulator.Target.Transform.WorldPosition, manipulator.Type);
-            //var distFromCam = camera.GetDistanceFromCamera(manipulator.Target);
-            //var viewSize = camera.GetViewSize(distFromCam);
-            //var maniScale = Manipulator.SCREEN_SIZE * viewSize.Y / camera.DisplayRectangle.Height;
-
-            //switch (manipulator.Type)
-            //{
-
-            //    case TransformType.Translation:
-            //        break;
-            //    case TransformType.Rotation:
-            //        break;
-            //    case TransformType.Sacle:
-            //        break;
-            //}
-
-            //RenderHelper.RenderAxes(maniScale, maniScale / 15f);
         }
 
         public static void RenderManipulator(Camera camera, Vector3 position, TransformType manipulatorType)
         {
             GL.PushAttrib(AttribMask.LightingBit | AttribMask.DepthBufferBit);
             GL.Clear(ClearBufferMask.DepthBufferBit);
-            GL.Disable(EnableCap.Lighting);
 
             var distFromCam = camera.GetDistanceFromCamera(position);
             var viewSize = camera.GetViewSize(distFromCam);
-
+            
             var maniScale = Manipulator.SCREEN_SIZE * viewSize.Y / camera.DisplayRectangle.Height;
 
             DrawManipulatorAxis(Vector3.UnitX, UNIT_X_COLOR, manipulatorType, maniScale, false);
 
-            DrawManipulatorAxis(Vector3.UnitY, UNIT_Y_COLOR, manipulatorType, maniScale, false);
+            DrawManipulatorAxis(Vector3.UnitY, UNIT_Y_COLOR, manipulatorType, maniScale, true);
 
-            DrawManipulatorAxis(Vector3.UnitZ, UNIT_Z_COLOR, manipulatorType, maniScale, true);
+            DrawManipulatorAxis(Vector3.UnitZ, UNIT_Z_COLOR, manipulatorType, maniScale, false);
 
             GL.PopAttrib();
         }
@@ -542,36 +537,40 @@ namespace Poly3D.Engine
         private static void DrawManipulatorAxis(Vector3 axis, Color color, TransformType manipulatorType, float length, bool selected)
         {
             GL.PushMatrix();
-
-            switch (manipulatorType)
+            GL.Disable(EnableCap.Lighting);
+            if (manipulatorType == TransformType.Rotation)
             {
-                case TransformType.Translation:
-                    {
-                        var endSize = length / 6f;
-                        var axisLen = length - endSize;
-                        DrawLine(color, Vector3.Zero, axis * axisLen, selected ? 3 : 1.5f);
-                        var rotMat = GLMath.RotationFromTo(Vector3.UnitY, axis);
-                        GL.Translate(axis * axisLen);
-                        GL.MultMatrix(ref rotMat);
-                        DrawCone(endSize / 3f, endSize);
-                        break;
-                    }
-                case TransformType.Rotation:
-                    break;
-                case TransformType.Scale:
-                    {
-                        var endSize = length / 6f;
-                        var axisLen = length - endSize;
-                        DrawLine(color, Vector3.Zero, axis * axisLen, selected ? 3 : 1.5f);
-                        GL.Translate(axis * (axisLen + endSize / 2f));
-
-                        GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
-                        endSize *= selected ? 1.5f : 1f;
-                        DrawCube(Vector3.One * endSize);
-                        break;
-                    }
+                var rotMat = GLMath.RotationFromTo(Vector3.UnitZ, axis);
+                GL.MultMatrix(ref rotMat);
+                GL.Color4(color);
+                DrawCircle(length, selected ? 3 : 1.5f);
             }
-            
+            else
+            {
+                var endSize = length / 8f;
+                var axisLength = length - endSize;
+
+                DrawLine(color, Vector3.Zero, axis * axisLength, selected ? 2.5f : 1.5f);
+
+                //GL.Enable(EnableCap.Lighting);
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+
+                if (manipulatorType == TransformType.Translation)
+                {
+                    var rotMat = GLMath.RotationFromTo(Vector3.UnitY, axis);
+                    GL.Translate(axis * (axisLength + endSize / 2f));
+                    GL.MultMatrix(ref rotMat);
+                    endSize *= selected ? 2f : 1.7f;
+                    DrawCone(endSize / 3f, endSize);
+                }
+                else
+                {
+                    GL.Translate(axis * (axisLength + endSize / 2f));
+                    endSize *= selected ? 1.5f : 1f;
+                    DrawCube(Vector3.One * endSize);
+                }
+            }
+
             GL.PopMatrix();
         }
 

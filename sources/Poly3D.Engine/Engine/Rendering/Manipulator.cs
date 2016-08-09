@@ -7,7 +7,7 @@ namespace Poly3D.Engine
 {
     public class Manipulator/* : SceneObject*/
     {
-        public static int SCREEN_SIZE = 64;
+        public static int SCREEN_SIZE = 80;
 
         public TransformType Type { get; set; }
 

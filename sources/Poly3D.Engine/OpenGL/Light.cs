@@ -18,7 +18,7 @@ namespace Poly3D.OpenGL
         private Color4 _Specular;
         private Color4 _Ambient;
         private Vector4 _Position;
-        private readonly int _Id;
+        private int _Id;
 
         public int Id
         {
@@ -165,13 +165,13 @@ namespace Poly3D.OpenGL
             _Ambient = new Color4(0, 0, 0, 1f);
             _Diffuse = new Color4(1f, 1f, 1f, 1f);
             _Specular = new Color4(1f, 1f, 1f, 1f);
-            _Position = new Vector4(0, 0, 1f, 0);
+            _Position = new Vector4(0, 0, 1f, 1f);
             _SpotDirection = new Vector3(0, 0, -1);
             _SpotExponent = 0f;
             _SpotCutoff = 180f;
         }
 
-        private void ApplyAll()
+        public void ApplyAll()
         {
             foreach (LightParameter lParam in Enum.GetValues(typeof(LightParameter)))
                 Apply(lParam);
@@ -245,10 +245,16 @@ namespace Poly3D.OpenGL
                     GL.GetLight(lName, lParam, out _SpotCutoff);
                     break;
                 case LightParameter.ConstantAttenuation:
+                    float test = 0f;
+                    GL.GetLight(lName, lParam, out test);
                     break;
                 case LightParameter.LinearAttenuation:
+                    float test1 = 0f;
+                    GL.GetLight(lName, lParam, out test1);
                     break;
                 case LightParameter.QuadraticAttenuation:
+                    float test2 = 0f;
+                    GL.GetLight(lName, lParam, out test2);
                     break;
             }
         }
@@ -307,5 +313,22 @@ namespace Poly3D.OpenGL
         {
             get { return GraphicsContext.CurrentContext != null; }
         }
+
+        private static readonly Light defaultLight = new Light(-1);
+
+        public static void ApplyDefault(int id)
+        {
+            defaultLight._Id = id;
+            defaultLight.ApplyAll();
+        }
+
+        public static Light GetLight(int id)
+        {
+            var l = new Light(id);
+            foreach (LightParameter lParam in Enum.GetValues(typeof(LightParameter)))
+                l.Load(lParam);
+            return l;
+        }
+
     }
 }

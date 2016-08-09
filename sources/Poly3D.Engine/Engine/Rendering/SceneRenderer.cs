@@ -46,35 +46,36 @@ namespace Poly3D.Engine.Rendering
             GL.MatrixMode(MatrixMode.Modelview);
             var viewMatrix = camera.GetModelviewMatrix();
             GL.LoadMatrix(ref viewMatrix);
-            GL.Enable(EnableCap.Light0);
 
+            GL.Enable(EnableCap.Light0);
+            
             foreach (var rootObj in scene.RootObjects.Where(o => o.IsActive))
             {
-                OnRenderObject(rootObj);
+                OnRenderObject(camera, rootObj);
             }
 
             RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Translation);
         }
 
-        private static void OnRenderObject(SceneObject sceneObject)
+        private static void OnRenderObject(Camera camera, SceneObject sceneObject)
         {
             GL.PushMatrix();
             var transMat = sceneObject.Transform.GetLocalTransformMatrix();
             GL.MultMatrix(ref transMat);
 
             if (sceneObject is ObjectMesh)
-                RenderMeshObject((ObjectMesh)sceneObject);
+                RenderMeshObject(camera, (ObjectMesh)sceneObject);
 
             if (sceneObject.Childs.Count > 0)
             {
                 foreach (var childObj in sceneObject.Childs.Where(o => o.IsActive))
-                    OnRenderObject(childObj);
+                    OnRenderObject(camera, childObj);
             }
 
             GL.PopMatrix();
         }
 
-        private static void RenderMeshObject(ObjectMesh meshObj)
+        private static void RenderMeshObject(Camera camera, ObjectMesh meshObj)
         {
             GL.PushAttrib(AttribMask.LightingBit | AttribMask.LineBit | AttribMask.StencilBufferBit | AttribMask.DepthBufferBit);
 
