@@ -157,6 +157,8 @@ namespace Poly3D.Maths
         {
             if(dir == Vector3.UnitY)
                 return FromDirection(dir, Vector3.UnitZ * -1f);
+            else if(dir == Vector3.UnitY * -1f)
+                return FromDirection(dir, Vector3.UnitZ);
             return FromDirection(dir,  Vector3.UnitY);
         }
 

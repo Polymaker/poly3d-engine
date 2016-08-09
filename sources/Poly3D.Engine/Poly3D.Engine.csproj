@@ -66,7 +66,7 @@
     <Compile Include="Engine\Rendering\RenderHelper.cs" />
     <Compile Include="Engine\Rendering\SceneRenderer.cs" />
     <Compile Include="Engine\Rendering\Space.cs" />
-    <Compile Include="Engine\Rendering\TransformType.cs" />
+    <Compile Include="Engine\TransformType.cs" />
     <Compile Include="Maths\BoundingBox.cs" />
     <Compile Include="Maths\BoundingSphere.cs" />
     <Compile Include="Maths\ComplexTransform.cs" />
