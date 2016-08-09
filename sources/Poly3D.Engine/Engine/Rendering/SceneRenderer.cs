@@ -48,13 +48,14 @@ namespace Poly3D.Engine.Rendering
             GL.LoadMatrix(ref viewMatrix);
 
             GL.Enable(EnableCap.Light0);
-            
+
             foreach (var rootObj in scene.RootObjects.Where(o => o.IsActive))
             {
                 OnRenderObject(camera, rootObj);
             }
 
-            RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Translation);
+            //RenderHelper.RenderAxes(5, 0.25f);
+            RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Scale);
         }
 
         private static void OnRenderObject(Camera camera, SceneObject sceneObject)

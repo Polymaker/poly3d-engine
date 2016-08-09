@@ -69,6 +69,54 @@ namespace Poly3D.Engine.Meshes
                 new Vertex(vertices[f.Item4], normals[f.Item4], f.Item4 >= 0 && uvs != null ? uvs[f.Item4] : (Vector2?)null)
                 )));
         }
+
+        public static Mesh CreatePrimitive(Primitives type, float size)
+        {
+            return CreatePrimitive(type, size, size, size);
+        }
+
+        public static Mesh CreatePrimitive(Primitives type, float size1, float size2)
+        {
+            return CreatePrimitive(type, size1, size2, size1);
+        }
+
+        public static Mesh CreatePrimitive(Primitives type, float size1, float size2, float size3)
+        {
+            switch (type)
+            {
+                case Primitives.Plane:
+                    return LoadFromVNTF(new Vector3[]
+                        {
+                            new Vector3(size1/2f, 0, size2/2f),
+                            new Vector3(size1/2f, 0, -size2/2f),
+                            new Vector3(-size1/2f, 0, -size2/2f),
+                            new Vector3(-size1/2f, 0, size2/2f)
+                        },
+                        new Vector3[]
+                        {
+                            Vector3.UnitY,
+                            Vector3.UnitY,
+                            Vector3.UnitY,
+                            Vector3.UnitY
+                        },
+                        new Vector2[]
+                        {
+                            new Vector2(1f, 1f),
+                            new Vector2(1f, 0f),
+                            new Vector2(0f, 0f),
+                            new Vector2(0f, 1f)
+                        },
+                        new Tuple<int, int, int>[]
+                        {
+                            new Tuple<int, int, int>(0, 1, 2),
+                            new Tuple<int, int, int>(0, 2, 3),
+                        });
+                case Primitives.Cube:
+
+                    break;
+            }
+            return null;
+        }
     
     }
 }

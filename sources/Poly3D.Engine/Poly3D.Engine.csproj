@@ -52,9 +52,12 @@
   <ItemGroup>
     <Compile Include="Collections\OwnerCollectionBase.cs" />
     <Compile Include="Collections\TSDictionary.cs" />
+    <Compile Include="Platform\GLPlatforms.cs" />
+    <Compile Include="Platform\IEngineSurface.cs" />
     <Compile Include="Control\RenderSettings.cs" />
     <Compile Include="Control\RenderStrategy.cs" />
     <Compile Include="Engine\Components\AnonymousBehaviour.cs" />
+    <Compile Include="Engine\Meshes\Primitives.cs" />
     <Compile Include="Engine\Rendering\Camera.cs" />
     <Compile Include="Engine\Components\EngineObject.cs" />
     <Compile Include="Engine\IViewPort.cs" />
@@ -120,10 +123,16 @@
       <DependentUpon>Poly3DControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Engine\Rendering\ProjectionType.cs" />
+    <Compile Include="Platform\EngineControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Platform\EngineWindow.cs" />
+    <Compile Include="Platform\IGLSurface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine\Components\Transform.cs" />
     <Compile Include="Utilities\FlagList.cs" />
     <Compile Include="Utilities\NumberExtensions.cs" />
+    <Compile Include="Utilities\ReflectionHelper.cs" />
     <Compile Include="Utilities\TempAssign.cs" />
   </ItemGroup>
   <ItemGroup>

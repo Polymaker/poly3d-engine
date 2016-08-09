@@ -88,16 +88,17 @@ namespace Poly3D.Engine
 
         public void OnUpdate(float deltaTime)
         {
+            var delay = Stopwatch.StartNew();
             foreach (var so in Objects)
             {
                 if (!so.IsActive)
                     continue;
-                foreach (var objBehave in so.Components.OfType< ObjectBehaviour>())
+                foreach (var objBehave in so.Components.OfType<ObjectBehaviour>())
                 {
                     if (!objBehave.Enabled)
                         continue;
 
-                    objBehave.DoUpdate(deltaTime);
+                    objBehave.DoUpdate(deltaTime + (float)delay.Elapsed.TotalSeconds);
                 }
             }
         }

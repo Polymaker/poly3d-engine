@@ -8,14 +8,16 @@ namespace Poly3D.Maths
         public static AngleUnit DefaultConvertionUnit = AngleUnit.Degrees;
         public const float PI = 3.1415926535897931f;
 
-        private float angleDeg;
+        private float _Degrees;
         
         public float Degrees
         {
-            get { return angleDeg; }
+            get { return _Degrees; }
             set
             {
-                angleDeg = value;
+                if (ReferenceEquals(this, Zero))
+                    return;
+                _Degrees = value;
             }
         }
         
@@ -24,7 +26,9 @@ namespace Poly3D.Maths
             get { return ToRadians(Degrees); }
             set
             {
-                angleDeg = ToDegrees(value);
+                if (object.ReferenceEquals(this, Zero))
+                    return;
+                _Degrees = ToDegrees(value);
             }
         }
 
@@ -118,7 +122,7 @@ namespace Poly3D.Maths
 
         public override int GetHashCode()
         {
-            return angleDeg.GetHashCode();
+            return _Degrees.GetHashCode();
         }
 
         #endregion
@@ -128,12 +132,12 @@ namespace Poly3D.Maths
         /// </summary>
         public void Normalize()
         {
-            angleDeg = NormalizeDegrees(angleDeg);
+            _Degrees = NormalizeDegrees(_Degrees);
         }
 
         public Angle Normalized()
         {
-            return Angle.FromDegrees(NormalizeDegrees(angleDeg));
+            return Angle.FromDegrees(NormalizeDegrees(_Degrees));
         }
 
         //assuming this is the minimum

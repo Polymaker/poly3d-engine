@@ -304,6 +304,7 @@ namespace Poly3D.Engine
         {
             var transformMatrix = Matrix4.Mult(GetModelviewMatrix(), ProjectionMatrix);
             var result = Vector4.Transform(new Vector4(point, 1), transformMatrix);
+
             var dispRect = DisplayRectangle;
             result.X = ((result.X / result.W) + 1f) / 2f;
             result.Y = (1f - (result.Y / result.W)) / 2f;

@@ -7,14 +7,16 @@ namespace Poly3D.Maths
         public static readonly AngleD Zero = new AngleD();
         public static AngleUnit DefaultConvertionUnit = AngleUnit.Degrees;
 
-        private double angleDeg;
+        private double _Degrees;
 
         public double Degrees
         {
-            get { return angleDeg; }
+            get { return _Degrees; }
             set
             {
-                angleDeg = value;
+                if (ReferenceEquals(this, Zero))
+                    return;
+                _Degrees = value;
             }
         }
 
@@ -23,7 +25,9 @@ namespace Poly3D.Maths
             get { return ToRadians(Degrees); }
             set
             {
-                angleDeg = ToDegrees(value);
+                if (ReferenceEquals(this, Zero))
+                    return;
+                _Degrees = ToDegrees(value);
             }
         }
 
@@ -117,7 +121,7 @@ namespace Poly3D.Maths
 
         public override int GetHashCode()
         {
-            return angleDeg.GetHashCode();
+            return _Degrees.GetHashCode();
         }
 
         #endregion
@@ -127,12 +131,12 @@ namespace Poly3D.Maths
         /// </summary>
         public void Clamp()
         {
-            angleDeg = ClampDegrees(angleDeg);
+            _Degrees = ClampDegrees(_Degrees);
         }
 
         public AngleD Clamped()
         {
-            return AngleD.FromDegrees(ClampDegrees(angleDeg));
+            return AngleD.FromDegrees(ClampDegrees(_Degrees));
         }
 
         //assuming this is the minimum
