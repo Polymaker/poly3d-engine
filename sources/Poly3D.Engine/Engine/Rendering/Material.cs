@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Poly3D.Engine
 {
-    public class Material : EngineObject
+    public class Material// : EngineObject
     {
         // Fields...
         private Texture _Texture;

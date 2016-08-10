@@ -67,9 +67,10 @@ namespace Poly3D.Engine
         {
             get
             {
-                if(Scene == null || Scene.Viewport == null)
+                if(Scene == null || Scene.Display == null)
                     return new Rect(0, 0, 1, 1);
-                
+
+                //var displaySize = new Vector2(Scene.Display.Width, Scene.Display.Height);
                 var displaySize = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
                 return new Rect(
                     displaySize.X * ViewRectangle.X, 
@@ -316,7 +317,7 @@ namespace Poly3D.Engine
         public SceneObject RaySelect(Ray ray)
         {
             var hits = new List<Tuple<float, SceneObject>>();
-            foreach (var meshObj in Scene.Objects.Where(o => o.IsActive).OfType<ObjectMesh>())
+            foreach (var meshObj in Scene.EngineObjects.Where(o => o.IsActive).OfType<ObjectMesh>())
             {
                 var worldToLocal = meshObj.Transform.WorldToLocalMatrix;
                 var localRay = Ray.Transform(ray, worldToLocal);

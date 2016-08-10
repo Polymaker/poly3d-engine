@@ -1,5 +1,7 @@
-﻿using Poly3D.Engine.Rendering;
+﻿using Poly3D.Engine.GUI;
+using Poly3D.Engine.Rendering;
 using Poly3D.Maths;
+using Poly3D.Platform;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,9 +13,12 @@ namespace Poly3D.Engine
     public class Scene
     {
         // Fields...
-        private List<SceneObject> _Objects;
+        private IEngineDisplay _Display;
+        private List<SceneObject> _ObjectsOld;
         private IViewPort _Viewport;
+        private List<EngineObject> _Objects;
 
+        [Obsolete("Use Scene.Display (when it will be implemented...).", false)]
         public IViewPort Viewport
         {
             get { return _Viewport; }
@@ -23,9 +28,24 @@ namespace Poly3D.Engine
             }
         }
 
-        public IEnumerable<SceneObject> Objects
+        public IEngineDisplay Display
+        {
+            get { return _Display; }
+        }
+
+        public IEnumerable<EngineObject> EngineObjects
         {
             get { return _Objects.AsReadOnly(); }
+        }
+
+        public IEnumerable<SceneObject> Objects
+        {
+            get { return EngineObjects.OfType<SceneObject>(); }
+        }
+
+        public IEnumerable<UIObject> UIObjects
+        {
+            get { return EngineObjects.OfType<UIObject>(); }
         }
 
         public IEnumerable<SceneObject> RootObjects
@@ -45,7 +65,8 @@ namespace Poly3D.Engine
 
         public Scene()
         {
-            _Objects = new List<SceneObject>();
+            _ObjectsOld = new List<SceneObject>();
+            _Objects = new List<EngineObject>();
             _Viewport = null;
             InitMainCamera();
         }
@@ -53,7 +74,8 @@ namespace Poly3D.Engine
         public Scene(IViewPort viewport)
         {
             _Viewport = viewport;
-            _Objects = new List<SceneObject>();
+            _ObjectsOld = new List<SceneObject>();
+            _Objects = new List<EngineObject>();
             InitMainCamera();
         }
 
@@ -65,10 +87,10 @@ namespace Poly3D.Engine
             camera.Transform.LookAt(new OpenTK.Vector3(0, 0f, 0));
         }
 
-        public T AddObject<T>() where T : SceneObject
+        public T AddObject<T>() where T : EngineObject
         {
             T sceneObj = Activator.CreateInstance<T>();
-            sceneObj.Scene = this;
+            sceneObj.Initialize(this);
             _Objects.Add(sceneObj);
             return sceneObj;
         }
@@ -89,7 +111,7 @@ namespace Poly3D.Engine
         public void OnUpdate(float deltaTime)
         {
             var delay = Stopwatch.StartNew();
-            foreach (var so in Objects)
+            foreach (var so in EngineObjects)
             {
                 if (!so.IsActive)
                     continue;
@@ -97,9 +119,63 @@ namespace Poly3D.Engine
                 {
                     if (!objBehave.Enabled)
                         continue;
-
+                    
                     objBehave.DoUpdate(deltaTime + (float)delay.Elapsed.TotalSeconds);
                 }
+            }
+        }
+
+        #region GetObject
+
+        public EngineObject GetObjectById(long instanceId)
+        {
+            return _Objects.FirstOrDefault(o => o.GetInstanceId() == instanceId);
+        }
+
+        public EngineObject GetObjectByName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+            return _Objects.FirstOrDefault(o => o.Name == name);
+        }
+
+        public EngineObject GetObjectByTag(object tag)
+        {
+            if (tag == null)
+                return null;
+            return _Objects.FirstOrDefault(o => o.Tag == tag);
+        }
+
+        public EngineObject[] GetObjectsByTag(object tag)
+        {
+            if(tag == null)
+                return new EngineObject[0];
+            return _Objects.Where(o => o.Tag == tag).ToArray();
+        }
+
+        #endregion
+
+        #region EngineObject name management
+
+        internal void SetObjectName(EngineObject engineObject, ref string currentName, string newName)
+        {
+            if (_Objects.Any(o => !string.IsNullOrEmpty(o.Name) && o.Name.Equals(newName) && o != engineObject))
+            {
+                if (string.IsNullOrEmpty(currentName))
+                    currentName = "EngineObject" + engineObject.GetInstanceId();
+            }
+            else
+                currentName = newName;
+        }
+
+        #endregion
+
+        public static Scene Current
+        {
+            get
+            {
+                //TODO: implement a way to know the current scene from the caller/calling thread
+                throw new NotImplementedException();
             }
         }
     }

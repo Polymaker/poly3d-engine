@@ -160,8 +160,8 @@ namespace Poly3D.Engine
         {
             get
             {
-                if (SceneObject != null && SceneObject.Parent != null)
-                    return SceneObject.Parent.Transform;
+                if (EngineObject != null && EngineObject.Parent != null)
+                    return EngineObject.Parent.Transform;
                 return null;
             }
         }
@@ -198,9 +198,9 @@ namespace Poly3D.Engine
 
         private void NotifyParentChanged()
         {
-            if (SceneObject != null && SceneObject.Childs.Count > 0)
+            if (EngineObject != null && EngineObject.Childs.Count > 0)
             {
-                foreach (var childObj in SceneObject.AllChilds)
+                foreach (var childObj in EngineObject.AllChilds)
                     childObj.Transform.isWorldMatrixDirty = true;
             }
         }
@@ -224,11 +224,11 @@ namespace Poly3D.Engine
 
         public void BuildConvertionMatrices()
         {
-            if (SceneObject == null)
+            if (EngineObject == null)
                 return;
             _LocalToWorldMatrix = Matrix4.Identity;
 
-            foreach (var node in SceneObject.GetHierarchy(false).Reverse())
+            foreach (var node in EngineObject.GetHierarchy(false).Reverse())
             {
                 var transformMatrix = node.Transform.GetLocalTransformMatrix();
                 _LocalToWorldMatrix = Matrix4.Mult(_LocalToWorldMatrix, transformMatrix);

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Poly3D.Platform
 {
-    public interface IEngineSurface
+    public interface IEngineDisplay
     {
         int Width { get; set; }
 

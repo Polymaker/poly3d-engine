@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Poly3D.Engine
 {
-    public class Texture : EngineObject
+    public class Texture// : EngineObject
     {
 
     }

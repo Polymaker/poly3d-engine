@@ -53,7 +53,7 @@ namespace Poly3D.Test
             var rotater = modelObject2.AddComponent<AnonymousBehaviour>();
             rotater.Update = (ob, dt) =>
              {
-                 ob.SceneObject.Transform.Rotate(new Rotation(0f, 0f, 90f * (float)dt));
+                 (ob.EngineObject as SceneObject).Transform.Rotate(new Rotation(0f, 0f, 90f * (float)dt));
              };
 
             var mainCam = poly3DControl1.Scene.ActiveCameras.First();
@@ -87,7 +87,7 @@ namespace Poly3D.Test
                 var selectedObject = mainCam.RaySelect(raycast);
                 if (selectedObject != null)
                 {
-                    Trace.WriteLine("Selected object id " + selectedObject.GetInstanceID());
+                    //Trace.WriteLine("Selected object id " + selectedObject.GetInstanceID());
                 }
             }
         }

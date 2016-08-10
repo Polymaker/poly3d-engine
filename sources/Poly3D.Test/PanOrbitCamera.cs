@@ -18,7 +18,7 @@ namespace Poly3D.Test
 
         public Camera Camera
         {
-            get { return (Camera)SceneObject; }
+            get { return (Camera)EngineObject; }
         }
 
         protected override void OnInitialize()

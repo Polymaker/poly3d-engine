@@ -8,39 +8,14 @@ namespace Poly3D.Engine
     public class SceneObject : EngineObject
     {
         // Fields...
-        private bool _Active;
         private SceneObject _Parent;
-        //private ComponentCollection _Components;
-        private List<ObjectComponent> _Components;
         private SceneObjectChildCollection _Childs;
         private Transform _Transform;
-        private Scene _Scene;
-
-        public Scene Scene
-        {
-            get { return _Scene; }
-            internal set
-            {
-                _Scene = value;
-            }
-        }
-
-        /// <summary>
-        /// Enables or disables the current scene object.
-        /// </summary>
-        public bool Active
-        {
-            get { return _Active; }
-            set
-            {
-                _Active = value;
-            }
-        }
         
         /// <summary>
         /// 
         /// </summary>
-        public bool IsActive
+        public override bool IsActive
         {
             get
             {
@@ -89,12 +64,6 @@ namespace Poly3D.Engine
             }
         }
 
-        //public ComponentCollection Components
-        public IEnumerable<ObjectComponent> Components
-        {
-            get { return _Components.AsReadOnly(); }
-        }
-
         public IList<SceneObject> Childs
         {
             get { return _Childs/*.AsReadOnly()*/; }
@@ -109,14 +78,12 @@ namespace Poly3D.Engine
 
         public SceneObject()
         {
-            //_Components = new ComponentCollection(this);
-            _Components = new List<ObjectComponent>();
             _Transform = new Transform(this);
-            _Components.Add(_Transform);
+            AddComponent(_Transform);
+            //_Components.Add(_Transform);
             _Childs = new SceneObjectChildCollection(this);
             _Parent = null;
-            _Scene = null;
-            _Active = true;
+            
         }
 
         private void OnHierarchyChangedInternal()
@@ -146,7 +113,8 @@ namespace Poly3D.Engine
 
             T comp = Activator.CreateInstance<T>();
             comp.SetOwner(this);
-            _Components.Add(comp);
+            AddComponent(comp);
+            //_Components.Add(comp);
             return comp;
         }
 
@@ -166,14 +134,14 @@ namespace Poly3D.Engine
             if (_Transform == transform)
                 return;
 
-            if (_Transform != null && _Components.Contains(_Transform))
+            if (_Transform != null && Components.Contains(_Transform))
             {
-                _Components.Remove(_Transform);
+                RemoveComponent(_Transform);
                 _Transform.SetOwner(null);
             }
 
             _Transform = transform.Clone();
-            _Components.Add(_Transform);
+            AddComponent(_Transform);
             _Transform.SetOwner(this);
 
             if (keepWorldPosition)
@@ -233,8 +201,8 @@ namespace Poly3D.Engine
                         newParent._Childs.Add(this);
                 }
                 _Parent = newParent;
-                if (_Scene == null)
-                    _Scene = _Parent.Scene;
+                if (Scene == null)
+                    Scene = _Parent.Scene;
                 OnHierarchyChangedInternal();
             }
         }
