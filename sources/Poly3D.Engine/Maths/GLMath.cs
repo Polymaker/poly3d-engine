@@ -80,6 +80,26 @@ namespace Poly3D.Maths
             return new Vector3(Angle.ToDegrees(v.X), Angle.ToDegrees(v.Y), Angle.ToDegrees(v.Z));
         }
 
+        public static float MaxComponent(this Vector3 v)
+        {
+            return Math.Max(v.X, Math.Max(v.Y, v.Z));
+        }
+
+        public static float MinComponent(this Vector3 v)
+        {
+            return Math.Min(v.X, Math.Min(v.Y, v.Z));
+        }
+
+        public static float MaxComponent(this Vector2 v)
+        {
+            return Math.Max(v.X, v.Y);
+        }
+
+        public static float MinComponent(this Vector2 v)
+        {
+            return Math.Min(v.X, v.Y);
+        }
+
         public static Matrix4 RotationFromTo(this Vector3 v1, Vector3 v2)
         {
             if (v1 == v2)

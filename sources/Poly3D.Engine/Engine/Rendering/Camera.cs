@@ -8,6 +8,8 @@ using Poly3D.Maths;
 using Poly3D.Graphics;
 using System.Diagnostics;
 using System.Collections;
+using System.ComponentModel;
+
 namespace Poly3D.Engine
 {
 	public class Camera : SceneObject
@@ -67,7 +69,7 @@ namespace Poly3D.Engine
         {
             get
             {
-                if(Scene == null || Scene.Display == null)
+                if(Scene == null || Scene.Viewport == null)
                     return new Rect(0, 0, 1, 1);
 
                 //var displaySize = new Vector2(Scene.Display.Width, Scene.Display.Height);
@@ -256,63 +258,199 @@ namespace Poly3D.Engine
                 return null;
 
             // Normalize screen poin
-            var normalizedPoint = new Vector2((point.X - viewRect.X) / viewRect.Width, (point.Y - viewRect.Y) / viewRect.Height);
+            //var normalizedPoint = new Vector2((point.X - viewRect.X) / viewRect.Width, (point.Y - viewRect.Y) / viewRect.Height);
 
-            return Raycast(normalizedPoint);
+            return Raycast(ScreenPointToViewport(point));
         }
 
-        public Ray Raycast(Vector2 point)
+        public Ray Raycast(Vector2 viewportPoint)
         {
-            if (point.X < 0f || point.X > 1f || point.Y < 0f || point.Y > 1f)
+            if (viewportPoint.X < 0f || viewportPoint.X > 1f || viewportPoint.Y < 0f || viewportPoint.Y > 1f)
                 return null;
 
-            var transformMatrix = Matrix4.Mult(GetModelviewMatrix(), ProjectionMatrix).Inverted();
+            var cameraMatrix = Matrix4.Mult(GetModelviewMatrix(), ProjectionMatrix).Inverted();
+            try
+            {
+                var nearFrustumPoint = ViewportPointToFrustum(viewportPoint, 0);
+                var farFrustumPoint = ViewportPointToFrustum(viewportPoint, 1);
 
-            // Transformation of normalized coordinates (from [0.0, 1.0] to [-1.0, 1.0]).
-            var startVector = new Vector4(
-                point.X * 2f - 1f,//-1 = left, so 0->1 = -1->+1
-                1f - point.Y * 2f,//-1 = bottom, so 0->1 = +1->-1
-                -1f,//near
-                1f);
+                var origin = FrustumPointToWorld(nearFrustumPoint, cameraMatrix);
+                var target = FrustumPointToWorld(farFrustumPoint, cameraMatrix);
+
+                return Ray.FromPoints(origin, target);
+            }
+            catch
+            {
+                return null;
+            }
             
-            var endVector = new Vector4(
-                startVector.X,
-                startVector.Y,
-                1f,//far
-                1f);
-
-            var origin = Vector4.Transform(startVector, transformMatrix);
-            if (origin.W == 0)
-                return null;
-
-            origin.X /= origin.W;
-            origin.Y /= origin.W;
-            origin.Z /= origin.W;
-
-            var end = Vector4.Transform(endVector, transformMatrix);
-
-            if (end.W == 0)
-                return null;
-
-            end.X /= end.W;
-            end.Y /= end.W;
-            end.Z /= end.W;
-
-            return Ray.FromPoints(origin.Xyz, end.Xyz);
         }
 
-        public Vector2 PointToScreen(Vector3 point)
+
+        #region Point convertion from Viewport space
+
+        /// <summary>
+        /// Transforms position from viewport space into screen space.
+        /// </summary>
+        /// <param name="viewportPoint">Viewport point. The bottom-left is (0,0); the top-right is (1,1); front is 0; back is 1</param>
+        /// <returns></returns>
+        public Vector2 ViewportPointToScreen(Vector3 viewportPoint)
+        {
+            return ViewportPointToScreen(viewportPoint.Xy); //we discard Z as it doesn't affect screen space, only world space
+        }
+
+        /// <summary>
+        /// Transforms position from viewport space into screen space.
+        /// </summary>
+        /// <param name="viewportPoint">Viewport point. The bottom-left is (0,0); the top-right is (1,1)</param>
+        /// <returns>Returns a screen space coordinate.</returns>
+        public Vector2 ViewportPointToScreen(Vector2 viewportPoint)
+        {
+            var viewRect = DisplayRectangle;
+            return new Vector2(
+                (int)(viewRect.X + viewRect.Width * viewportPoint.X),
+                (int)(viewRect.Y + viewRect.Height * (1f - viewportPoint.Y)));
+        }
+
+        /// <summary>
+        /// Converts Viewport point (0.0 to 1.0) to 'Frustum' (3D) point (-1.0 to +1.0)
+        /// </summary>
+        /// <param name="viewportPoint"></param>
+        /// <param name="z"></param>
+        /// <returns>Returns a frustum space coordinate.</returns>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Vector4 ViewportPointToFrustum(Vector2 viewportPoint, float z = 0f)
+        {
+            return ViewportPointToFrustum(new Vector3(viewportPoint.X, viewportPoint.Y, z));
+        }
+
+        /// <summary>
+        /// Converts Viewport point (0.0 to 1.0) to 'Frustum' (3D) point (-1.0 to +1.0)
+        /// </summary>
+        /// <param name="viewportPoint"></param>
+        /// <returns>Returns a frustum space coordinate.</returns>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Vector4 ViewportPointToFrustum(Vector3 viewportPoint)
+        {
+            if (viewportPoint.MaxComponent() > 1f || viewportPoint.MinComponent() < 0)
+                throw new ArgumentException("Point not in viewport space (0.0 to 1.0).", "viewportPoint");
+            return new Vector4(
+                viewportPoint.X * 2f - 1f,
+                viewportPoint.Y * 2f - 1f,
+                viewportPoint.Z * 2f - 1f,
+                1f);
+        }
+
+        /// <summary>
+        /// Transforms position from viewport space into world space.
+        /// </summary>
+        /// <param name="viewportPoint">Viewport point. The bottom-left is (0,0); the top-right is (1,1)</param>
+        /// <returns>Returns a world space coordinate.</returns>
+        public Vector3 ViewportPointToWorld(Vector2 viewportPoint)
+        {
+            return FrustumPointToWorld(ViewportPointToFrustum(viewportPoint));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="viewportPoint"></param>
+        /// <param name="z"></param>
+        /// <returns></returns>
+        public Vector3 ViewportPointToWorld(Vector2 viewportPoint, float z)
+        {
+            return FrustumPointToWorld(ViewportPointToFrustum(viewportPoint, z));
+        }
+
+        /// <summary>
+        /// Transforms position from viewport space into world space.
+        /// </summary>
+        /// <param name="viewportPoint">Viewport point. The bottom-left is (0,0); the top-right is (1,1); front is 0; back is 1</param>
+        /// <returns></returns>
+        public Vector3 ViewportPointToWorld(Vector3 viewportPoint)
+        {
+            return FrustumPointToWorld(ViewportPointToFrustum(viewportPoint));
+        }
+
+        #endregion
+
+        #region Point convertion from Screen space
+
+        /// <summary>
+        /// Transforms position from screen space into viewport space.
+        /// </summary>
+        /// <param name="screenPoint"></param>
+        /// <returns></returns>
+        public Vector2 ScreenPointToViewport(Vector2 screenPoint)
+        {
+            var viewRect = DisplayRectangle;
+            return new Vector2(
+                (screenPoint.X - viewRect.X) / viewRect.Width, //left to right = 0 to 1
+                (viewRect.Height - (screenPoint.Y - viewRect.Y)) / viewRect.Height);//up to bottom = 0 to 1 (invert Y)
+        }
+
+        /// <summary>
+        /// Transforms position from screen space into world space.
+        /// </summary>
+        /// <param name="screenPoint"></param>
+        /// <returns></returns>
+        public Vector3 ScreenPointToWorld(Vector2 screenPoint)
+        {
+            return ViewportPointToWorld(ScreenPointToViewport(screenPoint));
+        }
+
+        #endregion
+
+        #region Point convertion from World space
+
+        /// <summary>
+        /// Transforms position from world space into viewport space.
+        /// </summary>
+        /// <param name="worldPoint"></param>
+        /// <returns></returns>
+        public Vector3 WorldPointToViewport(Vector3 worldPoint)
         {
             var transformMatrix = Matrix4.Mult(GetModelviewMatrix(), ProjectionMatrix);
-            var result = Vector4.Transform(new Vector4(point, 1), transformMatrix);
-
-            var dispRect = DisplayRectangle;
-            result.X = ((result.X / result.W) + 1f) / 2f;
-            result.Y = (1f - (result.Y / result.W)) / 2f;
-            result.X = dispRect.X + result.X * dispRect.Width;
-            result.Y = dispRect.Y + result.Y * dispRect.Height;
-            return result.Xy;
+            var result = Vector4.Transform(new Vector4(worldPoint, 1), transformMatrix);
+            //if result.Z < 0, point is behind camera (I think, not tested)
+            return FrustumPointToViewPort(result);
         }
+
+        /// <summary>
+        /// Transforms position from world space into screen space.
+        /// </summary>
+        /// <param name="worldPoint"></param>
+        /// <returns></returns>
+        public Vector2 WorldPointToScreen(Vector3 worldPoint)
+        {
+            return ViewportPointToScreen(WorldPointToViewport(worldPoint));
+        }
+
+        #endregion
+
+        #region Point convertion from Frustum
+
+        private Vector3 FrustumPointToWorld(Vector4 frustumPoint)
+        {
+            var cameraMatrix = Matrix4.Mult(GetModelviewMatrix(), ProjectionMatrix).Inverted();
+            return FrustumPointToWorld(frustumPoint, cameraMatrix);
+        }
+
+        private static Vector3 FrustumPointToWorld(Vector4 frustumPoint, Matrix4 cameraMatrix)
+        {
+            var result = Vector4.Transform(frustumPoint, cameraMatrix);
+            if (result.W == 0)
+                throw new Exception("Problems");
+            return result.Xyz / result.W;
+        }
+
+        private static Vector3 FrustumPointToViewPort(Vector4 frustumPoint)
+        {
+            var pos = frustumPoint.Xyz / frustumPoint.W;
+            return new Vector3((pos.X + 1f) / 2f, (pos.Y + 1f) / 2f, (pos.Z + 1f) / 2f);
+        }
+
+        #endregion
 
         public SceneObject RaySelect(Ray ray)
         {
@@ -337,6 +475,8 @@ namespace Poly3D.Engine
             return null;
         }
 
+        #region Visible world space calculations
+
         /// <summary>
         /// Gets the visible vertical height of the world at the distance specified. 
         /// </summary>
@@ -344,7 +484,7 @@ namespace Poly3D.Engine
         /// <returns></returns>
         public float GetViewHeight(float distFromCamera)
         {
-            if(Projection == ProjectionType.Perspective)
+            if (Projection == ProjectionType.Perspective)
                 return (float)Math.Tan(FieldOfView.Radians / 2f) * distFromCamera * 2f;
 
             return OrthographicSize;
@@ -365,6 +505,9 @@ namespace Poly3D.Engine
             var vh = GetViewHeight(distFromCamera);
             return new Vector2(vh * AspectRatio, vh);
         }
+
+        #endregion
+
 
         public float GetDistanceFromCamera(SceneObject so)
         {

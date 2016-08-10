@@ -15,10 +15,10 @@ namespace Poly3D.Platform
 
         float AspectRatio { get; }
 
-        event EventHandler<EventArgs> SizeChanged;
+        event EventHandler SizeChanged;
 
-        event EventHandler<EventArgs> Load;
+        event EventHandler Load;
 
-        event EventHandler<EventArgs> Unload;
+        event EventHandler Unload;
     }
 }

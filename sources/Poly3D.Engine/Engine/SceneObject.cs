@@ -9,7 +9,7 @@ namespace Poly3D.Engine
     {
         // Fields...
         private SceneObject _Parent;
-        private SceneObjectChildCollection _Childs;
+        private SceneObjectCollection _Childs;
         private Transform _Transform;
         
         /// <summary>
@@ -81,9 +81,8 @@ namespace Poly3D.Engine
             _Transform = new Transform(this);
             AddComponent(_Transform);
             //_Components.Add(_Transform);
-            _Childs = new SceneObjectChildCollection(this);
+            _Childs = new SceneObjectCollection(this);
             _Parent = null;
-            
         }
 
         private void OnHierarchyChangedInternal()
@@ -140,7 +139,7 @@ namespace Poly3D.Engine
                 _Transform.SetOwner(null);
             }
 
-            _Transform = transform.Clone();
+            _Transform = (Transform)transform.Clone();
             AddComponent(_Transform);
             _Transform.SetOwner(this);
 

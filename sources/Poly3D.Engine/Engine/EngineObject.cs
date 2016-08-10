@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Poly3D.Engine.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace Poly3D.Engine
         private readonly long InstanceId = GenerateInstanceId();
         private Scene _Scene;
         private bool _Active;
-        private List<IComponent> _Components;
+        private List<IEngineComponent> _Components;
 
         public Scene Scene
         {
@@ -44,38 +45,64 @@ namespace Poly3D.Engine
             get { return _Active; }
             set
             {
+                if (_Active == value)
+                    return;
                 _Active = value;
             }
         }
 
         public abstract bool IsActive { get; }
 
-        public IList<IComponent> Components
+        public IList<IEngineComponent> Components
         {
             get { return _Components.AsReadOnly(); }
         }
+
+        #region Events
+
+        public event EventHandler Activated;
+
+        public event EventHandler Deactivated;
+
+        #endregion
 
         public EngineObject()
         {
             _Name = String.Empty;
             _Scene = null;
             Tag = null;
-            _Active = true;
-            _Components = new List<IComponent>();
+            _Active = false;
+            _Components = new List<IEngineComponent>();
         }
 
         internal void Initialize(Scene scene)
         {
             _Scene = scene;
-            Scene.SetObjectName(this, ref _Name, GetType().Name + GetInstanceId());
+            _Active = true;
+            _Name = Scene.GetDefaultName(this);
         }
 
-        internal void AddComponent(IComponent component)
+        #region Components
+
+
+
+        #endregion
+
+        internal void AddComponent(IEngineComponent component)
         {
             _Components.Add(component);
         }
 
-        internal void RemoveComponent(IComponent component)
+        //internal void AddComponent<T>(IEngineComponent<T> component) where T : EngineObject
+        //{
+        //    if (GetType() == typeof(SceneObject) && typeof(T) == typeof(UIObject))
+        //        return;
+        //    else if (GetType() == typeof(UIObject) && typeof(T) == typeof(SceneObject))
+        //        return;
+        //    _Components.Add(component);
+        //}
+
+        internal void RemoveComponent(IEngineComponent component)
         {
             _Components.Remove(component);
         }

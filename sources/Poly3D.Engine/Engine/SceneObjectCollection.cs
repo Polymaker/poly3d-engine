@@ -6,15 +6,15 @@ using System.Text;
 
 namespace Poly3D.Engine
 {
-    public class SceneObjectChildCollection : OwnerCollectionBase<SceneObject, SceneObject>
+    public sealed class SceneObjectCollection : OwnerCollectionBase<SceneObject, SceneObject>
     {
-        public SceneObjectChildCollection(SceneObject owner)
+        public SceneObjectCollection(SceneObject owner)
             : base(owner)
         {
             
         }
 
-        public SceneObjectChildCollection(SceneObject owner, IEnumerable<SceneObject> source)
+        public SceneObjectCollection(SceneObject owner, IEnumerable<SceneObject> source)
             : base(owner, source)
         {
             

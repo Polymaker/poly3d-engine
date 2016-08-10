@@ -1,4 +1,4 @@
-using Poly3D.Engine.GUI;
+using Poly3D.Engine.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Poly3D.Engine
 {
-    public abstract class BaseComponent<T> : IComponent where T : EngineObject
+    public abstract class BaseComponent<T> : IEngineComponent<T>, IEngineComponent where T : EngineObject
     {
         private T _EngineObject;
 
@@ -30,9 +30,21 @@ namespace Poly3D.Engine
             _EngineObject = owner;
         }
 
-        EngineObject IComponent.EngineObject
+        EngineObject IEngineComponent.EngineObject
         {
             get { return EngineObject; }
+        }
+
+        protected virtual void Initialize() { }
+
+        internal void InitializeInternal()
+        {
+            Initialize();
+        }
+
+        public virtual IEngineComponent Clone()
+        {
+            return (IEngineComponent)Activator.CreateInstance(GetType());
         }
     }
 }

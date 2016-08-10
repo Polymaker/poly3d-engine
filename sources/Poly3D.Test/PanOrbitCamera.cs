@@ -49,7 +49,18 @@ namespace Poly3D.Test
             {
                 CameraTarget = Vector3.Zero;
                 Camera.Transform.LookAt(CameraTarget, false);
-                Camera.Transform.Rotation.Roll = 0f;
+                var rotAngles = Camera.Transform.Rotation.EulerAngles;
+                rotAngles.Z = 0;//reset roll
+                Camera.Transform.Rotation = rotAngles;
+
+                //var sceneObj = EngineObject.Scene.GetObjectByName("WheelHub") as SceneObject;
+                //if (sceneObj != null)
+                //{
+                //    var rot1 = sceneObj.Transform.WorldRotation;
+                //    var rot2 = sceneObj.Transform.WorldRotation2;
+                //    Trace.WriteLine(rot1);
+                //    Trace.WriteLine(rot2);
+                //}
             }
 
             if (mouseState.MiddleButton == ButtonState.Pressed && Math.Abs(mouseDelta.Length) > 1)

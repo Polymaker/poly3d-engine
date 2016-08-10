@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace Poly3D.Platform
 {
-    public class EngineWindow : NativeWindow, IGLSurface, IDisposable
+    public class EngineWindow : NativeWindow, IGLSurface, IEngineDisplay, IDisposable
     {
         private bool _IsExiting;
         private VSyncMode _VSync;
@@ -51,6 +51,26 @@ namespace Poly3D.Platform
             }
         }
 
+        /// <summary>
+        /// Gets or states the state of the NativeWindow.
+        /// </summary>
+        public override WindowState WindowState
+        {
+            get
+            {
+                return base.WindowState;
+            }
+            set
+            {
+                base.WindowState = value;
+                if (Context != null)
+                {
+                    Context.Update(WindowInfo);
+                }
+            }
+        }
+
+
         public bool IsExiting
         {
             get
@@ -59,6 +79,37 @@ namespace Poly3D.Platform
                 return _IsExiting;
             }
         }
+
+        /// <summary>
+        /// Gets the aspect ratio of this EngineWindow.
+        /// </summary>
+        public float AspectRatio
+        {
+            get
+            {
+                EnsureUndisposed();
+                return (float)ClientSize.Width / (float)ClientSize.Height;
+            }
+        }
+
+        public new bool Visible
+        {
+            get { return base.Visible; }
+            set
+            {
+                SetVisible(value);
+            }
+        }
+
+        #endregion
+
+        #region Events
+
+        public event EventHandler Load;
+
+        public event EventHandler Unload;
+
+        public event EventHandler SizeChanged;
 
         #endregion
 
@@ -133,7 +184,11 @@ namespace Poly3D.Platform
 
         public IGraphicsContext Context
         {
-            get { return _Context; }
+            get
+            {
+                EnsureUndisposed();
+                return _Context;
+            }
         }
 
         protected INativeWindow Implementation
@@ -170,16 +225,60 @@ namespace Poly3D.Platform
 
         #endregion
 
-        #region IEngineSurface
+        #region IEngineDisplay
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            OnSizeChanged(e);
+        }
+
+        protected virtual void OnSizeChanged(EventArgs e)
+        {
+            var handler = SizeChanged;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        protected virtual void OnLoad(EventArgs e)
+        {
+            var handler = Load;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        protected virtual void OnUnload(EventArgs e)
+        {
+            var handler = Unload;
+            if (handler != null)
+                handler(this, e);
+        }
 
         #endregion
 
         #region Window/Form methods & functions
 
+        private void SetVisible(bool value)
+        {
+            EnsureUndisposed();
+            if (value != Visible)
+            {
+                if (value)
+                    Show();
+                else
+                    Hide();
+            }
+        }
+
         public void Show()
         {
-            Visible = true;
+            base.Visible = true;
             RunMessageLoop();
+        }
+
+        public void Hide()
+        {
+            base.Visible = false;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -196,7 +295,7 @@ namespace Poly3D.Platform
             if (Initialized)
                 return;
             Initialized = true;
-            //MessageLoop();
+            OnLoad(EventArgs.Empty);
             new Thread(MessageLoop).Start();
         }
 

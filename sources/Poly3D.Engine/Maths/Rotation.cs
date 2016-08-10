@@ -5,7 +5,10 @@ using System.Diagnostics;
 
 namespace Poly3D.Maths
 {
-    public class Rotation
+    //Defined as struct to prevent implementing complex change detection mechanism.
+    //Since you can't assign a struct field by a class property, you must assign the property to a new struct, 
+    //so detecting changes can be done in the property accessor.
+    public struct Rotation
     {
         private Quaternion _Quaternion;
         private Vector3 _EulerAngles;
@@ -199,12 +202,13 @@ namespace Poly3D.Maths
 
         public static explicit operator Matrix4(Rotation rot)
         {
-            return new Matrix4(
-                new Vector4(rot.Matrix.Row0),
-                new Vector4(rot.Matrix.Row1),
-                new Vector4(rot.Matrix.Row2),
-                Vector4.UnitW
-                );
+            return Matrix4.CreateFromQuaternion(rot.Quaternion);
+            //return new Matrix4(
+            //    new Vector4(rot.Matrix.Row0),
+            //    new Vector4(rot.Matrix.Row1),
+            //    new Vector4(rot.Matrix.Row2),
+            //    Vector4.UnitW
+            //    );
         }
 
         public static Rotation Identity

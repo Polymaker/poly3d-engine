@@ -54,9 +54,17 @@
     <Compile Include="Collections\TSDictionary.cs" />
     <Compile Include="Engine\BaseComponent.cs" />
     <Compile Include="Engine\EngineObject.cs" />
-    <Compile Include="Engine\GUI\UIObject.cs" />
-    <Compile Include="Engine\IComponent.cs" />
-    <Compile Include="Engine\GUI\UIComponent.cs" />
+    <Compile Include="Engine\UI\UIContainer.cs" />
+    <Compile Include="Engine\UI\UIObject.cs" />
+    <Compile Include="Engine\UI\UIWindow.cs" />
+    <Compile Include="Engine\IEngineComponent.cs" />
+    <Compile Include="Engine\UI\UIComponent.cs" />
+    <Compile Include="Engine\Physics\BoxCollider.cs" />
+    <Compile Include="Engine\Physics\Collider.cs" />
+    <Compile Include="Engine\Physics\Collider2D.cs" />
+    <Compile Include="Engine\Physics\RaycastHit.cs" />
+    <Compile Include="Engine\Physics\SphereCollider.cs" />
+    <Compile Include="Engine\SceneState.cs" />
     <Compile Include="Platform\GLPlatforms.cs" />
     <Compile Include="Platform\IEngineDisplay.cs" />
     <Compile Include="Control\RenderSettings.cs" />
@@ -81,7 +89,7 @@
     <Compile Include="Maths\Ray.cs" />
     <Compile Include="Engine\Scene.cs" />
     <Compile Include="Engine\SceneObject.cs" />
-    <Compile Include="Engine\SceneObjectChildCollection.cs" />
+    <Compile Include="Engine\SceneObjectCollection.cs" />
     <Compile Include="Engine\Rendering\Texture.cs" />
     <Compile Include="Graphics\Color.cs" />
     <Compile Include="Graphics\ColorConverter.cs" />
@@ -142,9 +150,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Engine\Physics\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

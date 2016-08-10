@@ -5,14 +5,48 @@ using System.Linq;
 using System.Text;
 using OpenTK.Graphics;
 using Poly3D.Utilities;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Drawing;
 
 namespace Poly3D.Platform
 {
     [System.ComponentModel.ToolboxItem(true)]
-    public class EngineControl : GLControl, IGLSurface, IDisposable
+    public class EngineControl : GLControl, IGLSurface, IEngineDisplay, IDisposable
     {
         private GLPlatforms _NativePlatform;
         private bool _Exists;
+
+        #region Properties
+
+        #endregion
+
+        #region Base properties overrides
+
+        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never), DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public override Image BackgroundImage
+        {
+            get { return base.BackgroundImage; }
+            set { base.BackgroundImage = value; }
+        }
+
+        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never), DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public override ImageLayout BackgroundImageLayout
+        {
+            get { return base.BackgroundImageLayout; }
+            set { base.BackgroundImageLayout = value; }
+        }
+
+        #endregion
+
+        #region Events
+
+        public event EventHandler Unload;
+
+        #endregion
 
         #region Ctors
 
@@ -98,9 +132,18 @@ namespace Poly3D.Platform
         }
 
         #endregion
+
+        protected virtual void OnUnload(EventArgs e)
+        {
+            var handler = Unload;
+            if (handler != null)
+                handler(this, e);
+        }
+
         protected override void Dispose(bool disposing)
         {
             _Exists = false;
+            OnUnload(EventArgs.Empty);
             base.Dispose(disposing);
         }
     }

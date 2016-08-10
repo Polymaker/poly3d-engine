@@ -7,6 +7,11 @@ using Poly3D.Maths;
 
 namespace Poly3D.Engine
 {
+    //***********************
+    // Except for the Position/Rotation/Scale properties (and _LocalMatrix field), 'Local' refers to the tranform's (SceneObject's) origin.
+    // In other words, the LocalToWorldMatrix and WorldToLocalMatrix excludes local transformations.
+    // I compute world/final values by adding the local tranforms to its parent. 
+    //***********************
     public sealed class Transform : ObjectComponent
     {
         private Rotation _Rotation;//local
@@ -14,6 +19,8 @@ namespace Poly3D.Engine
         private Vector3 _Position;//local
         internal bool isWorldMatrixDirty;
         private Matrix4 _LocalToWorldMatrix;
+        private Matrix4 _LocalMatrix;
+        private bool isLocalMatrixDirty;
 
         /// <summary>
         /// The blue axis of the transform in world space. (Z Axis)
@@ -50,6 +57,7 @@ namespace Poly3D.Engine
                 if (_Position == value)
                     return;
                 _Position = value;
+                isLocalMatrixDirty = true;
                 NotifyParentChanged();
             }
         }
@@ -62,9 +70,10 @@ namespace Poly3D.Engine
             get { return _Rotation; }
             set
             {
-                //if (_Rotation == value)
-                //    return;
+                if (_Rotation.Quaternion == value.Quaternion)
+                    return;
                 _Rotation = value;
+                isLocalMatrixDirty = true;
                 NotifyParentChanged();
             }
         }
@@ -82,6 +91,7 @@ namespace Poly3D.Engine
                 if (_Scale == value)
                     return;
                 _Scale = value;
+                isLocalMatrixDirty = true;
                 NotifyParentChanged();
             }
         }
@@ -93,9 +103,7 @@ namespace Poly3D.Engine
         {
             get
             {
-                if (isWorldMatrixDirty)
-                    BuildConvertionMatrices();
-                return _LocalToWorldMatrix;
+                return GetLocalToWorldMatrix();
             }
         }
 
@@ -111,6 +119,7 @@ namespace Poly3D.Engine
             set
             {
                 _Position = Vector3.Transform(value, LocalToWorldMatrix.Inverted());
+                isLocalMatrixDirty = true;
             }
         }
 
@@ -128,6 +137,7 @@ namespace Poly3D.Engine
             {
                 var baseRotation = LocalToWorldMatrix.ExtractRotation();
                 _Rotation = Quaternion.Multiply(value.Quaternion, baseRotation.Inverted());
+                isLocalMatrixDirty = true;
             }
         }
 
@@ -145,6 +155,7 @@ namespace Poly3D.Engine
                 if (value == Vector3.Zero || value.X == 0f || value.Y == 0f || value.Z == 0f)
                     return;
                 _Scale = Vector3.Divide(value, LocalToWorldMatrix.ExtractScale());
+                isLocalMatrixDirty = true;
             }
         }
 
@@ -173,6 +184,7 @@ namespace Poly3D.Engine
             _Scale = Vector3.One;
             _Position = Vector3.Zero;
             isWorldMatrixDirty = true;
+            isLocalMatrixDirty = true;
         }
 
         public Transform(Vector3 position, Rotation rotation, Vector3 scale)
@@ -181,6 +193,7 @@ namespace Poly3D.Engine
             _Scale = scale;
             _Position = position;
             isWorldMatrixDirty = true;
+            isLocalMatrixDirty = true;
             _LocalToWorldMatrix = Matrix4.Identity;
         }
 
@@ -192,6 +205,7 @@ namespace Poly3D.Engine
             _Scale = Vector3.One;
             _Position = Vector3.Zero;
             isWorldMatrixDirty = true;
+            isLocalMatrixDirty = true;
         }
 
         #region Matrices
@@ -205,37 +219,63 @@ namespace Poly3D.Engine
             }
         }
 
+        /// <summary>
+        /// Returns a transformation matrix containing the local transformations (position/rotation/scale).
+        /// </summary>
+        /// <returns></returns>
         public Matrix4 GetLocalTransformMatrix()
         {
-            var finalMat = Matrix4.Identity;
+            if (EngineObject == null)
+                return Matrix4.Identity;
 
-            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateScale(Scale));
-            finalMat = Matrix4.Mult(finalMat, (Matrix4)Rotation);
-            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateTranslation(Position));
+            if (!isLocalMatrixDirty)
+                return _LocalMatrix;
 
-            return finalMat;
+            _LocalMatrix = Matrix4.Identity;
+
+            _LocalMatrix = Matrix4.Mult(_LocalMatrix, Matrix4.CreateScale(Scale));
+            _LocalMatrix = Matrix4.Mult(_LocalMatrix, (Matrix4)Rotation);
+            _LocalMatrix = Matrix4.Mult(_LocalMatrix, Matrix4.CreateTranslation(Position));
+
+            isLocalMatrixDirty = false;
+
+            return _LocalMatrix;
         }
 
+        /// <summary>
+        /// Returns the final transformation matrix.
+        /// </summary>
+        /// <returns></returns>
         public Matrix4 GetTransformMatrix()
         {
             return Matrix4.Mult(GetLocalTransformMatrix(), LocalToWorldMatrix);
-            //return Matrix4.Mult(LocalToWorldMatrix, GetLocalTransformMatrix());
         }
 
-        public void BuildConvertionMatrices()
+        /// <summary>
+        /// Returns a transformation matrix 
+        /// </summary>
+        /// <returns></returns>
+        private Matrix4 GetLocalToWorldMatrix()
         {
             if (EngineObject == null)
-                return;
-            _LocalToWorldMatrix = Matrix4.Identity;
+                return Matrix4.Identity;
 
-            foreach (var node in EngineObject.GetHierarchy(false).Reverse())
+            if (!isWorldMatrixDirty)
+                return _LocalToWorldMatrix;
+
+            if (ParentTransform != null)
             {
-                var transformMatrix = node.Transform.GetLocalTransformMatrix();
-                _LocalToWorldMatrix = Matrix4.Mult(_LocalToWorldMatrix, transformMatrix);
+                _LocalToWorldMatrix = Matrix4.Mult(
+                    ParentTransform.GetLocalTransformMatrix(),
+                    ParentTransform.GetLocalToWorldMatrix());
             }
+            else
+                _LocalToWorldMatrix = Matrix4.Identity;
 
             isWorldMatrixDirty = false;
+            return _LocalToWorldMatrix;
         }
+
 
         #endregion
 
@@ -308,7 +348,7 @@ namespace Poly3D.Engine
 
         #endregion
 
-        public Transform Clone()
+        public override IEngineComponent Clone()
         {
             return new Transform(Position, Rotation, Scale);
         }

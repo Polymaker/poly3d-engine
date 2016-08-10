@@ -48,12 +48,13 @@ namespace Poly3D.Test
             var offset = 13.3f * modelScale;
             modelObject2.Transform.Translate(modelObject2.Transform.Forward * offset, Space.World);
             modelObject2.Transform.Rotation = new Rotation(0, 180f, 0);
-            
+            modelObject2.Name = "WheelHub";
 
             var rotater = modelObject2.AddComponent<AnonymousBehaviour>();
             rotater.Update = (ob, dt) =>
              {
                  (ob.EngineObject as SceneObject).Transform.Rotate(new Rotation(0f, 0f, 90f * (float)dt));
+                 
              };
 
             var mainCam = poly3DControl1.Scene.ActiveCameras.First();
@@ -78,17 +79,26 @@ namespace Poly3D.Test
 
         private void poly3DControl1_MouseClick(object sender, MouseEventArgs e)
         {
+            if (poly3DControl1.Scene == null)
+                return;
             //modelRootObj.Transform.Rotate(new Rotation(22.5f, 0f, 0f));
 
-            if (poly3DControl1.Scene != null && e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
             {
                 var mainCam = poly3DControl1.Scene.ActiveCameras.First();
                 var raycast = mainCam.RaycastFromScreen(new Vector2(e.X, e.Y));
                 var selectedObject = mainCam.RaySelect(raycast);
                 if (selectedObject != null)
                 {
-                    //Trace.WriteLine("Selected object id " + selectedObject.GetInstanceID());
+                    Trace.WriteLine("Selected object id " + selectedObject.Name);
                 }
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                
+                //var mainCam = poly3DControl1.Scene.ActiveCameras.First();
+                //var objPos = mainCam.WorldPointToScreen(modelObject.Transform.WorldPosition);
+                //Trace.WriteLine(objPos);
             }
         }
 

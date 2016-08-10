@@ -1,4 +1,4 @@
-﻿using Poly3D.Engine.GUI;
+﻿using Poly3D.Engine.UI;
 using Poly3D.Engine.Rendering;
 using Poly3D.Maths;
 using Poly3D.Platform;
@@ -13,8 +13,8 @@ namespace Poly3D.Engine
     public class Scene
     {
         // Fields...
+        private SceneState _State;
         private IEngineDisplay _Display;
-        private List<SceneObject> _ObjectsOld;
         private IViewPort _Viewport;
         private List<EngineObject> _Objects;
 
@@ -31,6 +31,16 @@ namespace Poly3D.Engine
         public IEngineDisplay Display
         {
             get { return _Display; }
+        }
+
+        public bool IsRunning
+        {
+            get { return State == SceneState.Running; }
+        }
+
+        public SceneState State
+        {
+            get { return _State; }
         }
 
         public IEnumerable<EngineObject> EngineObjects
@@ -65,27 +75,52 @@ namespace Poly3D.Engine
 
         public Scene()
         {
-            _ObjectsOld = new List<SceneObject>();
             _Objects = new List<EngineObject>();
             _Viewport = null;
-            InitMainCamera();
+            _State = SceneState.Initializing;
+            Initialize();
         }
 
         public Scene(IViewPort viewport)
         {
             _Viewport = viewport;
-            _ObjectsOld = new List<SceneObject>();
             _Objects = new List<EngineObject>();
-            InitMainCamera();
+            _State = SceneState.Initializing;
+            Initialize();
         }
 
-        private void InitMainCamera()
+        #region Initialization
+
+        private void Initialize()
+        {
+
+            _State = SceneState.Suspended;
+        }
+
+        public static Scene CreateDefault(IViewPort viewport)
+        {
+            var scene = new Scene(viewport);
+            scene.CreateDefaultCamera();
+            return scene;
+        }
+
+        public static Scene CreateDefault()
+        {
+            var scene = new Scene();
+            scene.CreateDefaultCamera();
+            return scene;
+        }
+
+        private void CreateDefaultCamera()
         {
             var camera = AddObject<Camera>();
             camera.Active = true;
             camera.Transform.Position = new OpenTK.Vector3(10, 10, 10);
             camera.Transform.LookAt(new OpenTK.Vector3(0, 0f, 0));
         }
+
+        #endregion
+
 
         public T AddObject<T>() where T : EngineObject
         {
@@ -125,6 +160,26 @@ namespace Poly3D.Engine
             }
         }
 
+        #region Pause/Resume
+
+        public void Pause()
+        {
+            if (IsRunning)
+            {
+                _State = SceneState.Suspended;
+            }
+        }
+
+        public void Resume()
+        {
+            if (State == SceneState.Suspended)
+            {
+                _State = SceneState.Running;
+            }
+        }
+
+        #endregion
+
         #region GetObject
 
         public EngineObject GetObjectById(long instanceId)
@@ -159,13 +214,30 @@ namespace Poly3D.Engine
 
         internal void SetObjectName(EngineObject engineObject, ref string currentName, string newName)
         {
-            if (_Objects.Any(o => !string.IsNullOrEmpty(o.Name) && o.Name.Equals(newName) && o != engineObject))
+            if (NameExists(newName, engineObject))
             {
                 if (string.IsNullOrEmpty(currentName))
-                    currentName = "EngineObject" + engineObject.GetInstanceId();
+                    currentName = GetDefaultName(engineObject);
             }
             else
                 currentName = newName;
+        }
+
+        internal bool NameExists(string name, EngineObject exclude = null)
+        {
+            return _Objects.Any(o => !string.IsNullOrEmpty(o.Name) && o.Name.Equals(name) && o != exclude);
+        }
+
+        internal string GetDefaultName(EngineObject engineObject)
+        {
+            var objectType = engineObject.GetType();
+            var instanceNb = Objects.Where(o => o.GetType() == objectType && o != engineObject).Count() + 1;
+            var defaultName = objectType.Name + instanceNb;
+            while (NameExists(defaultName, engineObject))
+            {
+                defaultName = objectType.Name + (++instanceNb);
+            }
+            return defaultName;
         }
 
         #endregion

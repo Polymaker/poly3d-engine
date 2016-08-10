@@ -25,6 +25,7 @@ namespace Poly3D.Control
         private Color _BackColor;
         private FlagList dirtyFlags;
         private bool parentFormHooked = false;
+        private bool isLoaded = false;
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
@@ -190,7 +191,7 @@ namespace Poly3D.Control
             _RenderBehavior.PropertyChanged += Behavior_PropertyChanged;
             _RenderSettings.PropertyChanged += RenderSettings_PropertyChanged;
 
-            _Scene = new Scene(this);
+            _Scene = Scene.CreateDefault(this);
 
             dirtyFlags.Set("BackColor");
         }
@@ -209,6 +210,8 @@ namespace Poly3D.Control
 
         private void RenderSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (!isLoaded)
+                return;
             if (e.PropertyName == "Strategy")
             {
                 SetupUpdateRenderStrategy();
@@ -224,6 +227,7 @@ namespace Poly3D.Control
             HookParentForm();
 
             SetupUpdateRenderStrategy();
+            isLoaded = true;
         }
 
         protected override void OnParentChanged(EventArgs e)
