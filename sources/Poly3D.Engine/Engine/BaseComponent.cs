@@ -15,6 +15,11 @@ namespace Poly3D.Engine
             get { return _EngineObject; }
         }
 
+        public Scene Scene
+        {
+            get { return EngineObject.Scene; }
+        }
+
         public BaseComponent()
         {
             _EngineObject = null;

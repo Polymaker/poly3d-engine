@@ -6,11 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
-namespace Poly3D.Test
+namespace Poly3D.Prefabs.Scripts
 {
-    public class PanOrbitCamera : ObjectBehaviour
+    public sealed class PanOrbitCamera : ObjectBehaviour
     {
         private MouseState lastMouse;
         private Vector2 lastMousePos = Vector2.Zero;
@@ -21,10 +20,15 @@ namespace Poly3D.Test
             get { return (Camera)EngineObject; }
         }
 
+        public MouseButton RotationButton { get; set; }
+
+        public bool AllowPan { get; set; }
+
         protected override void OnInitialize()
         {
             lastMouse = Mouse.GetState();
             lastMousePos = GetMousePosition();
+            RotationButton = MouseButton.Middle;
 
             var groundPlane = new Plane(Vector3.UnitY, 0);
             var camRay = new Ray(Camera.Transform.WorldPosition, Camera.Transform.Forward);
@@ -39,13 +43,12 @@ namespace Poly3D.Test
 
         protected override void OnUpdate(float deltaTime)
         {
-
             var mouseState = Mouse.GetState();
             var keyState = Keyboard.GetState();
             var mousePos = GetMousePosition();
             var mouseDelta = new Vector2(mousePos.X - lastMousePos.X, mousePos.Y - lastMousePos.Y);
 
-            if (!EngineObject.Scene.Display.Focused)
+            if (!Scene.Display.Focused)
             {
                 if (Math.Abs(mouseDelta.Length) > 1)
                     lastMousePos = mousePos;
@@ -53,20 +56,27 @@ namespace Poly3D.Test
                 lastMouse = mouseState;
                 return;
             }
-
-            if (mouseState.RightButton == ButtonState.Released && lastMouse.RightButton == ButtonState.Pressed)
+            
+            if (mouseState.RightButton == ButtonState.Released && 
+                lastMouse.RightButton == ButtonState.Pressed)
             {
                 CameraTarget = Vector3.Zero;
                 Camera.Transform.LookAt(CameraTarget, false);
                 Camera.Transform.SetRotation(RotationComponent.Roll, 0f);//reset roll
             }
 
-            if (mouseState.MiddleButton == ButtonState.Pressed && Math.Abs(mouseDelta.Length) > 1)
+            if (mouseState.IsButtonDown(RotationButton) && Math.Abs(mouseDelta.Length) > 1)
             {
                 var mouseViewDelta = Vector2.Divide(mouseDelta, Camera.DisplayRectangle.Size);
 
+                //Roll camera
+                if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
+                {
+                    var rollAmount = mouseViewDelta.X * 180f;
+                    Camera.Transform.Rotate(new Rotation(0, 0, rollAmount), Space.Self);
+                }
                 //Pan camera
-                if (keyState.IsKeyDown(Key.LShift) || keyState.IsKeyDown(Key.RShift))
+                else if (keyState.IsKeyDown(Key.LShift) || keyState.IsKeyDown(Key.RShift))
                 {
 
                     var viewSize = Camera.GetViewSize(Camera.GetDistanceFromCamera(CameraTarget));
@@ -93,12 +103,13 @@ namespace Poly3D.Test
                         var yawAngle = Angle.FromDegrees(360f * mouseViewDelta.X);
                         newPos = Vector3.Transform(newPos, Matrix4.CreateFromAxisAngle(Vector3.UnitY, -yawAngle.Radians));
                         Camera.Transform.WorldPosition = newPos + CameraTarget;
-                        Camera.Transform.Rotate(new Vector3(0, yawAngle.Degrees, 0), Space.Self);
+                        Camera.Transform.Rotate(new Vector3(0, yawAngle.Degrees, 0), Space.Parent);
                     }
                 }
             }
 
-            if (mouseState.Wheel != lastMouse.Wheel)
+            if (mouseState.Wheel != lastMouse.Wheel && 
+                Scene.Display.GetDisplayBounds().Contains((int)mousePos.X, (int)mousePos.Y))
             {
                 var scrollAmount = mouseState.WheelPrecise - lastMouse.WheelPrecise;
 

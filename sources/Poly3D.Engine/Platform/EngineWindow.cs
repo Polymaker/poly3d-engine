@@ -7,6 +7,10 @@ using OpenTK.Graphics;
 using Poly3D.Utilities;
 using System.ComponentModel;
 using System.Threading;
+using Poly3D.Platform.Native;
+using Poly3D.Engine;
+using Poly3D.Maths;
+using System.Drawing;
 
 namespace Poly3D.Platform
 {
@@ -15,7 +19,7 @@ namespace Poly3D.Platform
         private bool _IsExiting;
         private VSyncMode _VSync;
         private IGraphicsContext _Context;
-        private GLPlatforms _NativePlatform;
+        private DisplayEngineSettings _Configuration;
         private bool Initialized;
 
         #region Properties
@@ -70,7 +74,6 @@ namespace Poly3D.Platform
             }
         }
 
-
         public bool IsExiting
         {
             get
@@ -92,6 +95,13 @@ namespace Poly3D.Platform
             }
         }
 
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public DisplayEngineSettings Configuration
+        {
+            get { return _Configuration; }
+        }
+
         public new bool Visible
         {
             get { return base.Visible; }
@@ -109,7 +119,7 @@ namespace Poly3D.Platform
 
         public event EventHandler Unload;
 
-        public event EventHandler SizeChanged;
+        public event EventHandler DisplayChanged;
 
         #endregion
 
@@ -153,6 +163,7 @@ namespace Poly3D.Platform
         public EngineWindow(int width, int height, GraphicsMode mode, string title, GameWindowFlags options, DisplayDevice device, int major, int minor, GraphicsContextFlags flags, IGraphicsContext sharedContext)
             : base(width, height, title, options, mode ?? GraphicsMode.Default, device ?? DisplayDevice.Default)
         {
+            _Configuration = new DisplayEngineSettings();
             try
             {
                 _Context = new GraphicsContext(mode ?? GraphicsMode.Default, base.WindowInfo, major, minor, flags);
@@ -165,17 +176,11 @@ namespace Poly3D.Platform
                 Dispose();
                 throw;
             }
-            DetectPlatform();
         }
 
         #endregion
 
         #region IGLSurface
-
-        GLPlatforms IGLSurface.Platform
-        {
-            get { return _NativePlatform; }
-        }
 
         public IntPtr Handle
         {
@@ -202,40 +207,36 @@ namespace Poly3D.Platform
             }
         }
 
-        private void DetectPlatform()
-        {
-            var impTypeName = Implementation.GetType().Name;
-            if (impTypeName.Equals("WinGLNative"))
-                _NativePlatform = GLPlatforms.Windows;
-            else if (impTypeName.Equals("CarbonGLNative"))
-                _NativePlatform = GLPlatforms.OSX;
-            else if (impTypeName.Equals("Sdl2NativeWindow"))
-                _NativePlatform = GLPlatforms.SDL2;
-            else if (impTypeName.Equals("X11GLNative"))
-                _NativePlatform = GLPlatforms.X11;
-            else
-                _NativePlatform = GLPlatforms.Unknown;
-        }
-
         public void MakeCurrent()
         {
             EnsureUndisposed();
             Context.MakeCurrent(WindowInfo);
         }
 
+        public void SwapBuffers()
+        {
+            EnsureUndisposed();
+            Context.SwapBuffers();
+        }
+
         #endregion
 
         #region IEngineDisplay
 
+        public bool IsIdle
+        {
+            get { return GetIdle(); }
+        }
+
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            OnSizeChanged(e);
+            OnDisplayChanged(e);
         }
 
-        protected virtual void OnSizeChanged(EventArgs e)
+        protected virtual void OnDisplayChanged(EventArgs e)
         {
-            var handler = SizeChanged;
+            var handler = DisplayChanged;
             if (handler != null)
                 handler(this, e);
         }
@@ -252,6 +253,16 @@ namespace Poly3D.Platform
             var handler = Unload;
             if (handler != null)
                 handler(this, e);
+        }
+
+        public void LoadScene(Scene scene)
+        {
+            scene.AssignDisplay(this);
+        }
+
+        public Rectangle GetDisplayBounds()
+        {
+            return Bounds;
         }
 
         #endregion
@@ -310,6 +321,15 @@ namespace Poly3D.Platform
         }
 
         #endregion
+
+        internal bool GetIdle()
+        {
+            if (Utility.CurrentPlatform == GLPlatforms.Windows)
+                return WinAPI.IsIdle(Handle);
+            else if (Utility.CurrentPlatform == GLPlatforms.SDL2)
+                return Sdl2API.SDL_HasEvents(0, 65535);
+            return true;
+        }
 
         public override void Dispose()
         {

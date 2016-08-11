@@ -65,14 +65,13 @@
     <Compile Include="Engine\Physics\RaycastHit.cs" />
     <Compile Include="Engine\Physics\SphereCollider.cs" />
     <Compile Include="Engine\SceneState.cs" />
+    <Compile Include="Maths\RotationComponent.cs" />
+    <Compile Include="Platform\DisplayEngineSettings.cs" />
     <Compile Include="Platform\GLPlatforms.cs" />
     <Compile Include="Platform\IEngineDisplay.cs" />
-    <Compile Include="Control\RenderSettings.cs" />
-    <Compile Include="Control\RenderStrategy.cs" />
     <Compile Include="Engine\Components\AnonymousBehaviour.cs" />
     <Compile Include="Engine\Meshes\Primitives.cs" />
     <Compile Include="Engine\Rendering\Camera.cs" />
-    <Compile Include="Engine\IViewPort.cs" />
     <Compile Include="Engine\Rendering\Manipulator.cs" />
     <Compile Include="Engine\Rendering\Material.cs" />
     <Compile Include="Engine\Components\ObjectBehaviour.cs" />
@@ -127,19 +126,17 @@
     <Compile Include="OpenGL\Renderer.cs" />
     <Compile Include="OpenGL\Shader.cs" />
     <Compile Include="OpenGL\Texture.cs" />
-    <Compile Include="Control\RenderBehavior.cs" />
-    <Compile Include="Control\Poly3DControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Control\Poly3DControl.Designer.cs">
-      <DependentUpon>Poly3DControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="Engine\Rendering\ProjectionType.cs" />
     <Compile Include="Platform\EngineControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Platform\EngineWindow.cs" />
     <Compile Include="Platform\IGLSurface.cs" />
+    <Compile Include="Platform\LoopController.cs" />
+    <Compile Include="Platform\Native\Sdl2API.cs" />
+    <Compile Include="Platform\Native\WinAPI.cs" />
+    <Compile Include="Platform\Utility.cs" />
+    <Compile Include="Prefabs\Scripts\PanOrbitCamera.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine\Components\Transform.cs" />
     <Compile Include="Utilities\FlagList.cs" />

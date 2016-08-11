@@ -4,12 +4,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
-namespace Poly3D.Control
+namespace Poly3D.Platform
 {
-    public class RenderSettings : INotifyPropertyChanged
+    public class DisplayEngineSettings : INotifyPropertyChanged
     {
-        // Fields...
-        private RenderStrategy _Strategy;
         private double _UpdatePeriod;
         private double _RenderPeriod;
 
@@ -109,30 +107,15 @@ namespace Poly3D.Control
             }
         }
 
-        [DefaultValue(RenderStrategy.OnIdle)]
-        public RenderStrategy Strategy
-        {
-            get { return _Strategy; }
-            set
-            {
-                if (_Strategy == value)
-                    return;
-                _Strategy = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Strategy"));
-            }
-        }
-        
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderSettings"/> class.
         /// </summary>
-        public RenderSettings()
+        public DisplayEngineSettings()
         {
             _UpdatePeriod = 0.016666666666666666d;
             _RenderPeriod = 0.016666666666666666d;
-            _Strategy = RenderStrategy.OnIdle;
         }
     }
 }

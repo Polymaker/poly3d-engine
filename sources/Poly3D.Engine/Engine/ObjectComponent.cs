@@ -13,7 +13,7 @@ namespace Poly3D.Engine
             
         }
 
-        public ObjectComponent(SceneObject engineObject)
+        internal ObjectComponent(SceneObject engineObject)
             : base(engineObject)
         {
             

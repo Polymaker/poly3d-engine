@@ -12,9 +12,9 @@ namespace Poly3D.Engine
 {
     public static class RenderHelper
     {
-        private static readonly Color UNIT_X_COLOR = Color.Red;
-        private static readonly Color UNIT_Y_COLOR = Color.LawnGreen;
-        private static readonly Color UNIT_Z_COLOR = Color.FromArgb(0x00, 0x66, 0xFF);
+        internal static readonly Color UNIT_X_COLOR = Color.Red;
+        internal static readonly Color UNIT_Y_COLOR = Color.LawnGreen;
+        internal static readonly Color UNIT_Z_COLOR = Color.FromArgb(0x00, 0x66, 0xFF);
 
         #region Shapes
 
@@ -374,7 +374,7 @@ namespace Poly3D.Engine
         public static void RenderManipulator(Camera camera, Vector3 position, TransformType manipulatorType)
         {
             GL.PushAttrib(AttribMask.LightingBit | AttribMask.DepthBufferBit);
-            GL.Clear(ClearBufferMask.DepthBufferBit);
+            //GL.Clear(ClearBufferMask.DepthBufferBit);
 
             var distFromCam = camera.GetDistanceFromCamera(position);
             var viewSize = camera.GetViewSize(distFromCam);
@@ -389,7 +389,6 @@ namespace Poly3D.Engine
 
             GL.PopAttrib();
         }
-
 
         private static void DrawManipulatorAxis(Vector3 axis, Color color, TransformType manipulatorType, float length, bool selected)
         {

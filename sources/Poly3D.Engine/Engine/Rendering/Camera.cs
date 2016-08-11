@@ -69,11 +69,11 @@ namespace Poly3D.Engine
         {
             get
             {
-                if(Scene == null || Scene.Viewport == null)
+                if(Scene == null || Scene.Display == null)
                     return new Rect(0, 0, 1, 1);
 
                 //var displaySize = new Vector2(Scene.Display.Width, Scene.Display.Height);
-                var displaySize = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
+                var displaySize = new Vector2(Scene.Display.Width, Scene.Display.Height);
                 return new Rect(
                     displaySize.X * ViewRectangle.X, 
                     displaySize.Y * ViewRectangle.Y, 
@@ -233,7 +233,7 @@ namespace Poly3D.Engine
 
         internal void UpdateViewport()
         {
-            var curViewport = new Vector2(Scene.Viewport.Width, Scene.Viewport.Height);
+            var curViewport = new Vector2(Scene.Display.Width, Scene.Display.Height);
             //if the GL render context size changed or the view rectangle of the camera changed (isViewportDirty)
             if (curViewport != lastViewPort || isViewportDirty)
             {

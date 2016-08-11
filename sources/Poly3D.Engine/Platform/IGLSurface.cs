@@ -8,9 +8,12 @@ namespace Poly3D.Platform
 {
     internal interface IGLSurface
     {
-        GLPlatforms Platform { get; }
         IntPtr Handle { get; }
         bool Exists { get; }
         IGraphicsContext Context { get; }
+
+        void MakeCurrent();
+
+        void SwapBuffers();
     }
 }

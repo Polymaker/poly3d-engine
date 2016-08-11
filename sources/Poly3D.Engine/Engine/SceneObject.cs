@@ -74,6 +74,8 @@ namespace Poly3D.Engine
             get { return Childs.Concat(Childs.SelectMany(c => c.AllChilds)); }
         }
 
+        public int RenderLayer { get; set; }
+
         public event EventHandler HierarchyChanged;
 
         public SceneObject()

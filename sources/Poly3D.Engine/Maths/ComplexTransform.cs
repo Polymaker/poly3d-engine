@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Runtime.Serialization;
 namespace Poly3D.Maths
 {
     public struct ComplexTransform
@@ -12,13 +12,18 @@ namespace Poly3D.Maths
         private Vector3 _Scale;
         private Vector3 _Translation;
         private Rotation _Rotation;
+        private bool isDirty;
+        private Matrix4 _TransformMatrix;
 
         public Rotation Rotation
         {
             get { return _Rotation; }
             set
             {
+                if (_Rotation.Quaternion == value.Quaternion)
+                    return;
                 _Rotation = value;
+                isDirty = true;
             }
         }
 
@@ -27,7 +32,10 @@ namespace Poly3D.Maths
             get { return _Translation; }
             set
             {
+                if (_Translation == value)
+                    return;
                 _Translation = value;
+                isDirty = true;
             }
         }
 
@@ -36,9 +44,12 @@ namespace Poly3D.Maths
             get { return _Scale; }
             set
             {
+                if (_Scale == value)
+                    return;
                 _Scale = value;
+                isDirty = true;
             }
-        }
+        } 
         
         public Matrix4 TransformMatrix
         {
@@ -54,20 +65,27 @@ namespace Poly3D.Maths
 
         public Matrix4 GetTransformMatrix()
         {
-            var finalMat = Matrix4.Identity;
+            if (_TransformMatrix == default(Matrix4))
+                _TransformMatrix = Matrix4.Identity;
 
-            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateScale(Scale));
-            finalMat = Matrix4.Mult(finalMat, (Matrix4)Rotation);
-            finalMat = Matrix4.Mult(finalMat, Matrix4.CreateTranslation(Translation));
-
-            return finalMat;
+            if (isDirty)
+            {
+                _TransformMatrix = Matrix4.Identity;
+                _TransformMatrix = Matrix4.Mult(_TransformMatrix, Matrix4.CreateScale(Scale));
+                _TransformMatrix = Matrix4.Mult(_TransformMatrix, (Matrix4)Rotation);
+                _TransformMatrix = Matrix4.Mult(_TransformMatrix, Matrix4.CreateTranslation(Translation));
+                isDirty = false;
+            }
+            return _TransformMatrix;
         }
-
+        
         private void SetTransformMatrix(Matrix4 matrix)
         {
+            _TransformMatrix = matrix;
             _Rotation = matrix.ExtractRotation();
             _Scale = matrix.ExtractScale();
             _Translation = matrix.ExtractTranslation();
+            isDirty = false;
         }
     }
 }

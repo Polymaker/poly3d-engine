@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Poly3D.Prefabs.Scripts;
 
 namespace Poly3D.Engine
 {
@@ -15,18 +16,8 @@ namespace Poly3D.Engine
         // Fields...
         private SceneState _State;
         private IEngineDisplay _Display;
-        private IViewPort _Viewport;
         private List<EngineObject> _Objects;
-
-        [Obsolete("Use Scene.Display (when it will be implemented...).", false)]
-        public IViewPort Viewport
-        {
-            get { return _Viewport; }
-            internal set
-            {
-                _Viewport = value;
-            }
-        }
+        private LoopController EngineLoop;
 
         public IEngineDisplay Display
         {
@@ -76,32 +67,26 @@ namespace Poly3D.Engine
         public Scene()
         {
             _Objects = new List<EngineObject>();
-            _Viewport = null;
             _State = SceneState.Initializing;
-            Initialize();
-        }
-
-        public Scene(IViewPort viewport)
-        {
-            _Viewport = viewport;
-            _Objects = new List<EngineObject>();
-            _State = SceneState.Initializing;
-            Initialize();
+            UpdateDelay = new Stopwatch();
+            //Initialize();
         }
 
         #region Initialization
 
-        private void Initialize()
+        internal void AssignDisplay(IEngineDisplay display)
         {
-
-            _State = SceneState.Suspended;
+            _Display = display;
+            Initialize();
         }
 
-        public static Scene CreateDefault(IViewPort viewport)
+        private void Initialize()
         {
-            var scene = new Scene(viewport);
-            scene.CreateDefaultCamera();
-            return scene;
+            EngineLoop = new LoopController(Display);
+            EngineLoop.RenderFrame += EngineLoop_RenderFrame;
+            EngineLoop.UpdateFrame += EngineLoop_UpdateFrame;
+            _State = SceneState.Suspended;
+            EngineLoop.ForceRender();
         }
 
         public static Scene CreateDefault()
@@ -115,12 +100,12 @@ namespace Poly3D.Engine
         {
             var camera = AddObject<Camera>();
             camera.Active = true;
-            camera.Transform.Position = new OpenTK.Vector3(10, 10, 10);
+            camera.Transform.Position = new OpenTK.Vector3(10, 0, 0);
             camera.Transform.LookAt(new OpenTK.Vector3(0, 0f, 0));
+            camera.AddComponent<PanOrbitCamera>();
         }
 
         #endregion
-
 
         public T AddObject<T>() where T : EngineObject
         {
@@ -141,6 +126,32 @@ namespace Poly3D.Engine
             {
                 SceneRenderer.RenderCamera(camera);
             }
+        }
+
+        private void EngineLoop_RenderFrame(object sender, OpenTK.FrameEventArgs e)
+        {
+            RenderScene();
+        }
+
+        private Stopwatch UpdateDelay;
+
+        private void EngineLoop_UpdateFrame(object sender, OpenTK.FrameEventArgs e)
+        {
+            UpdateDelay.Restart();
+            foreach (var so in EngineObjects)
+            {
+                if (!so.IsActive)
+                    continue;
+                foreach (var objBehave in so.Components.OfType<ObjectBehaviour>())
+                {
+                    if (!objBehave.Enabled)
+                        continue;
+
+                    objBehave.DoUpdate((float)e.Time + (float)UpdateDelay.Elapsed.TotalSeconds);
+                }
+            }
+            UpdateDelay.Stop();
+            
         }
 
         public void OnUpdate(float deltaTime)
@@ -166,6 +177,7 @@ namespace Poly3D.Engine
         {
             if (IsRunning)
             {
+                EngineLoop.Stop();
                 _State = SceneState.Suspended;
             }
         }
@@ -174,6 +186,7 @@ namespace Poly3D.Engine
         {
             if (State == SceneState.Suspended)
             {
+                EngineLoop.Start();
                 _State = SceneState.Running;
             }
         }

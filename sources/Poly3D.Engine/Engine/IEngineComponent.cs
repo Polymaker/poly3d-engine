@@ -10,6 +10,8 @@ namespace Poly3D.Engine
     {
         EngineObject EngineObject { get; }
 
+        Scene Scene { get; }
+
         IEngineComponent Clone();
     }
 

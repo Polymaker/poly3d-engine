@@ -49,10 +49,25 @@ namespace Poly3D.Engine.Rendering
 
             GL.Enable(EnableCap.Light0);
 
-            foreach (var rootObj in scene.RootObjects.Where(o => o.IsActive))
+            //foreach (var rootObj in scene.RootObjects.Where(o => o.IsActive))
+            //{
+            //    OnRenderObject(camera, rootObj);
+            //}
+
+            foreach (var renderLayerGroup in scene.Objects
+                .Where(o => o.IsActive)
+                .GroupBy(o => o.RenderLayer)
+                .OrderBy(kv=>kv.Key))
             {
-                OnRenderObject(camera, rootObj);
+                foreach (var sceneObject in renderLayerGroup.OrderBy(o => o.HierarchyLevel))
+                {
+                    RenderObject(camera, sceneObject);
+                }
+                GL.Clear(ClearBufferMask.DepthBufferBit);
             }
+
+            foreach (var sceneObject in scene.Objects.Where(o => o.IsActive))
+                RenderObjectAxes(camera, sceneObject);
 
             //RenderHelper.RenderAxes(5, 0.25f);
             RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Scale);
@@ -73,6 +88,35 @@ namespace Poly3D.Engine.Rendering
                     OnRenderObject(camera, childObj);
             }
 
+            GL.PopMatrix();
+        }
+
+        private static void RenderObject(Camera camera, SceneObject sceneObject)
+        {
+            GL.PushMatrix();
+            var transMat = sceneObject.Transform.GetTransformMatrix();
+            GL.MultMatrix(ref transMat);
+
+            if (sceneObject is ObjectMesh)
+                RenderMeshObject(camera, (ObjectMesh)sceneObject);
+
+            GL.PopMatrix();
+        }
+
+        private static void RenderObjectAxes(Camera camera, SceneObject sceneObject)
+        {
+            GL.PushMatrix();
+            var transMat = sceneObject.Transform.GetTransformMatrix();
+            GL.MultMatrix(ref transMat);
+            GL.Scale(Vector3.Divide(Vector3.One, transMat.ExtractScale()));
+            GL.PushAttrib(AttribMask.LightingBit);
+            GL.Disable(EnableCap.Lighting);
+
+            RenderHelper.DrawLine(RenderHelper.UNIT_X_COLOR, Vector3.Zero, Vector3.UnitX * 3, 3f);
+            RenderHelper.DrawLine(RenderHelper.UNIT_Y_COLOR, Vector3.Zero, Vector3.UnitY * 3, 3f);
+            RenderHelper.DrawLine(RenderHelper.UNIT_Z_COLOR, Vector3.Zero, Vector3.UnitZ * 3, 3f);
+
+            GL.PopAttrib();
             GL.PopMatrix();
         }
 

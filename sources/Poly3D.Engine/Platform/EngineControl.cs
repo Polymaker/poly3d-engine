@@ -9,16 +9,24 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Drawing;
+using Poly3D.Engine;
 
 namespace Poly3D.Platform
 {
     [System.ComponentModel.ToolboxItem(true)]
     public class EngineControl : GLControl, IGLSurface, IEngineDisplay, IDisposable
     {
-        private GLPlatforms _NativePlatform;
         private bool _Exists;
+        private DisplayEngineSettings _Configuration;
 
         #region Properties
+
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public DisplayEngineSettings Configuration
+        {
+            get { return _Configuration; }
+        }
 
         #endregion
 
@@ -46,14 +54,16 @@ namespace Poly3D.Platform
 
         public event EventHandler Unload;
 
+        public event EventHandler DisplayChanged;
+
         #endregion
 
         #region Ctors
 
         public EngineControl()
-            : base()
+            : this(new GraphicsMode(32,24,2,4))
         {
-            Initialize();
+            //Initialize();
         }
 
         public EngineControl(GraphicsMode mode)
@@ -70,7 +80,7 @@ namespace Poly3D.Platform
 
         private void Initialize()
         {
-            DetectPlatform();
+            _Configuration = new DisplayEngineSettings();
             _Exists = true;
         }
 
@@ -88,12 +98,31 @@ namespace Poly3D.Platform
             _Exists = true;
         }
 
-        #region IGLSurface
-
-        GLPlatforms IGLSurface.Platform
+        protected void OnDisplayChanged(EventArgs e)
         {
-            get { return _NativePlatform; }
+            var handler = DisplayChanged;
+            if (handler != null)
+                handler(this, e);
         }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            OnDisplayChanged(e);
+        }
+
+        protected override void OnSizeChanged(EventArgs e)
+        {
+            base.OnSizeChanged(e);
+            OnDisplayChanged(e);
+        }
+
+        public Rectangle GetDisplayBounds()
+        {
+            return RectangleToScreen(Bounds);
+        }
+
+        #region IGLSurface
 
         protected object Implementation
         {
@@ -116,22 +145,12 @@ namespace Poly3D.Platform
             get { return _Exists; }
         }
 
-        private void DetectPlatform()
-        {
-            var impTypeName = Implementation.GetType().Name;
-            if (impTypeName.Equals("WinGLControl"))
-                _NativePlatform = GLPlatforms.Windows;
-            else if (impTypeName.Equals("CarbonGLControl"))
-                _NativePlatform = GLPlatforms.OSX;
-            else if (impTypeName.Equals("Sdl2GLControl"))
-                _NativePlatform = GLPlatforms.SDL2;
-            else if (impTypeName.Equals("X11GLControl"))
-                _NativePlatform = GLPlatforms.X11;
-            else
-                _NativePlatform = GLPlatforms.Unknown;
-        }
-
         #endregion
+
+        public void LoadScene(Scene scene)
+        {
+            scene.AssignDisplay(this);
+        }
 
         protected virtual void OnUnload(EventArgs e)
         {

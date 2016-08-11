@@ -33,7 +33,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.poly3DControl1 = new Poly3D.Control.Poly3DControl();
+            this.engineControl1 = new Poly3D.Platform.EngineControl();
             this.SuspendLayout();
             // 
             // button1
@@ -70,15 +70,15 @@
             this.timer1.Enabled = true;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // poly3DControl1
+            // engineControl1
             // 
-            this.poly3DControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.poly3DControl1.Location = new System.Drawing.Point(0, 0);
-            this.poly3DControl1.Name = "poly3DControl1";
-            this.poly3DControl1.Size = new System.Drawing.Size(496, 412);
-            this.poly3DControl1.TabIndex = 0;
-            this.poly3DControl1.VSync = false;
-            this.poly3DControl1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.poly3DControl1_MouseClick);
+            this.engineControl1.BackColor = System.Drawing.Color.Black;
+            this.engineControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.engineControl1.Location = new System.Drawing.Point(0, 0);
+            this.engineControl1.Name = "engineControl1";
+            this.engineControl1.Size = new System.Drawing.Size(496, 412);
+            this.engineControl1.TabIndex = 4;
+            this.engineControl1.VSync = true;
             // 
             // Form1
             // 
@@ -88,7 +88,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.poly3DControl1);
+            this.Controls.Add(this.engineControl1);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -98,11 +98,10 @@
         }
 
         #endregion
-
-        private Poly3D.Control.Poly3DControl poly3DControl1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Timer timer1;
+        private Platform.EngineControl engineControl1;
     }
 }
