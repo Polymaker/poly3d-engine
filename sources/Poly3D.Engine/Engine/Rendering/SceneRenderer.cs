@@ -16,7 +16,8 @@ namespace Poly3D.Engine.Rendering
 
         private static void InitShader()
         {
-            PhongShader = new Shader(System.IO.File.ReadAllText("phong.vsh"), System.IO.File.ReadAllText("phong.psh"));
+            PhongShader = Shader.LoadPrefab("phong");
+            //PhongShader = new Shader(System.IO.File.ReadAllText("phong.vsh"), System.IO.File.ReadAllText("phong.psh"));
             PhongShader.SetVariable("shininess", 0.4f);
         }
 

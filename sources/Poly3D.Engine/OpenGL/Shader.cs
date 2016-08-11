@@ -6,6 +6,8 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
 using Poly3D.Graphics;
+using System.Reflection;
+using System.IO;
 
 namespace Poly3D.OpenGL
 {
@@ -342,6 +344,30 @@ namespace Poly3D.OpenGL
         {
             if (Program != 0)
                 Renderer.Call(() => GL.DeleteProgram(Program));
+        }
+
+        public static Shader LoadPrefab(string shaderName)
+        {
+            var resNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            var shaderPrefabs = resNames.Where(n => n.Contains("Prefabs.Shaders")).ToList();
+            if (!shaderPrefabs.Any(n => n.EndsWith(shaderName + ".vert") || n.EndsWith(shaderName + ".frag")))
+                return null;
+            var vertShaderRes = shaderPrefabs.FirstOrDefault(n => n.EndsWith(shaderName + ".vert"));
+            var fragShaderRes = shaderPrefabs.FirstOrDefault(n => n.EndsWith(shaderName + ".frag"));
+
+            vertShaderRes = vertShaderRes != null ? ReadPrefabCode(vertShaderRes) : string.Empty;
+            fragShaderRes = fragShaderRes != null ? ReadPrefabCode(fragShaderRes) : string.Empty;
+
+            return new Shader(vertShaderRes, fragShaderRes);
+        }
+
+        private static string ReadPrefabCode(string resourceName)
+        {
+            using (var resStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+            {
+                using (var sr = new StreamReader(resStream))
+                    return sr.ReadToEnd();
+            }
         }
     }
 }

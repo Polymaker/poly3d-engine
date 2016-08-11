@@ -54,6 +54,8 @@
     <Compile Include="Collections\TSDictionary.cs" />
     <Compile Include="Engine\BaseComponent.cs" />
     <Compile Include="Engine\EngineObject.cs" />
+    <Compile Include="Engine\Shaders\Shader.cs" />
+    <Compile Include="Engine\Shaders\ShaderProgram.cs" />
     <Compile Include="Engine\UI\UIContainer.cs" />
     <Compile Include="Engine\UI\UIObject.cs" />
     <Compile Include="Engine\UI\UIWindow.cs" />
@@ -140,6 +142,7 @@
     </Compile>
     <Compile Include="Platform\EngineWindow.cs" />
     <Compile Include="Platform\IGLSurface.cs" />
+    <Compile Include="Engine\Shaders\ShaderParameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine\Components\Transform.cs" />
     <Compile Include="Utilities\FlagList.cs" />
@@ -149,6 +152,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Prefabs\Shaders\BasicShader.frag" />
+    <EmbeddedResource Include="Prefabs\Shaders\BasicShader.vert" />
+    <EmbeddedResource Include="Prefabs\Shaders\phong.frag" />
+    <EmbeddedResource Include="Prefabs\Shaders\phong.vert" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

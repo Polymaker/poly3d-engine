@@ -144,5 +144,11 @@ namespace Poly3D.Tests
             Assert.That(v1.Z, Is.EqualTo(v2.Z).Within(0.001));
         }
 
+
+        [TestMethod]
+        public void TestShader()
+        {
+            Poly3D.Engine.Shaders.ShaderProgram.TestShader();
+        }
     }
 }
