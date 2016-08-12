@@ -72,7 +72,7 @@ namespace Poly3D.Prefabs.Scripts
                 //Roll camera
                 if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
                 {
-                    var rollAmount = mouseViewDelta.X * 180f;
+                    var rollAmount = mouseViewDelta.X * 360f;
                     Camera.Transform.Rotate(new Rotation(0, 0, rollAmount), Space.Self);
                 }
                 //Pan camera
@@ -101,6 +101,8 @@ namespace Poly3D.Prefabs.Scripts
                     if (Camera.Transform.Up != Vector3.UnitY)
                     {
                         var yawAngle = Angle.FromDegrees(360f * mouseViewDelta.X);
+                        if (Camera.Transform.Up.Y < 0)
+                            yawAngle = -(float)yawAngle;
                         newPos = Vector3.Transform(newPos, Matrix4.CreateFromAxisAngle(Vector3.UnitY, -yawAngle.Radians));
                         Camera.Transform.WorldPosition = newPos + CameraTarget;
                         Camera.Transform.Rotate(new Vector3(0, yawAngle.Degrees, 0), Space.Parent);
@@ -120,7 +122,7 @@ namespace Poly3D.Prefabs.Scripts
                     scrollAmount *= cameraDist.Length / 10f;
                     Camera.Transform.Translate(new Vector3(0, 0, scrollAmount), Space.Self);
                 }
-                else
+                else if (Camera.Projection == ProjectionType.Orthographic)
                 {
                     scrollAmount *= Camera.OrthographicSize / 10f;
                     Camera.OrthographicSize -= scrollAmount;

@@ -66,13 +66,13 @@ namespace Poly3D.Engine.Rendering
                 GL.Clear(ClearBufferMask.DepthBufferBit);
             }
 
-            foreach (var sceneObject in scene.Objects.Where(o => o.IsActive))
-            {
-                //if(!(sceneObject is ObjectMesh))
-                    RenderObjectAxes(camera, sceneObject);
-            }
+            //foreach (var sceneObject in scene.Objects.Where(o => o.IsActive))
+            //{
+            //    //if(!(sceneObject is ObjectMesh))
+            //        RenderObjectAxes(camera, sceneObject);
+            //}
             //RenderHelper.RenderAxes(5, 0.25f);
-            RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Scale);
+            RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Translation);
         }
 
         private static void OnRenderObject(Camera camera, SceneObject sceneObject)
@@ -139,7 +139,7 @@ namespace Poly3D.Engine.Rendering
 
             RenderHelper.DrawWireMesh(Color.DarkBlue, meshObj.Mesh);
 
-            //RenderHelper.DrawBox(Color.Yellow, meshObj.Mesh.BoundingBox);
+            RenderHelper.OutlineCube(Color.Yellow, meshObj.Mesh.BoundingBox);
 
             GL.PopAttrib();
         }

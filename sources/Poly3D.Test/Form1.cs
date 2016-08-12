@@ -35,8 +35,8 @@ namespace Poly3D.Test
             engineControl1.LoadScene(MyScene);
             
             modelRootObj = MyScene.AddObject<SceneObject>();
-            
-            //modelRootObj.Transform.SetRotation(RotationComponent.Pitch, 45f);
+
+            modelRootObj.Transform.SetRotation(RotationComponent.Pitch, 45f);
             //modelRootObj.Transform.Translate(new Vector3(0, 0, 2), Space.Self);
 
             var model = WavefrontMeshLoader.LoadWavefrontObj(@"32495.obj");
@@ -46,23 +46,22 @@ namespace Poly3D.Test
             modelObject = modelRootObj.AddObject<ObjectMesh>();
             modelObject.Mesh = model;
             modelObject.Transform.WorldScale = new Vector3(modelScale, modelScale, modelScale);
-            //modelObject.Transform.SetRotation(RotationComponent.Yaw, -45f);
-            //modelObject.Transform.Translate(new Vector3(0, 0, 2), Space.Self);
             model = WavefrontMeshLoader.LoadWavefrontObj(@"32496.obj");
 
             modelObject2 = modelObject.AddObject<ObjectMesh>();
             modelObject2.Mesh = model;
 
             var offset = 13.3f * modelScale;
+
             modelObject2.Transform.Translate(modelObject2.Transform.Forward * offset, Space.World);
             modelObject2.Transform.Rotation = new Rotation(0f, 180f, 0);
-            //modelObject2.Transform.Translate(new Vector3(0, 0, -2), Space.Self);
             modelObject2.Name = "WheelHub";
+
             var rotater = modelObject2.AddComponent<AnonymousBehaviour>();
+
             rotater.Update = (ob, dt) =>
              {
                  (ob.EngineObject as SceneObject).Transform.Rotate(new Rotation(0f, 0f, 90f * (float)dt), Space.Self);
-                 //Trace.WriteLine("Rotation = " + (ob.EngineObject as SceneObject).Transform.Rotation);
 
              };
             
@@ -120,6 +119,20 @@ namespace Poly3D.Test
         private void timer1_Tick(object sender, EventArgs e)
         {
             //label1.Text = string.Format("{0:0.##} FPS", poly3DControl1.RenderFrequency);
+        }
+
+        private void engineControl1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                var mainCam = MyScene.ActiveCameras.First();
+                var raycast = mainCam.RaycastFromScreen(new Vector2(e.X, e.Y));
+                var selectedObject = mainCam.RaySelect(raycast);
+                if (selectedObject != null)
+                {
+                    Trace.WriteLine("Selected object id " + selectedObject.Name);
+                }
+            }
         }
 
     }

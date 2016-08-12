@@ -151,6 +151,18 @@ namespace Poly3D.Engine
             OutlineCube(new BoundingBox(Vector3.Zero, size / 2f));
         }
 
+        public static void OutlineCube(Color color, Vector3 size)
+        {
+            GL.Color4(color);
+            OutlineCube(size);
+        }
+
+        public static void OutlineCube(Color color, BoundingBox box)
+        {
+            GL.Color4(color);
+            OutlineCube(box);
+        }
+
         public static void OutlineCube(BoundingBox box)
         {
             //front

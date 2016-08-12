@@ -79,6 +79,7 @@
             this.engineControl1.Size = new System.Drawing.Size(496, 412);
             this.engineControl1.TabIndex = 4;
             this.engineControl1.VSync = true;
+            this.engineControl1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.engineControl1_MouseClick);
             // 
             // Form1
             // 
