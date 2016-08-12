@@ -24,6 +24,11 @@ namespace Poly3D.Maths
             return yaw * pitch * roll;
         }
 
+        public static Quaterniond Doublelize(this Quaternion value)
+        {
+            return new Quaterniond(value.X, value.Y, value.Z, value.W);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -66,6 +71,12 @@ namespace Poly3D.Maths
             pitchYawRoll.Z = (float)Math.Atan2(2 * quat.X * quat.W - 2 * quat.Y * quat.Z, -sqx + sqy - sqz + sqw);      // Roll
 
             return pitchYawRoll;
+        }
+
+
+        public static Rotation GetRotation(this Matrix4 matrix)
+        {
+            return Rotation.FromMatrix4(matrix);
         }
 
         #region Vector3 Extensions

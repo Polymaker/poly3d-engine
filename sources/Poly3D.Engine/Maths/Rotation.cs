@@ -118,7 +118,7 @@ namespace Poly3D.Maths
 
         public Rotation(Quaternion quaternion)
         {
-            _Quaternion = quaternion;
+            _Quaternion = quaternion.Normalized();
             _Matrix = Matrix3.CreateFromQuaternion(_Quaternion);
             _EulerAngles = Vector3.Zero;
             isEulerDirty = true;
@@ -167,7 +167,7 @@ namespace Poly3D.Maths
 
         public static Rotation FromDirection(Vector3 dir, Vector3 up)
         {
-            return Matrix4.LookAt(dir, Vector3.Zero, up);
+            return new Rotation(Matrix4.LookAt(dir, Vector3.Zero, up));
         }
 
         public static implicit operator Rotation(Quaternion quat)
@@ -187,7 +187,22 @@ namespace Poly3D.Maths
 
         public static implicit operator Rotation(Matrix4 mat)
         {
-            return new Rotation(mat);
+            var invScale = Vector3.One;// Vector3.Divide(Vector3.One, mat.ExtractScale());
+            var newF = Vector3.Multiply(Vector3.TransformVector(Vector3.UnitZ, mat), invScale);
+            var newU = Vector3.Multiply(Vector3.TransformVector(Vector3.UnitY, mat), invScale);
+            return Rotation.FromDirection(newF, newU);
+        }
+
+        public static Rotation FromMatrix4(Matrix4 mat)
+        {
+            //var invScale = Vector3.Divide(Vector3.One, mat.ExtractScale());
+            //if (invScale != Vector3.One)
+            //{
+            //    mat = Matrix4.Mult(Matrix4.CreateScale(invScale), mat);
+            //}
+            var newF = Vector3.TransformVector(Vector3.UnitZ, mat).Normalized();
+            var newU = Vector3.TransformVector(Vector3.UnitY, mat).Normalized();
+            return Rotation.FromDirection(newF, newU);
         }
 
         public static explicit operator Quaternion(Rotation rot)

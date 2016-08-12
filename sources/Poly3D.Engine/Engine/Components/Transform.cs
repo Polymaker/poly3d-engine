@@ -28,7 +28,7 @@ namespace Poly3D.Engine
         /// </summary>
         public Vector3 Forward
         {
-            get { return Vector3.Transform(Vector3.UnitZ, WorldRotation.Quaternion); }
+            get { return Vector3.TransformVector(Vector3.UnitZ, (Matrix4)WorldRotation); }
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Poly3D.Engine
         /// </summary>
         public Vector3 Up
         {
-            get { return Vector3.Transform(Vector3.UnitY, WorldRotation.Quaternion); }
+            get { return Vector3.TransformVector(Vector3.UnitY, (Matrix4)WorldRotation); }
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Poly3D.Engine
         /// </summary>
         public Vector3 Right
         {
-            get { return Vector3.Transform(Vector3.UnitX, WorldRotation.Quaternion); }
+            get { return Vector3.TransformVector(Vector3.UnitX, (Matrix4)WorldRotation); }
         }
 
         /// <summary>
@@ -130,15 +130,16 @@ namespace Poly3D.Engine
         {
             get
             {
-                return Quaternion.Multiply(LocalToWorldMatrix.ExtractRotation(), Rotation.Quaternion);
+                return GetTransformMatrix().GetRotation();
             }
             set
             {
-                //Rotation = Quaternion.Sub(LocalToWorldMatrix.ExtractRotation(), value.Quaternion);
-                var baseRotation = LocalToWorldMatrix.ExtractRotation();
-                Rotation = Quaternion.Multiply(value.Quaternion, baseRotation.Inverted());
+                var baseRotation = LocalToWorldMatrix.ExtractRotation().Inverted();
+                Rotation = Quaternion.Multiply(baseRotation, value.Quaternion);
             }
         }
+
+
 
         /// <summary>
         /// Gets or sets the scale of the transform in world space.
@@ -155,6 +156,11 @@ namespace Poly3D.Engine
                     return;
                 Scale = Vector3.Divide(value, LocalToWorldMatrix.ExtractScale());
             }
+        }
+
+        private Vector3 WorldScaleInv
+        {
+            get { return Vector3.Divide(Vector3.One, WorldScale); }
         }
 
         public Matrix4 WorldToLocalMatrix
@@ -340,8 +346,11 @@ namespace Poly3D.Engine
             }
             else if (relativeTo == Space.Self)
             {
-                var currentWorldRotation = GetTransformMatrix().ExtractRotation();
-                WorldRotation = Quaternion.Multiply(currentWorldRotation, rotation.Quaternion);
+                var realRot = GetTransformMatrix().GetRotation();
+                //var mat2 = Matrix4.Mult((Matrix4)rotation, GetTransformMatrix());
+                WorldRotation = Quaternion.Multiply(realRot.Quaternion, rotation.Quaternion);
+                //var currentQuat = GetTransformMatrix().ExtractRotation();
+                //WorldRotation = Quaternion.Multiply(rotation.Quaternion, currentQuat);
             }
         }
 

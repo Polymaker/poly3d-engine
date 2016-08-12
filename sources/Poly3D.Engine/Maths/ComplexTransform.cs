@@ -63,6 +63,13 @@ namespace Poly3D.Maths
             }
         }
 
+        public static implicit operator ComplexTransform(Matrix4 transformMatrix)
+        {
+            var trans = new ComplexTransform();
+            trans.SetTransformMatrix(transformMatrix);
+            return trans;
+        }
+
         public Matrix4 GetTransformMatrix()
         {
             if (_TransformMatrix == default(Matrix4))

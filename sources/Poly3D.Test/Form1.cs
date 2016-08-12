@@ -35,6 +35,9 @@ namespace Poly3D.Test
             engineControl1.LoadScene(MyScene);
             
             modelRootObj = MyScene.AddObject<SceneObject>();
+            
+            //modelRootObj.Transform.SetRotation(RotationComponent.Pitch, 45f);
+            //modelRootObj.Transform.Translate(new Vector3(0, 0, 2), Space.Self);
 
             var model = WavefrontMeshLoader.LoadWavefrontObj(@"32495.obj");
             var modelBounds = model.BoundingBox;
@@ -43,7 +46,8 @@ namespace Poly3D.Test
             modelObject = modelRootObj.AddObject<ObjectMesh>();
             modelObject.Mesh = model;
             modelObject.Transform.WorldScale = new Vector3(modelScale, modelScale, modelScale);
-
+            //modelObject.Transform.SetRotation(RotationComponent.Yaw, -45f);
+            //modelObject.Transform.Translate(new Vector3(0, 0, 2), Space.Self);
             model = WavefrontMeshLoader.LoadWavefrontObj(@"32496.obj");
 
             modelObject2 = modelObject.AddObject<ObjectMesh>();
@@ -51,51 +55,41 @@ namespace Poly3D.Test
 
             var offset = 13.3f * modelScale;
             modelObject2.Transform.Translate(modelObject2.Transform.Forward * offset, Space.World);
-            modelObject2.Transform.Rotation = new Rotation(0, 180f, 0);
+            modelObject2.Transform.Rotation = new Rotation(0f, 180f, 0);
+            //modelObject2.Transform.Translate(new Vector3(0, 0, -2), Space.Self);
             modelObject2.Name = "WheelHub";
-
             var rotater = modelObject2.AddComponent<AnonymousBehaviour>();
             rotater.Update = (ob, dt) =>
              {
-                 (ob.EngineObject as SceneObject).Transform.Rotate(new Rotation(0f, 0f, 30f * (float)dt), Space.Parent);
+                 (ob.EngineObject as SceneObject).Transform.Rotate(new Rotation(0f, 0f, 90f * (float)dt), Space.Self);
                  //Trace.WriteLine("Rotation = " + (ob.EngineObject as SceneObject).Transform.Rotation);
 
              };
-            var mainCam = MyScene.ActiveCameras.First();
-            var testObj = mainCam.AddObject<SceneObject>();
-            testObj.Transform.Position = new Vector3(0, 0, 10);
+            
             MyScene.Resume();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (MyScene.IsRunning)
-                MyScene.Pause();
-            else
-                MyScene.Resume();
+            //var finalTrans = (ComplexTransform)modelObject2.Transform.GetTransformMatrix();
+            //Trace.WriteLine("final rot = " + finalTrans.Rotation);
+            //Trace.WriteLine("world rot = " + modelObject2.Transform.WorldRotation);
+            //modelObject2.Transform.SetRotation(RotationComponent.Roll, modelObject2.Transform.Rotation.Roll + 45f, Space.Self);
+            modelObject2.Transform.Rotate(new Rotation(0, 0, 45f), Space.Self);
+            //if (MyScene.IsRunning)
+            //    MyScene.Pause();
+            //else
+            //    MyScene.Resume();
             //poly3DControl1.SetGraphicsMode(new OpenTK.Graphics.GraphicsMode(32, 24, 8, 4));
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             var mainCam = MyScene.ActiveCameras.First();
-            
-            var testObj = mainCam.Childs.First();
-
-            testObj.Transform.SetRotation(RotationComponent.Roll, testObj.Transform.Rotation.Roll + 45f, Space.Self);
-            //mainCam.Transform.Rotate(new Rotation(0, 0, 45f), Space.Self);
-
-            Trace.WriteLine("testObj forward = " + mainCam.Transform.Forward);
-            Trace.WriteLine("testObj forward = " + testObj.Transform.Forward);
-            //var mainCam = MyScene.ActiveCameras.First();
-            //if (mainCam.Projection == ProjectionType.Perspective)
-            //    mainCam.Projection = ProjectionType.Orthographic;
-            //else
-            //    mainCam.Projection = ProjectionType.Perspective;
-
-            //Trace.WriteLine("obj forward = " + mainCam.Childs.First().Transform.Forward);
-            //mainCam.Transform.SetRotation(RotationComponent.Roll, 45f, Space.Self);
-            //Trace.WriteLine(poly3DControl1.RenderFrequency.ToString());
+            if (mainCam.Projection == ProjectionType.Perspective)
+                mainCam.Projection = ProjectionType.Orthographic;
+            else
+                mainCam.Projection = ProjectionType.Perspective;
         }
 
         private void poly3DControl1_MouseClick(object sender, MouseEventArgs e)

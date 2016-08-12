@@ -100,7 +100,7 @@ namespace Poly3D.Engine
         {
             var camera = AddObject<Camera>();
             camera.Active = true;
-            camera.Transform.Position = new OpenTK.Vector3(10, 0, 0);
+            camera.Transform.Position = new OpenTK.Vector3(10, 10, 10);
             camera.Transform.LookAt(new OpenTK.Vector3(0, 0f, 0));
             camera.AddComponent<PanOrbitCamera>();
         }

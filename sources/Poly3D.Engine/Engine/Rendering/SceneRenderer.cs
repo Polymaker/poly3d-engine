@@ -24,8 +24,8 @@ namespace Poly3D.Engine.Rendering
         {
             var scene = camera.Scene;
             camera.UpdateViewport();
-            if (PhongShader == null)
-                InitShader();
+            //if (PhongShader == null)
+            //    InitShader();
             //SetViewport(camera.DisplayRectangle);
 
             GL.Enable(EnableCap.DepthTest);
@@ -67,8 +67,10 @@ namespace Poly3D.Engine.Rendering
             }
 
             foreach (var sceneObject in scene.Objects.Where(o => o.IsActive))
-                RenderObjectAxes(camera, sceneObject);
-
+            {
+                //if(!(sceneObject is ObjectMesh))
+                    RenderObjectAxes(camera, sceneObject);
+            }
             //RenderHelper.RenderAxes(5, 0.25f);
             RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Scale);
         }
@@ -106,15 +108,17 @@ namespace Poly3D.Engine.Rendering
         private static void RenderObjectAxes(Camera camera, SceneObject sceneObject)
         {
             GL.PushMatrix();
-            var transMat = sceneObject.Transform.GetTransformMatrix();
-            GL.MultMatrix(ref transMat);
-            GL.Scale(Vector3.Divide(Vector3.One, transMat.ExtractScale()));
+            //var transMat = sceneObject.Transform.GetTransformMatrix();
+            //GL.MultMatrix(ref transMat);
+            //GL.Scale(Vector3.Divide(Vector3.One, transMat.ExtractScale()));
             GL.PushAttrib(AttribMask.LightingBit);
             GL.Disable(EnableCap.Lighting);
-
-            RenderHelper.DrawLine(RenderHelper.UNIT_X_COLOR, Vector3.Zero, Vector3.UnitX * 3, 3f);
-            RenderHelper.DrawLine(RenderHelper.UNIT_Y_COLOR, Vector3.Zero, Vector3.UnitY * 3, 3f);
-            RenderHelper.DrawLine(RenderHelper.UNIT_Z_COLOR, Vector3.Zero, Vector3.UnitZ * 3, 3f);
+            RenderHelper.DrawLine(RenderHelper.UNIT_X_COLOR, sceneObject.Transform.WorldPosition, sceneObject.Transform.WorldPosition + sceneObject.Transform.Right * 3, 3f);
+            RenderHelper.DrawLine(RenderHelper.UNIT_Y_COLOR, sceneObject.Transform.WorldPosition, sceneObject.Transform.WorldPosition + sceneObject.Transform.Up * 3, 3f);
+            RenderHelper.DrawLine(RenderHelper.UNIT_Z_COLOR, sceneObject.Transform.WorldPosition, sceneObject.Transform.WorldPosition + sceneObject.Transform.Forward * 3, 3f);
+            //RenderHelper.DrawLine(RenderHelper.UNIT_X_COLOR, Vector3.Zero, Vector3.UnitX * 3, 3f);
+            //RenderHelper.DrawLine(RenderHelper.UNIT_Y_COLOR, Vector3.Zero, Vector3.UnitY * 3, 3f);
+            //RenderHelper.DrawLine(RenderHelper.UNIT_Z_COLOR, Vector3.Zero, Vector3.UnitZ * 3, 3f);
 
             GL.PopAttrib();
             GL.PopMatrix();
@@ -126,9 +130,9 @@ namespace Poly3D.Engine.Rendering
 
             //SetupStencil();
 
-            PhongShader.Bind();
+            //PhongShader.Bind();
             RenderHelper.DrawMesh(Color.Gray, meshObj.Mesh, meshObj.Transform.WorldScale);
-            Shader.Bind(null);
+            //Shader.Bind(null);
 
             //ApplyStencil();
             GL.Disable(EnableCap.Lighting);
