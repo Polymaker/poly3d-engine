@@ -91,6 +91,7 @@ namespace Poly3D.Engine
         internal void AddComponent(IEngineComponent component)
         {
             _Components.Add(component);
+            
         }
 
         //internal void AddComponent<T>(IEngineComponent<T> component) where T : EngineObject
@@ -105,6 +106,11 @@ namespace Poly3D.Engine
         internal void RemoveComponent(IEngineComponent component)
         {
             _Components.Remove(component);
+        }
+
+        public T GetComponent<T>() where T : IEngineComponent
+        {
+            return _Components.OfType<T>().FirstOrDefault();
         }
 
         public long GetInstanceId()

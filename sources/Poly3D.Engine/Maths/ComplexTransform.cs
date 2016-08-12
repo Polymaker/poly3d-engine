@@ -65,6 +65,11 @@ namespace Poly3D.Maths
 
         public static implicit operator ComplexTransform(Matrix4 transformMatrix)
         {
+            return FromMatrix(transformMatrix);
+        }
+
+        public static ComplexTransform FromMatrix(Matrix4 transformMatrix)
+        {
             var trans = new ComplexTransform();
             trans.SetTransformMatrix(transformMatrix);
             return trans;

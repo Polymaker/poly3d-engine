@@ -2,7 +2,7 @@
 
 using System;
 using System.Diagnostics;
-
+using System.Drawing;
 namespace Poly3D.Maths
 {
     //Defined as struct to prevent implementing complex change detection mechanism.
@@ -158,16 +158,26 @@ namespace Poly3D.Maths
 
         public static Rotation FromDirection(Vector3 dir)
         {
-            if(dir == Vector3.UnitY)
-                return FromDirection(dir, Vector3.UnitZ * -1f);
-            else if(dir == Vector3.UnitY * -1f)
-                return FromDirection(dir, Vector3.UnitZ);
             return FromDirection(dir,  Vector3.UnitY);
         }
 
         public static Rotation FromDirection(Vector3 dir, Vector3 up)
         {
+            if (dir == Vector3.UnitY)
+                up = Vector3.UnitZ * -1f;
+            else if (dir == Vector3.UnitY * -1f)
+                up = Vector3.UnitZ;
             return new Rotation(Matrix4.LookAt(dir, Vector3.Zero, up));
+        }
+
+        public static Rotation LookAt(Vector3 eye, Vector3 target, Vector3 up)
+        {
+            var dir = (target - eye).Normalized();
+            if (dir == Vector3.UnitY)
+                up = Vector3.UnitZ * -1f;
+            else if (dir == Vector3.UnitY * -1f)
+                up = Vector3.UnitZ;
+            return FromDirection(dir, up);
         }
 
         public static implicit operator Rotation(Quaternion quat)
@@ -187,10 +197,7 @@ namespace Poly3D.Maths
 
         public static implicit operator Rotation(Matrix4 mat)
         {
-            var invScale = Vector3.One;// Vector3.Divide(Vector3.One, mat.ExtractScale());
-            var newF = Vector3.Multiply(Vector3.TransformVector(Vector3.UnitZ, mat), invScale);
-            var newU = Vector3.Multiply(Vector3.TransformVector(Vector3.UnitY, mat), invScale);
-            return Rotation.FromDirection(newF, newU);
+            return FromMatrix4(mat);
         }
 
         public static Rotation FromMatrix4(Matrix4 mat)
@@ -218,12 +225,6 @@ namespace Poly3D.Maths
         public static explicit operator Matrix4(Rotation rot)
         {
             return Matrix4.CreateFromQuaternion(rot.Quaternion);
-            //return new Matrix4(
-            //    new Vector4(rot.Matrix.Row0),
-            //    new Vector4(rot.Matrix.Row1),
-            //    new Vector4(rot.Matrix.Row2),
-            //    Vector4.UnitW
-            //    );
         }
 
         public static Rotation Identity
@@ -249,6 +250,11 @@ namespace Poly3D.Maths
             angles.Y = Angle.NormalizeDegrees(angles.Y);
             angles.Z = Angle.NormalizeDegrees(angles.Z);
             return angles;
+        }
+
+        public static Rotation Slerp(Rotation rot1, Rotation rot2, float blend)
+        {
+            return Quaternion.Slerp(rot1.Quaternion, rot2.Quaternion, blend);
         }
     }
 }

@@ -139,7 +139,7 @@ namespace Poly3D.Engine.Rendering
 
             RenderHelper.DrawWireMesh(Color.DarkBlue, meshObj.Mesh);
 
-            RenderHelper.OutlineCube(Color.Yellow, meshObj.Mesh.BoundingBox);
+            //RenderHelper.OutlineCube(Color.Yellow, meshObj.Mesh.BoundingBox);
 
             GL.PopAttrib();
         }

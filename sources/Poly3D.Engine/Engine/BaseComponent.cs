@@ -33,6 +33,7 @@ namespace Poly3D.Engine
         internal void SetOwner(T owner)
         {
             _EngineObject = owner;
+            InitializeInternal();
         }
 
         EngineObject IEngineComponent.EngineObject
@@ -50,6 +51,11 @@ namespace Poly3D.Engine
         public virtual IEngineComponent Clone()
         {
             return (IEngineComponent)Activator.CreateInstance(GetType());
+        }
+
+        public void Destroy()
+        {
+            EngineObject.RemoveComponent(this);
         }
     }
 }

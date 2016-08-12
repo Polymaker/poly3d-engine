@@ -136,6 +136,7 @@
     <Compile Include="Platform\Native\Sdl2API.cs" />
     <Compile Include="Platform\Native\WinAPI.cs" />
     <Compile Include="Platform\Utility.cs" />
+    <Compile Include="Prefabs\Scripts\Animator.cs" />
     <Compile Include="Prefabs\Scripts\PanOrbitCamera.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine\Components\Transform.cs" />

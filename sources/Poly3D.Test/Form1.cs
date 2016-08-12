@@ -13,6 +13,7 @@ using Poly3D.Engine.OpenGL;
 using Poly3D.Engine;
 using Poly3D.Maths;
 using Poly3D.Engine.Data;
+using Poly3D.Prefabs.Scripts;
 
 namespace Poly3D.Test
 {
@@ -36,7 +37,7 @@ namespace Poly3D.Test
             
             modelRootObj = MyScene.AddObject<SceneObject>();
 
-            modelRootObj.Transform.SetRotation(RotationComponent.Pitch, 45f);
+            //modelRootObj.Transform.SetRotation(RotationComponent.Pitch, 45f);
             //modelRootObj.Transform.Translate(new Vector3(0, 0, 2), Space.Self);
 
             var model = WavefrontMeshLoader.LoadWavefrontObj(@"32495.obj");
@@ -58,7 +59,8 @@ namespace Poly3D.Test
             modelObject2.Name = "WheelHub";
 
             var rotater = modelObject2.AddComponent<AnonymousBehaviour>();
-
+            
+            
             rotater.Update = (ob, dt) =>
              {
                  (ob.EngineObject as SceneObject).Transform.Rotate(new Rotation(0f, 0f, 90f * (float)dt), Space.Self);
@@ -85,10 +87,19 @@ namespace Poly3D.Test
         private void button2_Click(object sender, EventArgs e)
         {
             var mainCam = MyScene.ActiveCameras.First();
-            if (mainCam.Projection == ProjectionType.Perspective)
-                mainCam.Projection = ProjectionType.Orthographic;
-            else
-                mainCam.Projection = ProjectionType.Perspective;
+            //if (mainCam.Projection == ProjectionType.Perspective)
+            //    mainCam.Projection = ProjectionType.Orthographic;
+            //else
+            //    mainCam.Projection = ProjectionType.Perspective;
+            var orbitScript = mainCam.GetComponent<PanOrbitCamera>();
+            var camTarget = orbitScript.CameraTarget;
+            var rotater = MyScene.ActiveCameras.First().AddComponent<Animator>();
+            var targetTransform = new ComplexTransform();
+            targetTransform.Translation = camTarget + new Vector3(0, orbitScript.TargetDistance, 0);
+            targetTransform.Rotation = Rotation.LookAt(targetTransform.Translation, camTarget, Vector3.UnitY);
+            rotater.Target = targetTransform;
+            rotater.Time = 1;
+            rotater.Enabled = true;
         }
 
         private void poly3DControl1_MouseClick(object sender, MouseEventArgs e)

@@ -138,11 +138,13 @@ namespace Poly3D.Engine
         private void EngineLoop_UpdateFrame(object sender, OpenTK.FrameEventArgs e)
         {
             UpdateDelay.Restart();
-            foreach (var so in EngineObjects)
+            var engineObjects = EngineObjects.ToArray();
+            foreach (var so in engineObjects)
             {
                 if (!so.IsActive)
                     continue;
-                foreach (var objBehave in so.Components.OfType<ObjectBehaviour>())
+                var objectComponents = so.Components.ToArray();
+                foreach (var objBehave in objectComponents.OfType<ObjectBehaviour>())
                 {
                     if (!objBehave.Enabled)
                         continue;
