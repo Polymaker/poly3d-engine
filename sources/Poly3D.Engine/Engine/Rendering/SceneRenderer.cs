@@ -31,7 +31,7 @@ namespace Poly3D.Engine.Rendering
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.ColorMaterial);
             GL.Enable(EnableCap.Lighting);
-            GL.Enable(EnableCap.LineSmooth);
+            //GL.Enable(EnableCap.LineSmooth);
             GL.Enable(EnableCap.Texture2D);
 
             GL.ClearColor(camera.BackColor);
@@ -73,6 +73,17 @@ namespace Poly3D.Engine.Rendering
             //}
             //RenderHelper.RenderAxes(5, 0.25f);
             RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Translation);
+
+            //UI Rendering
+            GL.MatrixMode(MatrixMode.Projection);
+            projectionMatrix = Matrix4.CreateOrthographic(10 * camera.AspectRatio, 10, 0.3f, 10f);
+            GL.LoadMatrix(ref projectionMatrix);
+            GL.MatrixMode(MatrixMode.Modelview);
+            viewMatrix = Matrix4.LookAt(new Vector3(0, 0, -1), Vector3.Zero, Vector3.UnitY);
+            GL.LoadMatrix(ref viewMatrix);
+            GL.Disable(EnableCap.Lighting);
+            GL.Color4(Color.White);
+            RenderHelper.DrawCircle(Vector3.UnitZ, 4);
         }
 
         private static void OnRenderObject(Camera camera, SceneObject sceneObject)
@@ -139,7 +150,7 @@ namespace Poly3D.Engine.Rendering
 
             RenderHelper.DrawWireMesh(Color.DarkBlue, meshObj.Mesh);
 
-            //RenderHelper.OutlineCube(Color.Yellow, meshObj.Mesh.BoundingBox);
+            RenderHelper.OutlineCube(Color.Yellow, meshObj.Mesh.BoundingBox);
 
             GL.PopAttrib();
         }

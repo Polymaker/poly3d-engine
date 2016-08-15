@@ -75,6 +75,18 @@ namespace Poly3D.Engine
             }
         }
 
+        public static void DrawCircle(Vector3 normal, float radius, float lineThickness = 1f)//stand on the Z axis
+        {
+            float stepAngle = (float)360f / (float)CURVE_RES;
+
+            for (int i = 0; i < CURVE_RES; i++)
+            {
+                var p1 = GetCirclePoint(stepAngle * i, radius, normal);
+                var p2 = GetCirclePoint(stepAngle * (i+1), radius, normal);
+                DrawLine(p1, p2, lineThickness);
+            }
+        }
+
         private static void OutlineQuad(Vector3 pt1, Vector3 pt2, Vector3 pt3, Vector3 pt4)
         {
             using (GLDraw.Begin(BeginMode.Lines))
@@ -377,11 +389,6 @@ namespace Poly3D.Engine
         #endregion
 
         #region Manipulators
-
-        public static void RenderManipulator(Camera camera, Manipulator manipulator)
-        {
-            RenderManipulator(camera, manipulator.Target.Transform.WorldPosition, manipulator.Type);
-        }
 
         public static void RenderManipulator(Camera camera, Vector3 position, TransformType manipulatorType)
         {

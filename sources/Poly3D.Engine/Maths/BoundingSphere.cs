@@ -40,5 +40,16 @@ namespace Poly3D.Maths
             _Center = center;
             _Radius = radius;
         }
+
+        public bool Intersects(BoundingSphere other)
+        {
+            return (Center - other.Center).Length < Radius + other.Radius;
+        }
+
+        public bool Intersects(Ray ray, out float distance)
+        {
+            distance = 0f;
+            return false;
+        }
     }
 }

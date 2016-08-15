@@ -8,6 +8,7 @@ namespace Poly3D.Engine
     public enum SceneState
     {
         Initializing,
+        Initialized,
         Running,
         Suspended,
         Exiting

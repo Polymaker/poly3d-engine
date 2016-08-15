@@ -8,11 +8,10 @@ namespace Poly3D.Engine.Physics
 {
     public class RaycastHit
     {
-        // Fields...
-        private int _FaceIndex;
+        private Ray _Ray;
         private SceneObject _Target;
         private float _Distance;
-        private Ray _Ray;
+        private int _FaceIndex;
 
         public Ray Ray
         {
@@ -33,6 +32,13 @@ namespace Poly3D.Engine.Physics
         {
             get { return _FaceIndex; }
         }
-        
+
+        public RaycastHit(Ray ray, SceneObject target, float distance, int faceIndex)
+        {
+            _Ray = ray;
+            _Target = target;
+            _Distance = distance;
+            _FaceIndex = faceIndex;
+        }
     }
 }

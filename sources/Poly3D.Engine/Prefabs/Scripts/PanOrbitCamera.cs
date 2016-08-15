@@ -21,8 +21,12 @@ namespace Poly3D.Prefabs.Scripts
             {
                 return Camera.Transform.WorldPosition + Camera.Transform.Forward * TargetDistance;
             }
+            set
+            {
+                _TargetDistance = (value - Camera.Transform.WorldPosition).Length;
+                Camera.Transform.LookAt(value);
+            }
         }
-        
         
         public float TargetDistance
         {
@@ -32,7 +36,6 @@ namespace Poly3D.Prefabs.Scripts
                 _TargetDistance = value;
             }
         }
-        
 
         public Camera Camera
         {
@@ -52,13 +55,11 @@ namespace Poly3D.Prefabs.Scripts
             var groundPlane = new Plane(Vector3.UnitY, 0);
             var camRay = new Ray(Camera.Transform.WorldPosition, Camera.Transform.Forward);
             float distFromGround;
+
             Vector3 camTarget = Vector3.Zero;
             if (groundPlane.Raycast(camRay, out distFromGround))
-            {
                 camTarget = camRay.GetPoint(distFromGround);
-            }
-            else
-                camTarget = Vector3.Zero;
+
             TargetDistance = (camTarget - Camera.Transform.WorldPosition).Length;
         }
 

@@ -49,7 +49,21 @@ namespace Poly3D.Engine.Physics
 
         public override bool Raycast(Ray ray, out RaycastHit hitInfo, float maxDistance)
         {
-            throw new NotImplementedException();
+            var localRay = Ray.Transform(ray, EngineObject.Transform.WorldToLocalMatrix);
+            float hitDistance;
+            if (_Bounds.Intersects(ray, out hitDistance))
+            {
+                var localPt = localRay.GetPoint(hitDistance);
+                var worldPt = Vector3.Transform(localPt, EngineObject.Transform.LocalToWorldMatrix);
+                var realDistance = (worldPt - ray.Origin).Length;
+                if (maxDistance == 0 || realDistance <= maxDistance)
+                {
+                    hitInfo = new RaycastHit(ray, EngineObject, realDistance, -1);
+                    return true;
+                }
+            }
+            hitInfo = null;
+            return false;
         }
     }
 }

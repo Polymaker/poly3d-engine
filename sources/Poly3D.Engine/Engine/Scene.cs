@@ -76,6 +76,8 @@ namespace Poly3D.Engine
 
         internal void AssignDisplay(IEngineDisplay display)
         {
+            if (State != SceneState.Initializing)
+                return;
             _Display = display;
             Initialize();
         }
@@ -85,8 +87,9 @@ namespace Poly3D.Engine
             EngineLoop = new LoopController(Display);
             EngineLoop.RenderFrame += EngineLoop_RenderFrame;
             EngineLoop.UpdateFrame += EngineLoop_UpdateFrame;
-            _State = SceneState.Suspended;
+            _State = SceneState.Initialized;
             EngineLoop.ForceRender();
+            
         }
 
         public static Scene CreateDefault()
@@ -137,23 +140,32 @@ namespace Poly3D.Engine
 
         private void EngineLoop_UpdateFrame(object sender, OpenTK.FrameEventArgs e)
         {
-            UpdateDelay.Restart();
-            var engineObjects = EngineObjects.ToArray();
-            foreach (var so in engineObjects)
+            lock (UpdateLocker)
             {
-                if (!so.IsActive)
-                    continue;
-                var objectComponents = so.Components.ToArray();
-                foreach (var objBehave in objectComponents.OfType<ObjectBehaviour>())
-                {
-                    if (!objBehave.Enabled)
-                        continue;
+                CurrentScene = this;
 
-                    objBehave.DoUpdate((float)e.Time + (float)UpdateDelay.Elapsed.TotalSeconds);
+                UpdateDelay.Restart();
+
+                var engineObjects = EngineObjects.ToArray();
+
+                foreach (var so in engineObjects)
+                {
+                    if (!so.IsActive)
+                        continue;
+                    var objectComponents = so.Components.ToArray();
+                    foreach (var objBehave in objectComponents.OfType<ObjectBehaviour>())
+                    {
+                        if (!objBehave.Enabled)
+                            continue;
+
+                        objBehave.DoUpdate((float)e.Time + (float)UpdateDelay.Elapsed.TotalSeconds);
+                    }
                 }
+
+                UpdateDelay.Stop();
+
+                CurrentScene = null;
             }
-            UpdateDelay.Stop();
-            
         }
 
         public void OnUpdate(float deltaTime)
@@ -175,6 +187,11 @@ namespace Poly3D.Engine
 
         #region Pause/Resume
 
+        public void Start()
+        {
+            Resume();
+        }
+
         public void Pause()
         {
             if (IsRunning)
@@ -186,7 +203,7 @@ namespace Poly3D.Engine
 
         public void Resume()
         {
-            if (State == SceneState.Suspended)
+            if (State == SceneState.Suspended || State == SceneState.Initialized)
             {
                 EngineLoop.Start();
                 _State = SceneState.Running;
@@ -257,12 +274,15 @@ namespace Poly3D.Engine
 
         #endregion
 
+        private static readonly object UpdateLocker = new object();
+        private static Scene CurrentScene;
+
         public static Scene Current
         {
             get
             {
                 //TODO: implement a way to know the current scene from the caller/calling thread
-                throw new NotImplementedException();
+                return CurrentScene;
             }
         }
     }
