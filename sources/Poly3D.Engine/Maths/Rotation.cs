@@ -202,14 +202,11 @@ namespace Poly3D.Maths
 
         public static Rotation FromMatrix4(Matrix4 mat)
         {
-            //var invScale = Vector3.Divide(Vector3.One, mat.ExtractScale());
-            //if (invScale != Vector3.One)
-            //{
-            //    mat = Matrix4.Mult(Matrix4.CreateScale(invScale), mat);
-            //}
-            var newF = Vector3.TransformVector(Vector3.UnitZ, mat).Normalized();
-            var newU = Vector3.TransformVector(Vector3.UnitY, mat).Normalized();
-            return Rotation.FromDirection(newF, newU);
+            var newF = Vector3.TransformVector(Vector3.UnitZ, mat);
+            newF.NormalizeFast();
+            var newU = Vector3.TransformVector(Vector3.UnitY, mat);
+            newU.NormalizeFast();
+            return FromDirection(newF, newU);
         }
 
         public static explicit operator Quaternion(Rotation rot)

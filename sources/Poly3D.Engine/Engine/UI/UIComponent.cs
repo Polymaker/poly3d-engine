@@ -12,10 +12,5 @@ namespace Poly3D.Engine.UI
 
         }
 
-        public UIComponent(UIObject engineObject)
-            : base(engineObject)
-        {
-
-        }
     }
 }

@@ -78,9 +78,12 @@ namespace Poly3D.Engine
 
         public event EventHandler HierarchyChanged;
 
+        public event EventHandler ParentChanged;
+
         public SceneObject()
         {
-            _Transform = new Transform(this);
+            _Transform = new Transform();
+            _Transform.SetOwner(this);
             AddComponent(_Transform);
             //_Components.Add(_Transform);
             _Childs = new SceneObjectCollection(this);
@@ -89,8 +92,8 @@ namespace Poly3D.Engine
 
         private void OnHierarchyChangedInternal()
         {
-            if (Transform != null)
-                Transform.isWorldMatrixDirty = true;
+            //if (Transform != null)
+            //    Transform.isWorldMatrixDirty = true;
             OnHierarchyChanged(EventArgs.Empty);
             foreach (var child in Childs)
                 child.OnHierarchyChangedInternal();
@@ -103,12 +106,27 @@ namespace Poly3D.Engine
                 handler(this, ea);
         }
 
+        private void OnParentChangedInternal()
+        {
+            OnParentChanged(EventArgs.Empty);
+        }
+
+        protected virtual void OnParentChanged(EventArgs ea)
+        {
+            var handler = ParentChanged;
+            if (handler != null)
+                handler(this, ea);
+        }
+
         public T AddComponent<T>() where T : ObjectComponent
         {
             if (typeof(T) == typeof(Transform))
             {
                 if (Transform == null)
-                    Transform = new Transform(this);
+                {
+                    _Transform = new Transform();
+                    _Transform.SetOwner(this);
+                }
                 return Transform as T;
             }
 
@@ -204,6 +222,7 @@ namespace Poly3D.Engine
                 _Parent = newParent;
                 if (Scene == null)
                     Scene = _Parent.Scene;
+                OnParentChangedInternal();
                 OnHierarchyChangedInternal();
             }
         }

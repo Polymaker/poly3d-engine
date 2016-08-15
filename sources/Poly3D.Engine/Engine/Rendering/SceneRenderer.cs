@@ -78,7 +78,7 @@ namespace Poly3D.Engine.Rendering
         private static void OnRenderObject(Camera camera, SceneObject sceneObject)
         {
             GL.PushMatrix();
-            var transMat = sceneObject.Transform.GetLocalTransformMatrix();
+            var transMat = sceneObject.Transform.LocalTransform;
             GL.MultMatrix(ref transMat);
 
             if (sceneObject is ObjectMesh)
@@ -96,7 +96,7 @@ namespace Poly3D.Engine.Rendering
         private static void RenderObject(Camera camera, SceneObject sceneObject)
         {
             GL.PushMatrix();
-            var transMat = sceneObject.Transform.GetTransformMatrix();
+            var transMat = sceneObject.Transform.LocalToWorldMatrix;
             GL.MultMatrix(ref transMat);
 
             if (sceneObject is ObjectMesh)

@@ -29,7 +29,7 @@ namespace Poly3D.Prefabs.Scripts
         protected override void OnInitialize()
         {
             //Enabled = false;
-            Origin = ComplexTransform.FromMatrix(EngineObject.Transform.GetTransformMatrix());
+            Origin = ComplexTransform.FromMatrix(EngineObject.Transform.LocalToWorldMatrix);
             TotalTime = 0;
         }
 

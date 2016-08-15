@@ -25,10 +25,11 @@ namespace Poly3D.Engine
             _EngineObject = null;
         }
 
-        public BaseComponent(T engineObject)
-        {
-            _EngineObject = engineObject;
-        }
+        //public BaseComponent(T engineObject)
+        //{
+        //    _EngineObject = engineObject;
+        //    InitializeInternal();
+        //}
 
         internal void SetOwner(T owner)
         {

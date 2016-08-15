@@ -463,7 +463,7 @@ namespace Poly3D.Engine
                 if (meshObj.Mesh.BoundingBox.Intersects(localRay, out dist))
                 {
                     var localPt = localRay.GetPoint(dist);
-                    var worldPt = Vector3.Transform(localPt, meshObj.Transform.GetTransformMatrix());
+                    var worldPt = Vector3.Transform(localPt, meshObj.Transform.LocalToWorldMatrix);
                     var worldDist = (worldPt - ray.Origin).Length;
                     hits.Add(new Tuple<float, SceneObject>(worldDist, meshObj));
                 }
