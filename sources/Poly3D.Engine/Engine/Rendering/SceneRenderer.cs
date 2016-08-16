@@ -106,8 +106,8 @@ namespace Poly3D.Engine.Rendering
             GL.PushAttrib(AttribMask.LightingBit | AttribMask.LineBit | AttribMask.StencilBufferBit | AttribMask.DepthBufferBit);
 
             //SetupStencil();
-            
-            RenderHelper.DrawMesh(Color.Gray, meshObj.Mesh, meshObj.Transform.WorldScale);
+            var renderColor = meshObj.Material != null ? meshObj.Material.Color : Color.Gray;
+            RenderHelper.DrawMesh(renderColor, meshObj.Mesh, meshObj.Transform.WorldScale);
 
 
             //ApplyStencil();

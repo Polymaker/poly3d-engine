@@ -341,24 +341,38 @@ namespace Poly3D.Engine
         public static void DrawMesh(Color color, Mesh mesh, Vector3 normalScale)
         {
             var triangles = mesh.Faces.OfType<FaceTriangle>();
-            if (triangles.Any())
+            var quads = mesh.Faces.OfType<FaceQuad>();
+            if (triangles.Any() || quads.Any())
             {
                 GL.Color4(color);
                 GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
                 GL.Begin(BeginMode.Triangles);
+
                 foreach (var triangle in triangles)
                 {
                     var textured = triangle.IsTextured;
                     foreach (var vert in triangle.Vertices)
                     {
-                        GL.Normal3(Vector3.Multiply(vert.Normal, normalScale));
-                        if (textured)
-                            GL.TexCoord2(vert.UV.Value);
-                        GL.Vertex3(vert.Position);
+                        GLVertex(vert, normalScale);
                     }
                 }
+
+                foreach (var face in quads)
+                {
+                    GLVertex(face.Vertex0, normalScale); GLVertex(face.Vertex1, normalScale); GLVertex(face.Vertex2, normalScale);
+                    GLVertex(face.Vertex0, normalScale); GLVertex(face.Vertex2, normalScale); GLVertex(face.Vertex3, normalScale);
+                }
+
                 GL.End();
             }
+        }
+
+        private static void GLVertex(Vertex vert, Vector3 normalScale)
+        {
+            GL.Normal3(Vector3.Multiply(vert.Normal, normalScale));
+            if (vert.IsTextured)
+                GL.TexCoord2(vert.UV.Value);
+            GL.Vertex3(vert.Position);
         }
         
         public static void DrawWireMesh(Color color, Mesh mesh, float lineThickness = 1f)
