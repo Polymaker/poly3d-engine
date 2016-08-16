@@ -286,7 +286,6 @@ namespace Poly3D.Engine
             
         }
 
-
         #region Point convertion from Viewport space
 
         /// <summary>
@@ -507,7 +506,6 @@ namespace Poly3D.Engine
         }
 
         #endregion
-
 
         public float GetDistanceFromCamera(SceneObject so)
         {

@@ -14,17 +14,20 @@ namespace Poly3D.Prefabs.Scripts
         private float _TargetDistance;
         private MouseState lastMouse;
         private Vector2 lastMousePos = Vector2.Zero;
-        
+        //private Vector3 _CameraTarget;
+
         public Vector3 CameraTarget
         {
             get
             {
                 return Camera.Transform.WorldPosition + Camera.Transform.Forward * TargetDistance;
+                //return _CameraTarget;
             }
             set
             {
-                _TargetDistance = (value - Camera.Transform.WorldPosition).Length;
+                //_CameraTarget = value;
                 Camera.Transform.LookAt(value);
+                _TargetDistance = (value - Camera.Transform.WorldPosition).Length;
             }
         }
         
@@ -59,7 +62,7 @@ namespace Poly3D.Prefabs.Scripts
             Vector3 camTarget = Vector3.Zero;
             if (groundPlane.Raycast(camRay, out distFromGround))
                 camTarget = camRay.GetPoint(distFromGround);
-
+            
             TargetDistance = (camTarget - Camera.Transform.WorldPosition).Length;
         }
 
@@ -69,6 +72,8 @@ namespace Poly3D.Prefabs.Scripts
             var keyState = Keyboard.GetState();
             var mousePos = GetMousePosition();
             var mouseDelta = new Vector2(mousePos.X - lastMousePos.X, mousePos.Y - lastMousePos.Y);
+
+            //AdjustTarget();
 
             if (!Scene.Display.Focused)
             {
@@ -130,6 +135,8 @@ namespace Poly3D.Prefabs.Scripts
                         Camera.Transform.WorldPosition = newPos + cameraPivot;
                         Camera.Transform.Rotate(new Vector3(0, yawAngle.Degrees, 0), Space.Parent);
                     }
+
+                    AdjustTargetDist(cameraPivot);
                 }
             }
 
@@ -140,10 +147,10 @@ namespace Poly3D.Prefabs.Scripts
 
                 if (Camera.Projection == ProjectionType.Perspective)
                 {
-                    var camPivot = CameraTarget;
+                    var cameraPivot = CameraTarget;
                     scrollAmount *= TargetDistance / 10f;
                     Camera.Transform.Translate(new Vector3(0, 0, scrollAmount), Space.Self);
-                    AdjustTargetDist(camPivot);
+                    AdjustTargetDist(cameraPivot);
                 }
                 else if (Camera.Projection == ProjectionType.Orthographic)
                 {
@@ -157,6 +164,15 @@ namespace Poly3D.Prefabs.Scripts
 
             lastMouse = mouseState;
         }
+
+        //private void AdjustTarget()
+        //{
+        //    var calcTarget = Camera.Transform.WorldPosition + Camera.Transform.Forward * TargetDistance;
+        //    if ((calcTarget - CameraTarget).Length > float.Epsilon)
+        //    {
+        //        _CameraTarget = Camera.Transform.WorldPosition + Camera.Transform.Forward * TargetDistance;
+        //    }
+        //}
 
         private void AdjustTargetDist(Vector3 newTarget)
         {

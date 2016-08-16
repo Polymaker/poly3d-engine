@@ -48,10 +48,11 @@ namespace Poly3D.Engine.Physics
         {
             var localRay = Ray.Transform(ray, EngineObject.Transform.WorldToLocalMatrix);
             float hitDistance;
+
             if (Bounds.Intersects(localRay, out hitDistance))
             {
                 var localPt = localRay.GetPoint(hitDistance);
-                var worldPt = Vector3.Transform(localPt, EngineObject.Transform.LocalToWorldMatrix);
+                var worldPt = EngineObject.Transform.ToWorldSpace(localPt);
                 var realDistance = (worldPt - ray.Origin).Length;
                 if (maxDistance == 0 || realDistance <= maxDistance)
                 {

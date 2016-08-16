@@ -388,10 +388,20 @@ namespace Poly3D.Engine
 
         #endregion
 
+        public Vector3 ToLocalSpace(Vector3 worldPosition)
+        {
+            return Vector3.Transform(worldPosition, WorldToLocalMatrix);
+        }
+
+        public Vector3 ToWorldSpace(Vector3 localPosition)
+        {
+            return Vector3.Transform(localPosition, LocalToWorldMatrix);
+        }
+
         private Vector3 GetDirection(Vector3 direction)
         {
             var newDir = Vector3.TransformVector(direction, GetMatrix(MatrixType.Final));
-            newDir.NormalizeFast();
+            newDir.Normalize();
             return newDir;
         }
 

@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using Poly3D.Engine.Physics;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -154,29 +155,19 @@ namespace Poly3D.Maths
 
         public bool Intersects(Ray ray, out float distance)
         {
-            var rayInv = Vector3.Divide(Vector3.One, ray.Direction);
-            var t1 = Vector3.Multiply(Min - ray.Origin, rayInv);
-            var t2 = Vector3.Multiply(Max - ray.Origin, rayInv);
-            
-            var vMin = Vector3.ComponentMin(t1, t2);
-            var vMax = Vector3.ComponentMax(t1, t2);
-            var min = System.Math.Max(vMin.X, System.Math.Max(vMin.Y, vMin.Z));
-            var max = System.Math.Min(vMax.X, System.Math.Min(vMax.Y, vMax.Z));
-            
-            if (max < 0)
-            {
-                distance = max;
-                return false;
-            }
+            return PhysicsHelper.RayIntersectsBox(ray, this, out distance);
+        }
 
-            if (min > max)
+        public bool Intersects(Ray ray, out Vector3 intersectPoint)
+        {
+            float dist;
+            if (Intersects(ray, out dist))
             {
-                distance = max;
-                return false;
+                intersectPoint = ray.GetPoint(dist);
+                return true;
             }
-
-            distance = min;
-            return true;
+            intersectPoint = Vector3.Zero;
+            return false;
         }
 
         public static BoundingBox FromPoints(IEnumerable<Vector3> points)

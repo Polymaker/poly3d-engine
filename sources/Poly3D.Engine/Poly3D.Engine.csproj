@@ -54,6 +54,7 @@
     <Compile Include="Collections\TSDictionary.cs" />
     <Compile Include="Engine\BaseComponent.cs" />
     <Compile Include="Engine\EngineObject.cs" />
+    <Compile Include="Engine\Physics\PhysicsHelper.cs" />
     <Compile Include="Engine\UI\UIContainer.cs" />
     <Compile Include="Engine\UI\UIObject.cs" />
     <Compile Include="Engine\UI\UIWindow.cs" />

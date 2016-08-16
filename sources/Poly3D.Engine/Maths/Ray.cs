@@ -40,7 +40,8 @@ namespace Poly3D.Maths
         public static Ray Transform(Ray ray, Matrix4 transform)
         {
             var origin = Vector3.Transform(ray.Origin, transform);
-            var dir = Vector3.Transform(ray.Direction, transform.ExtractRotation());
+            //var dir = Vector3.Transform(ray.Direction, transform.ExtractRotation());
+            var dir = Vector3.TransformVector(ray.Direction, transform).Normalized();
             return new Ray(origin, dir);
         }
     }

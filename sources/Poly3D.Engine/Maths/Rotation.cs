@@ -156,9 +156,20 @@ namespace Poly3D.Maths
         public Rotation(Angle pitch, Angle yaw, Angle roll)
             : this(new Vector3(pitch.Degrees, yaw.Degrees, roll.Degrees)) { }
 
+        #region Static Ctors
+
+        public static Rotation FromMatrix4(Matrix4 mat)
+        {
+            var newF = Vector3.TransformVector(Vector3.UnitZ, mat);
+            newF.NormalizeFast();
+            var newU = Vector3.TransformVector(Vector3.UnitY, mat);
+            newU.NormalizeFast();
+            return FromDirection(newF, newU);
+        }
+
         public static Rotation FromDirection(Vector3 dir)
         {
-            return FromDirection(dir,  Vector3.UnitY);
+            return FromDirection(dir, Vector3.UnitY);
         }
 
         public static Rotation FromDirection(Vector3 dir, Vector3 up)
@@ -180,6 +191,15 @@ namespace Poly3D.Maths
             return FromDirection(dir, up);
         }
 
+        public static Rotation FromAxisAngle(Vector3 axis, Angle angle)
+        {
+            return FromMatrix4(Matrix4.CreateFromAxisAngle(axis, angle.Radians));
+        }
+
+        #endregion
+
+        #region Convertion operators
+
         public static implicit operator Rotation(Quaternion quat)
         {
             return new Rotation(quat);
@@ -200,15 +220,6 @@ namespace Poly3D.Maths
             return FromMatrix4(mat);
         }
 
-        public static Rotation FromMatrix4(Matrix4 mat)
-        {
-            var newF = Vector3.TransformVector(Vector3.UnitZ, mat);
-            newF.NormalizeFast();
-            var newU = Vector3.TransformVector(Vector3.UnitY, mat);
-            newU.NormalizeFast();
-            return FromDirection(newF, newU);
-        }
-
         public static explicit operator Quaternion(Rotation rot)
         {
             return rot.Quaternion;
@@ -223,6 +234,8 @@ namespace Poly3D.Maths
         {
             return Matrix4.CreateFromQuaternion(rot.Quaternion);
         }
+
+        #endregion
 
         public static Rotation Identity
         {

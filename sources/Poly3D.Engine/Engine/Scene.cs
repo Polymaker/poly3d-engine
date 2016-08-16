@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Poly3D.Prefabs.Scripts;
+using System.Windows.Forms;
 
 namespace Poly3D.Engine
 {
@@ -88,8 +89,10 @@ namespace Poly3D.Engine
             EngineLoop.RenderFrame += EngineLoop_RenderFrame;
             EngineLoop.UpdateFrame += EngineLoop_UpdateFrame;
             _State = SceneState.Initialized;
-            EngineLoop.ForceRender();
+            //foreach (var sceneObj in Objects)
+            //    sceneObj.Initialize(this);
             
+            //EngineLoop.ForceRender();
         }
 
         public static Scene CreateDefault()
@@ -113,9 +116,15 @@ namespace Poly3D.Engine
         public T AddObject<T>() where T : EngineObject
         {
             T sceneObj = Activator.CreateInstance<T>();
-            sceneObj.Initialize(this);
+            //if (Display != null)
+                sceneObj.Initialize(this);
             _Objects.Add(sceneObj);
             return sceneObj;
+        }
+
+        public void RemoveObject(EngineObject engineObject)
+        {
+            _Objects.Remove(engineObject);
         }
 
         internal void RenderScene()

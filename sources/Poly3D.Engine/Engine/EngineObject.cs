@@ -113,6 +113,12 @@ namespace Poly3D.Engine
             return _Components.OfType<T>().FirstOrDefault();
         }
 
+        public void Destroy()
+        {
+            if (Scene != null)
+                Scene.RemoveObject(this);
+        }
+
         public long GetInstanceId()
         {
             return InstanceId;

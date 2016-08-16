@@ -67,7 +67,7 @@ namespace Poly3D.Test
 
              };
             
-            MyScene.Resume();
+            //MyScene.Resume();
         }
 
         private void button1_Click(object sender, EventArgs e)

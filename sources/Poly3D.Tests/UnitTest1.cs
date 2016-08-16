@@ -7,6 +7,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Assert = NUnit.Framework.Assert;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Poly3D.Engine.Physics;
+
 namespace Poly3D.Tests
 {
     [TestClass]
@@ -142,6 +144,18 @@ namespace Poly3D.Tests
             Assert.That(v1.X, Is.EqualTo(v2.X).Within(0.001));
             Assert.That(v1.Y, Is.EqualTo(v2.Y).Within(0.001));
             Assert.That(v1.Z, Is.EqualTo(v2.Z).Within(0.001));
+        }
+
+        [TestMethod]
+        public void TestIntersection()
+        {
+            var sphere = new BoundingSphere(Vector3.Zero, 4f);
+            var ray = new Ray(new Vector3(4, 0, 10), new Vector3(0, 0, -1));
+            float hitDist;
+            if (PhysicsHelper.RayIntersectsSphere(ray, sphere, out hitDist))
+            {
+                var hitLoc = ray.GetPoint(hitDist);
+            }
         }
 
     }

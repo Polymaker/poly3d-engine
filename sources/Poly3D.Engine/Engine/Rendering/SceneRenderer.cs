@@ -31,7 +31,7 @@ namespace Poly3D.Engine.Rendering
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.ColorMaterial);
             GL.Enable(EnableCap.Lighting);
-            //GL.Enable(EnableCap.LineSmooth);
+            GL.Enable(EnableCap.LineSmooth);
             GL.Enable(EnableCap.Texture2D);
 
             GL.ClearColor(camera.BackColor);
@@ -49,11 +49,6 @@ namespace Poly3D.Engine.Rendering
 
             GL.Enable(EnableCap.Light0);
 
-            //foreach (var rootObj in scene.RootObjects.Where(o => o.IsActive))
-            //{
-            //    OnRenderObject(camera, rootObj);
-            //}
-
             foreach (var renderLayerGroup in scene.Objects
                 .Where(o => o.IsActive)
                 .GroupBy(o => o.RenderLayer)
@@ -66,43 +61,32 @@ namespace Poly3D.Engine.Rendering
                 GL.Clear(ClearBufferMask.DepthBufferBit);
             }
 
-            //foreach (var sceneObject in scene.Objects.Where(o => o.IsActive))
-            //{
-            //    //if(!(sceneObject is ObjectMesh))
-            //        RenderObjectAxes(camera, sceneObject);
-            //}
-            //RenderHelper.RenderAxes(5, 0.25f);
+            
             RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Translation);
 
+            /*
             //UI Rendering
             GL.MatrixMode(MatrixMode.Projection);
             projectionMatrix = Matrix4.CreateOrthographic(10 * camera.AspectRatio, 10, 0.3f, 10f);
             GL.LoadMatrix(ref projectionMatrix);
+
             GL.MatrixMode(MatrixMode.Modelview);
             viewMatrix = Matrix4.LookAt(new Vector3(0, 0, -1), Vector3.Zero, Vector3.UnitY);
             GL.LoadMatrix(ref viewMatrix);
+
             GL.Disable(EnableCap.Lighting);
+            
+            var pixelScale = 10f / camera.DisplayRectangle.Height;
+
+            GL.Color4(Color.Black);
+            RenderHelper.DrawCircle(16 * pixelScale, 1f);
+
             GL.Color4(Color.White);
-            RenderHelper.DrawCircle(Vector3.UnitZ, 4);
+            RenderHelper.DrawCircle(17 * pixelScale, 1f);
+
+            */
         }
-
-        private static void OnRenderObject(Camera camera, SceneObject sceneObject)
-        {
-            GL.PushMatrix();
-            var transMat = sceneObject.Transform.LocalTransform;
-            GL.MultMatrix(ref transMat);
-
-            if (sceneObject is ObjectMesh)
-                RenderMeshObject(camera, (ObjectMesh)sceneObject);
-
-            if (sceneObject.Childs.Count > 0)
-            {
-                foreach (var childObj in sceneObject.Childs.Where(o => o.IsActive))
-                    OnRenderObject(camera, childObj);
-            }
-
-            GL.PopMatrix();
-        }
+        
 
         private static void RenderObject(Camera camera, SceneObject sceneObject)
         {
@@ -115,42 +99,23 @@ namespace Poly3D.Engine.Rendering
 
             GL.PopMatrix();
         }
-
-        private static void RenderObjectAxes(Camera camera, SceneObject sceneObject)
-        {
-            GL.PushMatrix();
-            //var transMat = sceneObject.Transform.GetTransformMatrix();
-            //GL.MultMatrix(ref transMat);
-            //GL.Scale(Vector3.Divide(Vector3.One, transMat.ExtractScale()));
-            GL.PushAttrib(AttribMask.LightingBit);
-            GL.Disable(EnableCap.Lighting);
-            RenderHelper.DrawLine(RenderHelper.UNIT_X_COLOR, sceneObject.Transform.WorldPosition, sceneObject.Transform.WorldPosition + sceneObject.Transform.Right * 3, 3f);
-            RenderHelper.DrawLine(RenderHelper.UNIT_Y_COLOR, sceneObject.Transform.WorldPosition, sceneObject.Transform.WorldPosition + sceneObject.Transform.Up * 3, 3f);
-            RenderHelper.DrawLine(RenderHelper.UNIT_Z_COLOR, sceneObject.Transform.WorldPosition, sceneObject.Transform.WorldPosition + sceneObject.Transform.Forward * 3, 3f);
-            //RenderHelper.DrawLine(RenderHelper.UNIT_X_COLOR, Vector3.Zero, Vector3.UnitX * 3, 3f);
-            //RenderHelper.DrawLine(RenderHelper.UNIT_Y_COLOR, Vector3.Zero, Vector3.UnitY * 3, 3f);
-            //RenderHelper.DrawLine(RenderHelper.UNIT_Z_COLOR, Vector3.Zero, Vector3.UnitZ * 3, 3f);
-
-            GL.PopAttrib();
-            GL.PopMatrix();
-        }
+        
 
         private static void RenderMeshObject(Camera camera, ObjectMesh meshObj)
         {
             GL.PushAttrib(AttribMask.LightingBit | AttribMask.LineBit | AttribMask.StencilBufferBit | AttribMask.DepthBufferBit);
 
             //SetupStencil();
-
-            //PhongShader.Bind();
+            
             RenderHelper.DrawMesh(Color.Gray, meshObj.Mesh, meshObj.Transform.WorldScale);
-            //Shader.Bind(null);
+
 
             //ApplyStencil();
             GL.Disable(EnableCap.Lighting);
 
             RenderHelper.DrawWireMesh(Color.DarkBlue, meshObj.Mesh);
 
-            RenderHelper.OutlineCube(Color.Yellow, meshObj.Mesh.BoundingBox);
+            //RenderHelper.OutlineCube(Color.Yellow, meshObj.Mesh.BoundingBox);
 
             GL.PopAttrib();
         }

@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using Poly3D.Engine.Physics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,15 +33,7 @@ namespace Poly3D.Maths
 
         public bool Raycast(Ray ray, out float distance)
         {
-            var denom = Vector3.Dot(Normal, ray.Direction);
-            if (Math.Abs(denom) > 0)
-            {
-                var center = Origin + (Normal * Distance);
-                distance = Vector3.Dot(center - ray.Origin, Normal) / denom;
-                return distance >= 0;
-            }
-            distance = 0;
-            return false;
+            return PhysicsHelper.RayIntersectsPlane(ray, this, out distance);
         }
 
     }

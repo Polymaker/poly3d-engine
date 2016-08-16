@@ -9,52 +9,54 @@ namespace Poly3D.Engine.Physics
 {
     public class SphereCollider : Collider
     {
-        private BoundingSphere _Bounds;
+        private BoundingSphere _SphereBounds;
+        private BoundingBox _BoxBounds;
 
         public override BoundingBox Bounds
         {
-            get
-            {
-                return new BoundingBox(_Bounds.Center, Vector3.One * _Bounds.Radius);
-            }
+            get { return _BoxBounds; }
         }
 
         public Vector3 Center
         {
-            get { return _Bounds.Center; }
+            get { return _SphereBounds.Center; }
             set
             {
-                _Bounds.Center = value;
+                _SphereBounds.Center = value;
+                _BoxBounds = new BoundingBox(_SphereBounds.Center, Vector3.One * _SphereBounds.Radius);
             }
         }
 
         public float Radius
         {
-            get { return _Bounds.Radius; }
+            get { return _SphereBounds.Radius; }
             set
             {
-                _Bounds.Radius = value;
+                _SphereBounds.Radius = value;
+                _BoxBounds = new BoundingBox(_SphereBounds.Center, Vector3.One * _SphereBounds.Radius);
             }
         }
 
         public SphereCollider()
         {
-            _Bounds = new BoundingSphere();
+            _SphereBounds = new BoundingSphere();
+            _BoxBounds = new BoundingBox();
         }
 
         public SphereCollider(BoundingSphere bounds)
         {
-            _Bounds = bounds;
+            _SphereBounds = bounds;
+            _BoxBounds = new BoundingBox(_SphereBounds.Center, Vector3.One * _SphereBounds.Radius);
         }
 
         public override bool Raycast(Ray ray, out RaycastHit hitInfo, float maxDistance)
         {
             var localRay = Ray.Transform(ray, EngineObject.Transform.WorldToLocalMatrix);
             float hitDistance;
-            if (_Bounds.Intersects(ray, out hitDistance))
+            if (_SphereBounds.Intersects(ray, out hitDistance))
             {
                 var localPt = localRay.GetPoint(hitDistance);
-                var worldPt = Vector3.Transform(localPt, EngineObject.Transform.LocalToWorldMatrix);
+                var worldPt = EngineObject.Transform.ToWorldSpace(localPt);
                 var realDistance = (worldPt - ray.Origin).Length;
                 if (maxDistance == 0 || realDistance <= maxDistance)
                 {

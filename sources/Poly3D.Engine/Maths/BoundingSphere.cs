@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using Poly3D.Engine.Physics;
 
 namespace Poly3D.Maths
 {
@@ -48,7 +49,18 @@ namespace Poly3D.Maths
 
         public bool Intersects(Ray ray, out float distance)
         {
-            distance = 0f;
+            return PhysicsHelper.RayIntersectsSphere(ray, this, out distance);
+        }
+
+        public bool Intersects(Ray ray, out Vector3 intersectPoint)
+        {
+            float dist;
+            if (Intersects(ray, out dist))
+            {
+                intersectPoint = ray.GetPoint(dist);
+                return true;
+            }
+            intersectPoint = Vector3.Zero;
             return false;
         }
     }
