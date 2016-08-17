@@ -16,6 +16,7 @@ namespace Poly3D.Platform
         private double nextRender;
         private double nextUpdate;
         private IEngineDisplay _Target;
+        private static List<LoopController> ActiveContexts;
 
         public bool IsRunning
         {
@@ -30,6 +31,29 @@ namespace Poly3D.Platform
         public event EventHandler<FrameEventArgs> UpdateFrame;
 
         public event EventHandler<FrameEventArgs> RenderFrame;
+
+        static LoopController()
+        {
+            ActiveContexts = new List<LoopController>();
+        }
+
+        private static void Application_Idle(object sender, EventArgs e)
+        {
+            while (true)
+            {
+                bool somethingToRun = false;
+                foreach (var context in ActiveContexts)
+                {
+                    if (!context.Target.IsIdle)
+                        break;
+                    
+                    somethingToRun = true;
+                    context.DispatchUpdateAndRenderFrame(); 
+                }
+                if (!somethingToRun)
+                    break;
+            }
+        }
 
         public LoopController(IEngineDisplay target)
         {
@@ -61,7 +85,8 @@ namespace Poly3D.Platform
             if (!IsRunning)
             {
                 _IsRunning = true;
-                Application.Idle += Application_Idle;
+                AttachLoop(this);
+                //Application.Idle += Application_Idle;
             }
         }
 
@@ -69,7 +94,7 @@ namespace Poly3D.Platform
         {
             if (IsRunning)
             {
-                Application.Idle -= Application_Idle;
+                DettachLoop(this);
                 _IsRunning = false;
                 updateTimer.Reset();
                 renderTimer.Reset();
@@ -77,13 +102,21 @@ namespace Poly3D.Platform
             }
         }
 
-        private void Application_Idle(object sender, EventArgs e)
+        private static void AttachLoop(LoopController loop)
         {
-            while (IsRunning && Target.IsIdle)
-            {
-                DispatchUpdateAndRenderFrame();
-            }
+            ActiveContexts.Add(loop);
+            if (ActiveContexts.Count == 1)
+                Application.Idle += Application_Idle;
         }
+
+        private static void DettachLoop(LoopController loop)
+        {
+            ActiveContexts.Remove(loop);
+            if (ActiveContexts.Count == 0)
+                Application.Idle -= Application_Idle;
+        }
+
+        #region Render & Update
 
         private void DispatchUpdateAndRenderFrame()
         {
@@ -99,7 +132,7 @@ namespace Poly3D.Platform
                 renderTimer.Restart();
                 return;
             }
- 
+
             elapsedSeconds = Math.Min(elapsedSeconds, 1.0);
 
             double renderDelay = nextRender - elapsedSeconds;
@@ -183,8 +216,15 @@ namespace Poly3D.Platform
                 handler(Target, e);
         }
 
+        #endregion
+
         internal void ForceRender()
         {
+            if (Target is EngineControl && (Target as EngineControl).InvokeRequired)
+            {
+                (Target as EngineControl).Invoke(new MethodInvoker(ForceRender));
+                return;
+            }
             DispatchRender(0.001);
         }
     }

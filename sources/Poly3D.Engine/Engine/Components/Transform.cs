@@ -128,7 +128,10 @@ namespace Poly3D.Engine
             }
             set
             {
-                Position = Vector3.Transform(value, ParentMatrix.Inverted());
+                if (ParentTransform == null)
+                    Position = value;
+                else
+                    Position = Vector3.Transform(value, ParentMatrix.Inverted());
             }
         }
 
@@ -143,8 +146,15 @@ namespace Poly3D.Engine
             }
             set
             {
-                var baseRotation = ParentMatrix.ExtractRotation().Inverted();
-                Rotation = Quaternion.Multiply(baseRotation, value.Quaternion);
+                if (ParentTransform == null)
+                {
+                    Rotation = value;
+                }
+                else
+                {
+                    var baseRotation = ParentMatrix.ExtractRotation().Inverted();
+                    Rotation = Quaternion.Multiply(baseRotation, value.Quaternion);
+                }
             }
         }
 
@@ -159,9 +169,16 @@ namespace Poly3D.Engine
             }
             set
             {
-                if (value == Vector3.Zero || value.X == 0f || value.Y == 0f || value.Z == 0f)
-                    return;
-                Scale = Vector3.Divide(value, ParentMatrix.ExtractScale());
+                if (ParentTransform == null)
+                {
+                    Scale = value;
+                }
+                else
+                {
+                    if (value == Vector3.Zero || value.X == 0f || value.Y == 0f || value.Z == 0f)
+                        return;
+                    Scale = Vector3.Divide(value, ParentMatrix.ExtractScale());
+                }
             }
         }
 
@@ -251,7 +268,12 @@ namespace Poly3D.Engine
         internal Matrix4 GetMatrix(MatrixType type)
         {
             if (EngineObject == null)
-                return Matrix4.Identity;
+            {
+                if (type == MatrixType.Parent)
+                    return Matrix4.Identity;
+                else
+                    type = MatrixType.Local; //with no object (thus no parent) Final = Local
+            }
 
             if (type == MatrixType.Parent)
             {
@@ -347,10 +369,7 @@ namespace Poly3D.Engine
             else if (relativeTo == Space.Self)
             {
                 var realRot = LocalToWorldMatrix.GetRotation();
-                //var mat2 = Matrix4.Mult((Matrix4)rotation, GetTransformMatrix());
                 WorldRotation = Quaternion.Multiply(realRot.Quaternion, rotation.Quaternion);
-                //var currentQuat = GetTransformMatrix().ExtractRotation();
-                //WorldRotation = Quaternion.Multiply(rotation.Quaternion, currentQuat);
             }
         }
 

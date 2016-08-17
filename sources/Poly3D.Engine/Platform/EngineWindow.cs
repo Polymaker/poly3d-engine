@@ -257,7 +257,14 @@ namespace Poly3D.Platform
 
         public void LoadScene(Scene scene)
         {
+            LoadScene(scene, true);
+        }
+
+        public void LoadScene(Scene scene, bool autostart)
+        {
             scene.AssignDisplay(this);
+            if (autostart)
+                scene.Start();
         }
 
         public Rectangle GetDisplayBounds()

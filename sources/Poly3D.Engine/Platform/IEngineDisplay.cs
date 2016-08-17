@@ -31,6 +31,8 @@ namespace Poly3D.Platform
 
         void LoadScene(Scene scene);
 
+        void LoadScene(Scene scene, bool autostart);
+
         System.Drawing.Rectangle GetDisplayBounds();
     }
 }

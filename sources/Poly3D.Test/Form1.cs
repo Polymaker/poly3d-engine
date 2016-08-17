@@ -67,39 +67,34 @@ namespace Poly3D.Test
 
              };
             
-            //MyScene.Resume();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //var finalTrans = (ComplexTransform)modelObject2.Transform.GetTransformMatrix();
-            //Trace.WriteLine("final rot = " + finalTrans.Rotation);
-            //Trace.WriteLine("world rot = " + modelObject2.Transform.WorldRotation);
-            //modelObject2.Transform.SetRotation(RotationComponent.Roll, modelObject2.Transform.Rotation.Roll + 45f, Space.Self);
-            modelObject2.Transform.Rotate(new Rotation(0, 0, 45f), Space.Self);
-            //if (MyScene.IsRunning)
-            //    MyScene.Pause();
-            //else
-            //    MyScene.Resume();
-            //poly3DControl1.SetGraphicsMode(new OpenTK.Graphics.GraphicsMode(32, 24, 8, 4));
+            var mainCam = MyScene.ActiveCameras.First();
+            if (mainCam.Projection == ProjectionType.Perspective)
+                mainCam.Projection = ProjectionType.Orthographic;
+            else
+                mainCam.Projection = ProjectionType.Perspective;
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             var mainCam = MyScene.ActiveCameras.First();
+            mainCam.MatchOrthoViewToPersp();
             //if (mainCam.Projection == ProjectionType.Perspective)
             //    mainCam.Projection = ProjectionType.Orthographic;
             //else
             //    mainCam.Projection = ProjectionType.Perspective;
-            var orbitScript = mainCam.GetComponent<PanOrbitCamera>();
-            var camTarget = orbitScript.CameraTarget;
-            var rotater = MyScene.ActiveCameras.First().AddComponent<Animator>();
-            var targetTransform = new ComplexTransform();
-            targetTransform.Translation = camTarget + new Vector3(0, orbitScript.TargetDistance, 0);
-            targetTransform.Rotation = Rotation.LookAt(targetTransform.Translation, camTarget, Vector3.UnitY);
-            rotater.Target = targetTransform;
-            rotater.Time = 1;
-            rotater.Enabled = true;
+            //var orbitScript = mainCam.GetComponent<PanOrbitCamera>();
+            //var camTarget = orbitScript.CameraTarget;
+            //var rotater = MyScene.ActiveCameras.First().AddComponent<Animator>();
+            //var targetTransform = new ComplexTransform();
+            //targetTransform.Translation = camTarget + new Vector3(0, orbitScript.TargetDistance, 0);
+            //targetTransform.Rotation = Rotation.LookAt(targetTransform.Translation, camTarget, Vector3.UnitY);
+            //rotater.Target = targetTransform;
+            //rotater.Time = 1;
+            //rotater.Enabled = true;
         }
 
         private void poly3DControl1_MouseClick(object sender, MouseEventArgs e)

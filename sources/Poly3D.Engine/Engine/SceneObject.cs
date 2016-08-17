@@ -153,21 +153,17 @@ namespace Poly3D.Engine
             if (_Transform == transform)
                 return;
 
-            if (_Transform != null && Components.Contains(_Transform))
-            {
-                RemoveComponent(_Transform);
-                _Transform.SetOwner(null);
-            }
-
-            _Transform = (Transform)transform.Clone();
-            AddComponent(_Transform);
-            _Transform.SetOwner(this);
-
             if (keepWorldPosition)
             {
                 _Transform.WorldScale = transform.WorldScale;
                 _Transform.WorldPosition = transform.WorldPosition;
                 _Transform.WorldRotation = transform.WorldRotation;
+            }
+            else
+            {
+                _Transform.Scale = transform.Scale;
+                _Transform.Position = transform.Position;
+                _Transform.Rotation = transform.Rotation;
             }
         }
 
@@ -194,10 +190,10 @@ namespace Poly3D.Engine
                 if (_Parent == newParent)
                     return;
 
-                if (!fromCollection)
+                //adding itself into one of its child (this check is already done when adding object from the collection)
+                if (!fromCollection && AllChilds.Contains(newParent))
                 {
-                    if (AllChilds.Contains(newParent))
-                        return;
+                    return;
                 }
 
                 if (_Parent != null)
@@ -219,9 +215,8 @@ namespace Poly3D.Engine
                     if (!newParent._Childs.Contains(this))
                         newParent._Childs.Add(this);
                 }
+
                 _Parent = newParent;
-                if (Scene == null)
-                    Scene = _Parent.Scene;
                 OnParentChangedInternal();
                 OnHierarchyChangedInternal();
             }

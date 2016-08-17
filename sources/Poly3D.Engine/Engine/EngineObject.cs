@@ -9,21 +9,18 @@ namespace Poly3D.Engine
 {
     public abstract class EngineObject
     {
-        private string _Name;
         private static long CurrentId = 0;
 
         private readonly long InstanceId = GenerateInstanceId();
+
         private Scene _Scene;
+        private string _Name;
         private bool _Active;
         private List<IEngineComponent> _Components;
 
         public Scene Scene
         {
             get { return _Scene; }
-            internal set
-            {
-                Initialize(value);
-            }
         }
 
         public string Name
@@ -68,30 +65,31 @@ namespace Poly3D.Engine
 
         public EngineObject()
         {
-            _Name = String.Empty;
+            _Name = string.Empty;
             _Scene = null;
             Tag = null;
-            _Active = false;
+            _Active = true;
             _Components = new List<IEngineComponent>();
         }
 
-        internal void Initialize(Scene scene)
+        internal void AssignScene(Scene scene)
         {
             _Scene = scene;
-            _Active = true;
             _Name = Scene.GetDefaultName(this);
         }
 
+        internal void Initialize()
+        {
+            OnInitialize();
+        }
+
+        protected virtual void OnInitialize() { }
+
         #region Components
-
-
-
-        #endregion
 
         internal void AddComponent(IEngineComponent component)
         {
             _Components.Add(component);
-            
         }
 
         //internal void AddComponent<T>(IEngineComponent<T> component) where T : EngineObject
@@ -112,6 +110,8 @@ namespace Poly3D.Engine
         {
             return _Components.OfType<T>().FirstOrDefault();
         }
+
+        #endregion
 
         public void Destroy()
         {

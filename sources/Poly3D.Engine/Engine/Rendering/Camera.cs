@@ -507,6 +507,11 @@ namespace Poly3D.Engine
 
         #endregion
 
+        public void MatchOrthoViewToPersp()
+        {
+            OrthographicSize = GetViewHeight((FarClipDistance - NearClipDistance) / 2f);
+        }
+
         public float GetDistanceFromCamera(SceneObject so)
         {
             return GetDistanceFromCamera(so.Transform.WorldPosition);

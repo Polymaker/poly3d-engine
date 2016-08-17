@@ -98,6 +98,11 @@ namespace Poly3D.Platform
             _Exists = true;
         }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+        }
+
         protected void OnDisplayChanged(EventArgs e)
         {
             var handler = DisplayChanged;
@@ -149,7 +154,14 @@ namespace Poly3D.Platform
 
         public void LoadScene(Scene scene)
         {
+            LoadScene(scene, true);
+        }
+
+        public void LoadScene(Scene scene, bool autostart)
+        {
             scene.AssignDisplay(this);
+            if (autostart)
+                scene.Start();
         }
 
         protected virtual void OnUnload(EventArgs e)

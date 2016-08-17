@@ -41,7 +41,7 @@ namespace Poly3D.Engine
 
         protected virtual void OnUpdate(float deltaTime) { }
 
-        protected virtual void OnRender(float deltaTime) { }
+        protected virtual void OnRender(Camera camera) { }
 
         protected virtual void OnEnable() { }
 

@@ -10,11 +10,15 @@ using System.Text;
 using Poly3D.Prefabs.Scripts;
 using System.Windows.Forms;
 
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Poly3D.Engine
 {
     public class Scene
     {
         // Fields...
+        private bool _Initialized;
         private SceneState _State;
         private IEngineDisplay _Display;
         private List<EngineObject> _Objects;
@@ -33,6 +37,11 @@ namespace Poly3D.Engine
         public SceneState State
         {
             get { return _State; }
+        }
+
+        public bool Initialized
+        {
+            get { return _Initialized; }
         }
 
         public IEnumerable<EngineObject> EngineObjects
@@ -70,7 +79,7 @@ namespace Poly3D.Engine
             _Objects = new List<EngineObject>();
             _State = SceneState.Initializing;
             UpdateDelay = new Stopwatch();
-            //Initialize();
+            _Initialized = false;
         }
 
         #region Initialization
@@ -89,10 +98,21 @@ namespace Poly3D.Engine
             EngineLoop.RenderFrame += EngineLoop_RenderFrame;
             EngineLoop.UpdateFrame += EngineLoop_UpdateFrame;
             _State = SceneState.Initialized;
-            //foreach (var sceneObj in Objects)
-            //    sceneObj.Initialize(this);
-            
-            //EngineLoop.ForceRender();
+            _Initialized = true;
+
+            foreach (var eObj in EngineObjects)
+                eObj.Initialize();
+
+            if (Display is EngineControl)
+            {
+                Task.Factory.StartNew(() =>
+                {
+                    Thread.Sleep(50);
+                    EngineLoop.ForceRender();
+                });
+            }
+            else
+                EngineLoop.ForceRender();
         }
 
         public static Scene CreateDefault()
@@ -115,11 +135,14 @@ namespace Poly3D.Engine
 
         public T AddObject<T>() where T : EngineObject
         {
-            T sceneObj = Activator.CreateInstance<T>();
-            //if (Display != null)
-                sceneObj.Initialize(this);
-            _Objects.Add(sceneObj);
-            return sceneObj;
+            T engineObject = Activator.CreateInstance<T>();
+            engineObject.AssignScene(this);
+
+            if (Initialized)
+                engineObject.Initialize();
+
+            _Objects.Add(engineObject);
+            return engineObject;
         }
 
         public void RemoveObject(EngineObject engineObject)
@@ -290,7 +313,7 @@ namespace Poly3D.Engine
         {
             get
             {
-                //TODO: implement a way to know the current scene from the caller/calling thread
+                //TODO: implement a (better) way to know the current scene from the caller/calling thread
                 return CurrentScene;
             }
         }
