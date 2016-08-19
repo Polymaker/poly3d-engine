@@ -97,31 +97,6 @@ namespace Poly3D.Test
             //rotater.Enabled = true;
         }
 
-        private void poly3DControl1_MouseClick(object sender, MouseEventArgs e)
-        {
-            //if (poly3DControl1.Scene == null)
-            //    return;
-            ////modelRootObj.Transform.Rotate(new Rotation(22.5f, 0f, 0f));
-
-            //if (e.Button == MouseButtons.Left)
-            //{
-            //    var mainCam = poly3DControl1.Scene.ActiveCameras.First();
-            //    var raycast = mainCam.RaycastFromScreen(new Vector2(e.X, e.Y));
-            //    var selectedObject = mainCam.RaySelect(raycast);
-            //    if (selectedObject != null)
-            //    {
-            //        Trace.WriteLine("Selected object id " + selectedObject.Name);
-            //    }
-            //}
-            //else if (e.Button == MouseButtons.Right)
-            //{
-                
-            //    //var mainCam = poly3DControl1.Scene.ActiveCameras.First();
-            //    //var objPos = mainCam.WorldPointToScreen(modelObject.Transform.WorldPosition);
-            //    //Trace.WriteLine(objPos);
-            //}
-        }
-
         private void timer1_Tick(object sender, EventArgs e)
         {
             //label1.Text = string.Format("{0:0.##} FPS", poly3DControl1.RenderFrequency);
