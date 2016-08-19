@@ -6,78 +6,46 @@ using System.Text;
 
 namespace Poly3D.Engine.Meshes
 {
-    public class Vertex : MeshElement, IVertex
+    public class Vertex
     {
-        
-        private Vector3 _Position;
-        private Vector3 _Normal;
-        private Vector2? _UV;
+        // Fields...
+        private Mesh _Mesh;
+        private int _Index;
 
-        public Vector3 Position
+        public Mesh Mesh
         {
-            get { return _Position; }
-            set
-            {
-                _Position = value;
-            }
+            get { return _Mesh; }
         }
 
-        public Vector3 Normal
+        public int Index
         {
-            get { return _Normal; }
-            set
-            {
-                _Normal = value;
-            }
+            get { return _Index; }
+        }
+        
+        public Vector3 Position
+        {
+            get { return Mesh.Positions[Index]; }
+        }
+
+        public Vector3? Normal
+        {
+            get { return Mesh.Normals != null && Mesh.Normals.Length > 0 ? Mesh.Normals[Index] : (Vector3?)null; }
+        }
+
+        public Vector3? Tangent
+        {
+            get { return Mesh.Tangents != null && Mesh.Tangents.Length > 0 ? Mesh.Tangents[Index] : (Vector3?)null; }
         }
 
         public Vector2? UV
         {
-            get { return _UV; }
-            set
-            {
-                _UV = value;
-            }
+            get { return Mesh.UVs != null && Mesh.UVs.Length > 0 ? Mesh.UVs[Index] : (Vector2?)null; }
         }
 
-        public bool IsTextured
+        internal Vertex(Mesh mesh, int index)
         {
-            get { return UV.HasValue; }
-        }
-
-        public Vertex()
-            : this(Vector3.Zero, Vector3.Zero, null) { }
-
-        public Vertex(Vector3 position)
-            : this(position, Vector3.Zero, null) { }
-
-        public Vertex(Vector3 position, Vector3 normal)
-            : this(position, normal, null) { }
-
-        public Vertex(Vector3 position, Vector3 normal, Vector2? uV)
-        {
-            _Position = position;
-            _Normal = normal;
-            _UV = uV;
-        }
-
-        public IEnumerable<Face> GetConnectedFaces()
-        {
-            if (Mesh == null)
-                return new Face[0];
-            return Mesh.Faces.Where(f => f.Contains(this));
-        }
-
-        public IEnumerable<Edge> GetConnectedEdges()
-        {
-            var faces = GetConnectedFaces();
-            var edges = faces.SelectMany(f => f.GetEdges().Where(e => e.Contains(this)));
-            return edges.Distinct();
-        }
-
-        internal Vertex CloneValue()
-        {
-            return new Vertex(Position, Normal, UV);
+            _Mesh = mesh;
+            _Index = index;
         }
     }
 }

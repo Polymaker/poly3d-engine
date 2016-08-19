@@ -53,7 +53,11 @@
     <Compile Include="Collections\OwnerCollectionBase.cs" />
     <Compile Include="Collections\TSDictionary.cs" />
     <Compile Include="Engine\BaseComponent.cs" />
+    <Compile Include="Engine\Components\ObjectMesh.cs" />
     <Compile Include="Engine\EngineObject.cs" />
+    <Compile Include="Engine\Meshes\Mesh.cs" />
+    <Compile Include="Engine\Meshes\SubMesh.cs" />
+    <Compile Include="Engine\Meshes\Vertex.cs" />
     <Compile Include="Engine\Physics\PhysicsHelper.cs" />
     <Compile Include="Engine\UI\UIContainer.cs" />
     <Compile Include="Engine\UI\UIObject.cs" />
@@ -77,7 +81,6 @@
     <Compile Include="Engine\Rendering\Material.cs" />
     <Compile Include="Engine\Components\ObjectBehaviour.cs" />
     <Compile Include="Engine\ObjectComponent.cs" />
-    <Compile Include="Engine\Components\ObjectMesh.cs" />
     <Compile Include="Engine\Rendering\RenderHelper.cs" />
     <Compile Include="Engine\Rendering\SceneRenderer.cs" />
     <Compile Include="Engine\Rendering\Space.cs" />
@@ -100,26 +103,6 @@
     <Compile Include="Maths\GLMath.cs" />
     <Compile Include="Maths\Rect.cs" />
     <Compile Include="Maths\Rotation.cs" />
-    <Compile Include="Engine\Meshes\Edge.cs" />
-    <Compile Include="Engine\Meshes\Face.cs" />
-    <Compile Include="Engine\Meshes\FaceQuad.cs" />
-    <Compile Include="Engine\Meshes\FaceTriangle.cs" />
-    <Compile Include="Engine\Meshes\FaceType.cs" />
-    <Compile Include="Engine\Meshes\IEdge.cs" />
-    <Compile Include="Engine\Meshes\IFace.cs" />
-    <Compile Include="Engine\Meshes\IMesh.cs" />
-    <Compile Include="Engine\Meshes\IMeshElement.cs" />
-    <Compile Include="Engine\Meshes\ISurface.cs" />
-    <Compile Include="Engine\Meshes\IVertex.cs" />
-    <Compile Include="Engine\Meshes\Mesh.cs" />
-    <Compile Include="Engine\Meshes\MeshBuilder.cs" />
-    <Compile Include="Engine\Meshes\MeshElement.cs" />
-    <Compile Include="Engine\Meshes\MeshElementCollection.cs" />
-    <Compile Include="Engine\Meshes\MeshGroup.cs" />
-    <Compile Include="Engine\Meshes\MeshMaterial.cs" />
-    <Compile Include="Engine\Meshes\Surface.cs" />
-    <Compile Include="Engine\Meshes\Vertex.cs" />
-    <Compile Include="Data\WavefrontMeshLoader.cs" />
     <Compile Include="OpenGL\GLDraw.cs" />
     <Compile Include="OpenGL\GLGet.cs" />
     <Compile Include="OpenGL\Light.cs" />
@@ -149,7 +132,9 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
