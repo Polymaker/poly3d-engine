@@ -34,5 +34,27 @@ namespace OpenTK.Graphics.OpenGL
             GL.GetBoolean(pname, out val);
             return val;
         }
+
+        public static Matrix4 Matrix(MatrixMode mMode)
+        {
+            float[] matValues = new float[16];
+            switch (mMode) {
+                case MatrixMode.Modelview:
+                    GL.GetFloat(GetPName.ModelviewMatrix, matValues);
+                    break;
+                case MatrixMode.Projection:
+                    GL.GetFloat(GetPName.ProjectionMatrix, matValues);
+                    break;
+                default:
+                    return Matrix4.Identity;
+            }
+            
+            int idx = 0;
+            return new Matrix4(
+                matValues[idx++], matValues[idx++], matValues[idx++], matValues[idx++], 
+                matValues[idx++], matValues[idx++], matValues[idx++], matValues[idx++], 
+                matValues[idx++], matValues[idx++], matValues[idx++], matValues[idx++], 
+                matValues[idx++], matValues[idx++], matValues[idx++], matValues[idx++]);
+        }
     }
 }

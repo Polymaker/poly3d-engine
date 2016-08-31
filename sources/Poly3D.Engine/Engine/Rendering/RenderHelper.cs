@@ -381,7 +381,9 @@ namespace Poly3D.Engine
 
             GL.PushAttrib(AttribMask.LineBit);
             GL.LineWidth(lineThickness);
-
+            //var curMat = GLGet.Matrix(MatrixMode.Modelview);
+            //var currentScale = curMat.ExtractScale();
+            //var vertOffset = 
             if (triangles.Any())
             {
                 GL.Color4(color);
@@ -392,7 +394,7 @@ namespace Poly3D.Engine
                 foreach (var triangle in triangles)
                 {
                     foreach (var vert in triangle.Vertices)
-                        GL.Vertex3(vert.Position + vert.Normal * (0.005f));
+                        GL.Vertex3(vert.Position + vert.Normal.Normalized() * (0.0015f));
                 }
 
                 GL.End();

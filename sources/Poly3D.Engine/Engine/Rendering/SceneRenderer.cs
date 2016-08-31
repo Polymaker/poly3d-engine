@@ -33,7 +33,6 @@ namespace Poly3D.Engine.Rendering
             GL.Enable(EnableCap.Lighting);
             GL.Enable(EnableCap.LineSmooth);
             GL.Enable(EnableCap.Texture2D);
-
             GL.ClearColor(camera.BackColor);
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
 
@@ -104,16 +103,39 @@ namespace Poly3D.Engine.Rendering
         private static void RenderMeshObject(Camera camera, ObjectMesh meshObj)
         {
             GL.PushAttrib(AttribMask.LightingBit | AttribMask.LineBit | AttribMask.StencilBufferBit | AttribMask.DepthBufferBit);
+            //GL.Enable(EnableCap.Lighting);
+            var meshMaterial = meshObj.Material ?? new Material();
 
-            //SetupStencil();
-            var renderColor = meshObj.Material != null ? meshObj.Material.Color : Color.Gray;
-            RenderHelper.DrawMesh(renderColor, meshObj.Mesh, meshObj.Transform.WorldScale);
+            if (meshMaterial.Outlined)
+                SetupStencil();
+            if (meshMaterial.Color.A < 1f)
+            {
+                GL.Enable(EnableCap.Blend);
+                GL.Enable(EnableCap.CullFace);
+                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
+                GL.CullFace(CullFaceMode.Back);
+                RenderHelper.DrawMesh(meshMaterial.Color, meshObj.Mesh, meshObj.Transform.WorldScale);
 
-            //ApplyStencil();
+                GL.CullFace(CullFaceMode.Front);
+                RenderHelper.DrawMesh(meshMaterial.Color, meshObj.Mesh, meshObj.Transform.WorldScale);
+
+                GL.Disable(EnableCap.Blend);
+                GL.Disable(EnableCap.CullFace);
+            }
+            else
+                RenderHelper.DrawMesh(meshMaterial.Color, meshObj.Mesh, meshObj.Transform.WorldScale);
+           
             GL.Disable(EnableCap.Lighting);
 
-            RenderHelper.DrawWireMesh(Color.DarkBlue, meshObj.Mesh);
+            if (meshMaterial.DrawWireframe)
+                RenderHelper.DrawWireMesh(meshMaterial.WireframeColor, meshObj.Mesh);
+
+            if (meshMaterial.Outlined)
+                ApplyStencil();
+
+            if (meshMaterial.Outlined)
+                RenderHelper.DrawWireMesh(meshMaterial.OutlineColor, meshObj.Mesh, meshMaterial.OutlineSize);
 
             //RenderHelper.OutlineCube(Color.Yellow, meshObj.Mesh.BoundingBox);
 

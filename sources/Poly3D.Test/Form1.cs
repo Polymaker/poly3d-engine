@@ -46,6 +46,8 @@ namespace Poly3D.Test
 
             modelObject = modelRootObj.AddObject<ObjectMesh>();
             modelObject.Mesh = model;
+            modelObject.Material.DrawWireframe = true;
+            modelObject.Material.Color = Color.FromArgb(150, 128, 128, 128);
             modelObject.Transform.WorldScale = new Vector3(modelScale, modelScale, modelScale);
             model = WavefrontMeshLoader.LoadWavefrontObj(@"32496.obj");
 
@@ -57,7 +59,7 @@ namespace Poly3D.Test
             modelObject2.Transform.Translate(modelObject2.Transform.Forward * offset, Space.World);
             modelObject2.Transform.Rotation = new Rotation(0f, 180f, 0);
             modelObject2.Name = "WheelHub";
-
+            modelObject2.Material.Outlined = true;
             var rotater = modelObject2.AddComponent<AnonymousBehaviour>();
             
             
