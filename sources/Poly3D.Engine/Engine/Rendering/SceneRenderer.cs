@@ -112,6 +112,7 @@ namespace Poly3D.Engine.Rendering
             {
                 GL.Enable(EnableCap.Blend);
                 GL.Enable(EnableCap.CullFace);
+                //GL.Enable(EnableCap.AlphaTest);
                 GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
                 GL.CullFace(CullFaceMode.Back);
@@ -122,6 +123,7 @@ namespace Poly3D.Engine.Rendering
 
                 GL.Disable(EnableCap.Blend);
                 GL.Disable(EnableCap.CullFace);
+                //GL.Disable(EnableCap.AlphaTest);
             }
             else
                 RenderHelper.DrawMesh(meshMaterial.Color, meshObj.Mesh, meshObj.Transform.WorldScale);
