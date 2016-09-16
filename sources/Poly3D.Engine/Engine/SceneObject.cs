@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Poly3D.Maths;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -83,7 +84,7 @@ namespace Poly3D.Engine
         public SceneObject()
         {
             _Transform = new Transform();
-            _Transform.SetOwner(this);
+            _Transform.Attach(this);
             AddComponent(_Transform);
             //_Components.Add(_Transform);
             _Childs = new SceneObjectCollection(this);
@@ -118,23 +119,13 @@ namespace Poly3D.Engine
                 handler(this, ea);
         }
 
-        public T AddComponent<T>() where T : ObjectComponent
+        public SceneObject AddObject() 
         {
-            if (typeof(T) == typeof(Transform))
-            {
-                if (Transform == null)
-                {
-                    _Transform = new Transform();
-                    _Transform.SetOwner(this);
-                }
-                return Transform as T;
-            }
-
-            T comp = Activator.CreateInstance<T>();
-            comp.SetOwner(this);
-            AddComponent(comp);
-            //_Components.Add(comp);
-            return comp;
+            if (Scene == null)
+                return null;
+            var newObject = Scene.AddObject<SceneObject>();
+            _Childs.Add(newObject);
+            return newObject;
         }
 
         public T AddObject<T>() where T : SceneObject
@@ -165,6 +156,11 @@ namespace Poly3D.Engine
                 _Transform.Position = transform.Position;
                 _Transform.Rotation = transform.Rotation;
             }
+        }
+
+        public void SetTransform(ComplexTransform transform, SceneSpace space)
+        {
+            Transform.SetTransform(transform, space);
         }
 
         public IEnumerable<SceneObject> GetHierarchy(bool includeSelf = true)

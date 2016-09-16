@@ -61,14 +61,21 @@
   <ItemGroup>
     <Compile Include="Collections\OwnerCollectionBase.cs" />
     <Compile Include="Collections\TSDictionary.cs" />
-    <Compile Include="Engine\BaseComponent.cs" />
+    <Compile Include="Engine\Components\BaseBehavior.cs" />
+    <Compile Include="Engine\Components\BaseComponent.cs" />
+    <Compile Include="Engine\Components\ComponentBehaviorAttribute.cs" />
+    <Compile Include="Engine\Components\MeshRenderer.cs" />
     <Compile Include="Engine\EngineObject.cs" />
+    <Compile Include="Engine\IInternalInitialize.cs" />
     <Compile Include="Engine\Physics\PhysicsHelper.cs" />
+    <Compile Include="Engine\Rendering\Material.cs" />
+    <Compile Include="Engine\Rendering\RenderMode.cs" />
+    <Compile Include="Engine\SceneSpace.cs" />
     <Compile Include="Engine\UI\UIContainer.cs" />
     <Compile Include="Engine\UI\UIObject.cs" />
     <Compile Include="Engine\UI\UIWindow.cs" />
-    <Compile Include="Engine\IEngineComponent.cs" />
-    <Compile Include="Engine\UI\UIComponent.cs" />
+    <Compile Include="Engine\Components\IEngineComponent.cs" />
+    <Compile Include="Engine\Components\UIComponent.cs" />
     <Compile Include="Engine\Physics\BoxCollider.cs" />
     <Compile Include="Engine\Physics\Collider.cs" />
     <Compile Include="Engine\Physics\Collider2D.cs" />
@@ -79,17 +86,15 @@
     <Compile Include="Platform\DisplayEngineSettings.cs" />
     <Compile Include="Platform\GLPlatforms.cs" />
     <Compile Include="Platform\IEngineDisplay.cs" />
-    <Compile Include="Engine\Components\AnonymousBehaviour.cs" />
+    <Compile Include="Engine\Components\AnonymousBehavior.cs" />
     <Compile Include="Engine\Meshes\Primitives.cs" />
     <Compile Include="Engine\Rendering\Camera.cs" />
     <Compile Include="Engine\Rendering\Manipulator.cs" />
-    <Compile Include="Engine\Rendering\Material.cs" />
-    <Compile Include="Engine\Components\ObjectBehaviour.cs" />
-    <Compile Include="Engine\ObjectComponent.cs" />
-    <Compile Include="Engine\Components\ObjectMesh.cs" />
+    <Compile Include="Engine\Components\ObjectBehavior.cs" />
+    <Compile Include="Engine\Components\ObjectComponent.cs" />
     <Compile Include="Engine\Rendering\RenderHelper.cs" />
     <Compile Include="Engine\Rendering\SceneRenderer.cs" />
-    <Compile Include="Engine\Rendering\Space.cs" />
+    <Compile Include="Engine\RelativeSpace.cs" />
     <Compile Include="Engine\TransformType.cs" />
     <Compile Include="Maths\BoundingBox.cs" />
     <Compile Include="Maths\BoundingSphere.cs" />
@@ -104,7 +109,6 @@
     <Compile Include="Graphics\ColorConverter.cs" />
     <Compile Include="Graphics\ColorHSV.cs" />
     <Compile Include="Maths\Angle.cs" />
-    <Compile Include="Maths\AngleD.cs" />
     <Compile Include="Maths\AngleUnit.cs" />
     <Compile Include="Maths\GLMath.cs" />
     <Compile Include="Maths\Rect.cs" />
@@ -157,8 +161,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Prefabs\Shapes\Cube.obj" />
+    <EmbeddedResource Include="Prefabs\Shapes\Sphere.obj" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Engine\Events\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>IF "$(ConfigurationName)" == "LDD Modder" (

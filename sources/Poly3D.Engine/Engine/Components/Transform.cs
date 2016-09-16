@@ -8,6 +8,7 @@ using System.Diagnostics;
 
 namespace Poly3D.Engine
 {
+    [ComponentBehavior(IsSingleton =true)]
     public sealed class Transform : ObjectComponent
     {
         private Rotation _Rotation;//local
@@ -208,9 +209,9 @@ namespace Poly3D.Engine
             InitMatrices();
         }
 
-        protected override void Initialize()
+        protected override void OnInitialize()
         {
-            base.Initialize();
+            base.OnInitialize();
             InvalidateMatrix(MatrixType.Local);
             InvalidateMatrix(MatrixType.Parent);
             EngineObject.ParentChanged += EngineObject_ParentChanged;
@@ -331,20 +332,20 @@ namespace Poly3D.Engine
 
         public void Translate(Vector3 translation)
         {
-            Translate(translation, Space.Parent);
+            Translate(translation, RelativeSpace.Parent);
         }
 
-        public void Translate(Vector3 translation, Space relativeTo)
+        public void Translate(Vector3 translation, RelativeSpace relativeTo)
         {
-            if (relativeTo == Space.World || (relativeTo == Space.Parent && ParentTransform == null))
+            if (relativeTo == RelativeSpace.World || (relativeTo == RelativeSpace.Parent && ParentTransform == null))
             {
                 WorldPosition += translation;
             }
-            else if (relativeTo == Space.Parent)
+            else if (relativeTo == RelativeSpace.Parent)
             {
                 Position += translation;
             }
-            else if (relativeTo == Space.Self)//the difference between Parent and Self is that self include local rotation
+            else if (relativeTo == RelativeSpace.Self)//the difference between Parent and Self is that self include local rotation
             {
                 Position += Vector3.Transform(translation, Rotation.Quaternion);
             }
@@ -352,21 +353,21 @@ namespace Poly3D.Engine
 
         public void Rotate(Rotation rotation)
         {
-            Rotate(rotation, Space.Self);
+            Rotate(rotation, RelativeSpace.Self);
         }
 
-        public void Rotate(Rotation rotation, Space relativeTo)
+        public void Rotate(Rotation rotation, RelativeSpace relativeTo)
         {
-            if (relativeTo == Space.World || (relativeTo == Space.Parent && ParentTransform == null))
+            if (relativeTo == RelativeSpace.World || (relativeTo == RelativeSpace.Parent && ParentTransform == null))
             {
                 //var result = Quaternion.Multiply(WorldRotation.Quaternion, rotation.Quaternion);
                 Rotation = Quaternion.Multiply(rotation.Quaternion, Rotation.Quaternion);
             }
-            else if (relativeTo == Space.Parent)
+            else if (relativeTo == RelativeSpace.Parent)
             {
                 Rotation = Quaternion.Multiply(rotation.Quaternion, Rotation.Quaternion);
             }
-            else if (relativeTo == Space.Self)
+            else if (relativeTo == RelativeSpace.Self)
             {
                 var realRot = LocalToWorldMatrix.GetRotation();
                 WorldRotation = Quaternion.Multiply(realRot.Quaternion, rotation.Quaternion);
@@ -375,12 +376,12 @@ namespace Poly3D.Engine
 
         public void SetRotation(RotationComponent component, Angle value)
         {
-            SetRotation(component, value, Space.Self);
+            SetRotation(component, value, SceneSpace.Local);
         }
 
-        public void SetRotation(RotationComponent component, Angle value, Space relativeTo)
+        public void SetRotation(RotationComponent component, Angle value, SceneSpace relativeTo)
         {
-            var rotation = relativeTo == Space.World ? WorldRotation : Rotation;//boxing
+            var rotation = relativeTo == SceneSpace.World ? WorldRotation : Rotation;//boxing
             switch (component)
             {
                 case RotationComponent.Pitch:
@@ -394,16 +395,38 @@ namespace Poly3D.Engine
                     break;
             }
 
-            if (relativeTo == Space.World)
+            if (relativeTo == SceneSpace.World)
                 WorldRotation = rotation;
             else
                 Rotation = rotation;
         }
 
-        //public Vector3 ToLocalSpace(Vector3 worldPosition)
-        //{
-        //    return Vector3.Transform(worldPosition, LocalToWorldMatrix.Inverted());
-        //}
+        public void SetTransform(ComplexTransform transform, SceneSpace space)
+        {
+            if (space == SceneSpace.World && ParentTransform != null)
+            {
+                _Position = Vector3.Transform(transform.Translation, ParentMatrix.Inverted());
+                _Scale = Vector3.Divide(transform.Scale, ParentMatrix.ExtractScale());
+                var baseRotation = ParentMatrix.ExtractRotation().Inverted();
+                _Rotation = Quaternion.Multiply(baseRotation, transform.Rotation.Quaternion);
+                InvalidateMatrix(MatrixType.Local);
+            }
+            else
+            {
+                _Position = transform.Translation;
+                _Scale = transform.Scale;
+                _Rotation = transform.Rotation;
+                InvalidateMatrix(MatrixType.Local);
+            }
+        }
+
+        public ComplexTransform GetTransform(SceneSpace space)
+        {
+            if (space == SceneSpace.World && ParentTransform != null)
+                return new ComplexTransform() { Translation = WorldPosition, Rotation = WorldRotation, Scale = WorldScale };
+
+            return new ComplexTransform() { Translation = Position, Rotation = Rotation, Scale = Scale };
+        }
 
         #endregion
 

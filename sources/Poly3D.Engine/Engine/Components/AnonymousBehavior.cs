@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Poly3D.Engine
 {
-    public class AnonymousBehaviour : ObjectBehaviour
+    public class AnonymousBehavior : ObjectBehavior
     {
-        public Action<AnonymousBehaviour, float> Update;
+        public Action<AnonymousBehavior, float> Update;
 
         protected override void OnUpdate(float deltaTime)
         {

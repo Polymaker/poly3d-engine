@@ -454,12 +454,13 @@ namespace Poly3D.Engine
         public SceneObject RaySelect(Ray ray)
         {
             var hits = new List<Tuple<float, SceneObject>>();
-            foreach (var meshObj in Scene.EngineObjects.Where(o => o.IsActive).OfType<ObjectMesh>())
+            foreach (var meshObj in Scene.Objects.Where(o => o.IsActive && o.HasComponent<MeshRenderer>()))
             {
                 var worldToLocal = meshObj.Transform.WorldToLocalMatrix;
+                var renderer = meshObj.GetComponent<MeshRenderer>();
                 var localRay = Ray.Transform(ray, worldToLocal);
                 float dist;
-                if (meshObj.Mesh.BoundingBox.Intersects(localRay, out dist))
+                if (renderer.Mesh.BoundingBox.Intersects(localRay, out dist))
                 {
                     var localPt = localRay.GetPoint(dist);
                     var worldPt = Vector3.Transform(localPt, meshObj.Transform.LocalToWorldMatrix);

@@ -53,10 +53,13 @@ namespace Poly3D.Engine.Rendering
                 .GroupBy(o => o.RenderLayer)
                 .OrderBy(kv=>kv.Key))
             {
-                foreach (var sceneObject in renderLayerGroup.OrderBy(o => o.HierarchyLevel))
-                {
+                var orderedObjects = renderLayerGroup
+                    .OrderBy(so => so.HasComponent<MeshRenderer>() ? so.GetComponent<MeshRenderer>().Mode == RenderMode.Transparent : false)
+                    .ThenBy(so => so.HierarchyLevel);
+
+                foreach (var sceneObject in orderedObjects)
                     RenderObject(camera, sceneObject);
-                }
+
                 GL.Clear(ClearBufferMask.DepthBufferBit);
             }
 
@@ -85,7 +88,6 @@ namespace Poly3D.Engine.Rendering
 
             */
         }
-        
 
         private static void RenderObject(Camera camera, SceneObject sceneObject)
         {
@@ -93,51 +95,50 @@ namespace Poly3D.Engine.Rendering
             var transMat = sceneObject.Transform.LocalToWorldMatrix;
             GL.MultMatrix(ref transMat);
 
-            if (sceneObject is ObjectMesh)
-                RenderMeshObject(camera, (ObjectMesh)sceneObject);
+            if (sceneObject.HasComponent<MeshRenderer>())
+                RenderMeshObject(camera, sceneObject.GetComponent<MeshRenderer>());
 
             GL.PopMatrix();
         }
-        
 
-        private static void RenderMeshObject(Camera camera, ObjectMesh meshObj)
+        private static void RenderMeshObject(Camera camera, MeshRenderer meshRenderer)
         {
             GL.PushAttrib(AttribMask.LightingBit | AttribMask.LineBit | AttribMask.StencilBufferBit | AttribMask.DepthBufferBit);
             //GL.Enable(EnableCap.Lighting);
-            var meshMaterial = meshObj.Material ?? new Material();
 
-            if (meshMaterial.Outlined)
+            var meshMaterial = meshRenderer.Materials.Length > 0 ? meshRenderer.Materials[0] : new Material();
+
+            if (meshRenderer.Outlined)
                 SetupStencil();
-            if (meshMaterial.Color.A < 1f)
+
+            if (meshMaterial.DiffuseColor.A < 1f && meshRenderer.Mode == RenderMode.Transparent)
             {
                 GL.Enable(EnableCap.Blend);
                 GL.Enable(EnableCap.CullFace);
-                //GL.Enable(EnableCap.AlphaTest);
                 GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
                 GL.CullFace(CullFaceMode.Back);
-                RenderHelper.DrawMesh(meshMaterial.Color, meshObj.Mesh, meshObj.Transform.WorldScale);
+                RenderHelper.DrawMesh(meshMaterial.DiffuseColor, meshRenderer.Mesh, meshRenderer.EngineObject.Transform.WorldScale);
 
                 GL.CullFace(CullFaceMode.Front);
-                RenderHelper.DrawMesh(meshMaterial.Color, meshObj.Mesh, meshObj.Transform.WorldScale);
+                RenderHelper.DrawMesh(meshMaterial.DiffuseColor, meshRenderer.Mesh, meshRenderer.EngineObject.Transform.WorldScale);
 
                 GL.Disable(EnableCap.Blend);
                 GL.Disable(EnableCap.CullFace);
-                //GL.Disable(EnableCap.AlphaTest);
             }
             else
-                RenderHelper.DrawMesh(meshMaterial.Color, meshObj.Mesh, meshObj.Transform.WorldScale);
+                RenderHelper.DrawMesh(meshMaterial.DiffuseColor, meshRenderer.Mesh, meshRenderer.EngineObject.Transform.WorldScale);
            
             GL.Disable(EnableCap.Lighting);
 
-            if (meshMaterial.DrawWireframe)
-                RenderHelper.DrawWireMesh(meshMaterial.WireframeColor, meshObj.Mesh);
+            if (meshRenderer.DrawWireframe)
+                RenderHelper.DrawWireMesh(meshRenderer.WireframeColor, meshRenderer.Mesh);
 
-            if (meshMaterial.Outlined)
+            if (meshRenderer.Outlined)
                 ApplyStencil();
 
-            if (meshMaterial.Outlined)
-                RenderHelper.DrawWireMesh(meshMaterial.OutlineColor, meshObj.Mesh, meshMaterial.OutlineSize);
+            if (meshRenderer.Outlined)
+                RenderHelper.DrawWireMesh(meshRenderer.OutlineColor, meshRenderer.Mesh, meshRenderer.OutlineSize);
 
             //RenderHelper.OutlineCube(Color.Yellow, meshObj.Mesh.BoundingBox);
 

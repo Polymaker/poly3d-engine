@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Poly3D.Prefabs.Scripts
 {
-    public class Animator : ObjectBehaviour
+    public class Animator : ObjectBehavior
     {
         public ComplexTransform Target { get; set; }
         public float Time { get; set; }

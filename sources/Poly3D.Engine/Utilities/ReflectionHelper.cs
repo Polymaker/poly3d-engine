@@ -94,5 +94,10 @@ namespace Poly3D.Utilities
             }
             return null;
         }
+
+        public static bool InheritsFrom(this Type type, Type otherType)
+        {
+            return type.IsAssignableFrom(otherType) || otherType.IsSubclassOf(type);
+        }
     }
 }

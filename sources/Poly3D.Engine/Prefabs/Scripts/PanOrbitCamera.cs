@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Poly3D.Prefabs.Scripts
 {
-    public sealed class PanOrbitCamera : ObjectBehaviour
+    public sealed class PanOrbitCamera : ObjectBehavior
     {
         private float _TargetDistance;
         private MouseState lastMouse;
@@ -99,7 +99,7 @@ namespace Poly3D.Prefabs.Scripts
                 if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
                 {
                     var rollAmount = mouseViewDelta.X * 360f;
-                    Camera.Transform.Rotate(new Rotation(0, 0, rollAmount), Space.Self);
+                    Camera.Transform.Rotate(new Rotation(0, 0, rollAmount), RelativeSpace.Self);
                 }
                 //Pan camera
                 else if (keyState.IsKeyDown(Key.LShift) || keyState.IsKeyDown(Key.RShift))
@@ -110,7 +110,7 @@ namespace Poly3D.Prefabs.Scripts
                     var panTranslate = Camera.Transform.Up * mouseViewDelta.Y * viewSize.Y;
                     panTranslate += Camera.Transform.Right * mouseViewDelta.X * viewSize.X;
 
-                    Camera.Transform.Translate(panTranslate, Space.World);
+                    Camera.Transform.Translate(panTranslate, RelativeSpace.World);
                 }
                 //Orbit camera
                 else
@@ -133,7 +133,7 @@ namespace Poly3D.Prefabs.Scripts
                             yawAngle = -(float)yawAngle;
                         newPos = Vector3.Transform(newPos, Matrix4.CreateFromAxisAngle(Vector3.UnitY, -yawAngle.Radians));
                         Camera.Transform.WorldPosition = newPos + cameraPivot;
-                        Camera.Transform.Rotate(new Vector3(0, yawAngle.Degrees, 0), Space.Parent);
+                        Camera.Transform.Rotate(new Vector3(0, yawAngle.Degrees, 0), RelativeSpace.Parent);
                     }
 
                     AdjustTargetDist(cameraPivot);
@@ -149,7 +149,7 @@ namespace Poly3D.Prefabs.Scripts
                 {
                     var cameraPivot = CameraTarget;
                     scrollAmount *= TargetDistance / 10f;
-                    Camera.Transform.Translate(new Vector3(0, 0, scrollAmount), Space.Self);
+                    Camera.Transform.Translate(new Vector3(0, 0, scrollAmount), RelativeSpace.Self);
                     AdjustTargetDist(cameraPivot);
                 }
                 else if (Camera.Projection == ProjectionType.Orthographic)

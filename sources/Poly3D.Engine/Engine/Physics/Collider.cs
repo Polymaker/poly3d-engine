@@ -27,9 +27,9 @@ namespace Poly3D.Engine.Physics
             _Enabled = false;
         }
 
-        protected override void Initialize()
+        protected override void OnInitialize()
         {
-            base.Initialize();
+            base.OnInitialize();
             _Enabled = true;
         }
 

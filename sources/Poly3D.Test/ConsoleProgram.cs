@@ -37,7 +37,7 @@ namespace Poly3D.Test
             var testObj3 = new SceneObject();
             testObj3.Parent = testObj2;
             //testObj3.Transform.Rotation = new Vector3(-90, 0, 0);
-            testObj3.Transform.Rotate(new Vector3(0, 45, 0), Space.World);
+            testObj3.Transform.Rotate(new Vector3(0, 45, 0), RelativeSpace.World);
             //testObj3.Transform.Translate(Vector3.UnitZ * 5f, Space.Self);
             //testObj3.Transform = new Transform(new Vector3(0, 0, 5), Rotation.Identity, Vector3.One);
             //testObj3.Transform.WorldRotation = new Vector3(0, 0, 0);

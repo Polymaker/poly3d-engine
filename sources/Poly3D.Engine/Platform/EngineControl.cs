@@ -152,6 +152,8 @@ namespace Poly3D.Platform
 
         #endregion
 
+        private Scene myScene;
+
         public void LoadScene(Scene scene)
         {
             LoadScene(scene, true);
@@ -159,9 +161,24 @@ namespace Poly3D.Platform
 
         public void LoadScene(Scene scene, bool autostart)
         {
+            UnloadScene();
+            myScene = scene;
             scene.AssignDisplay(this);
             if (autostart)
-                scene.Start();
+            {
+                if (IsIdle)
+                    scene.Start();
+                else
+                {
+                    Application.Idle += Application_Idle;
+                }
+            }
+        }
+
+        private void Application_Idle(object sender, EventArgs e)
+        {
+            Application.Idle -= Application_Idle;
+            myScene.Start();
         }
 
         protected virtual void OnUnload(EventArgs e)
@@ -171,10 +188,20 @@ namespace Poly3D.Platform
                 handler(this, e);
         }
 
+        private void UnloadScene()
+        {
+            if (myScene != null)
+            {
+                myScene.Stop();
+                myScene = null;
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             _Exists = false;
             OnUnload(EventArgs.Empty);
+            UnloadScene();
             base.Dispose(disposing);
         }
     }

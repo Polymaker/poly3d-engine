@@ -101,7 +101,7 @@ namespace Poly3D.Engine
             _Initialized = true;
 
             foreach (var eObj in EngineObjects)
-                eObj.Initialize();
+                (eObj as IInternalInitialize).Initialize();
 
             if (Display is EngineControl)
             {
@@ -137,10 +137,6 @@ namespace Poly3D.Engine
         {
             T engineObject = Activator.CreateInstance<T>();
             engineObject.AssignScene(this);
-
-            if (Initialized)
-                engineObject.Initialize();
-
             _Objects.Add(engineObject);
             return engineObject;
         }
@@ -170,6 +166,9 @@ namespace Poly3D.Engine
 
         private Stopwatch UpdateDelay;
 
+        private double MinFPS;
+        private double MaxFPS;
+        private double AvgFPS;
         private void EngineLoop_UpdateFrame(object sender, OpenTK.FrameEventArgs e)
         {
             lock (UpdateLocker)
@@ -185,7 +184,7 @@ namespace Poly3D.Engine
                     if (!so.IsActive)
                         continue;
                     var objectComponents = so.Components.ToArray();
-                    foreach (var objBehave in objectComponents.OfType<ObjectBehaviour>())
+                    foreach (var objBehave in objectComponents.OfType<ObjectBehavior>())
                     {
                         if (!objBehave.Enabled)
                             continue;
@@ -195,7 +194,23 @@ namespace Poly3D.Engine
                 }
 
                 UpdateDelay.Stop();
+                if (e.Time > double.Epsilon)
+                {
+                    var totalElapsed = UpdateDelay.Elapsed.Add(TimeSpan.FromSeconds(e.Time));
+                    var curFPS = 1d / totalElapsed.TotalSeconds;
 
+                    if (MinFPS == 0 || curFPS < MinFPS)
+                        MinFPS = curFPS;
+
+                    if (curFPS > MaxFPS && curFPS < 1000)
+                        MaxFPS = curFPS;
+
+                    if (AvgFPS == 0)
+                        AvgFPS = curFPS;
+                    else
+                        AvgFPS = (AvgFPS + curFPS) / 2f;
+                }
+                
                 CurrentScene = null;
             }
         }
@@ -207,7 +222,7 @@ namespace Poly3D.Engine
             {
                 if (!so.IsActive)
                     continue;
-                foreach (var objBehave in so.Components.OfType<ObjectBehaviour>())
+                foreach (var objBehave in so.Components.OfType<ObjectBehavior>())
                 {
                     if (!objBehave.Enabled)
                         continue;
@@ -240,6 +255,16 @@ namespace Poly3D.Engine
                 EngineLoop.Start();
                 _State = SceneState.Running;
             }
+        }
+
+        public void Stop()
+        {
+            Pause();
+            _State = SceneState.Exiting;
+            Trace.WriteLine("Avg FPS= " + AvgFPS);
+            Trace.WriteLine("Min FPS= " + MinFPS);
+            Trace.WriteLine("Max FPS= " + MaxFPS);
+
         }
 
         #endregion

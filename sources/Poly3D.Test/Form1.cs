@@ -21,8 +21,8 @@ namespace Poly3D.Test
     {
 
         private SceneObject modelRootObj;
-        private ObjectMesh modelObject;
-        private ObjectMesh modelObject2;
+        private SceneObject modelObject;
+        private SceneObject modelObject2;
         private Scene MyScene;
 
         public Form1()
@@ -33,8 +33,9 @@ namespace Poly3D.Test
         private void Form1_Load(object sender, EventArgs e)
         {
             MyScene = Scene.CreateDefault();
-            engineControl1.LoadScene(MyScene);
-            
+
+            engineControl1.LoadScene(MyScene,false);
+            MyScene.ActiveCameras.First().BackColor = Color.SkyBlue;
             modelRootObj = MyScene.AddObject<SceneObject>();
 
             //modelRootObj.Transform.SetRotation(RotationComponent.Pitch, 45f);
@@ -44,31 +45,35 @@ namespace Poly3D.Test
             var modelBounds = model.BoundingBox;
             var modelScale = 5f / modelBounds.Extents.Length;
 
-            modelObject = modelRootObj.AddObject<ObjectMesh>();
-            modelObject.Mesh = model;
-            modelObject.Material.DrawWireframe = true;
-            modelObject.Material.Color = Color.FromArgb(150, 128, 128, 128);
+            modelObject = modelRootObj.AddObject();
+            var meshRenderer = modelObject.AddComponent<MeshRenderer>();
+
+            meshRenderer.Mesh = model;
+            meshRenderer.DrawWireframe = true;
+            meshRenderer.Materials[0].DiffuseColor = Color.FromArgb(150, 128, 128, 128);
+            meshRenderer.Mode = RenderMode.Transparent;
             modelObject.Transform.WorldScale = new Vector3(modelScale, modelScale, modelScale);
             model = WavefrontMeshLoader.LoadWavefrontObj(@"32496.obj");
 
-            modelObject2 = modelObject.AddObject<ObjectMesh>();
-            modelObject2.Mesh = model;
+            modelObject2 = modelObject.AddObject();
+            meshRenderer = modelObject2.AddComponent<MeshRenderer>();
+            meshRenderer.Mesh = model;
 
             var offset = 13.3f * modelScale;
 
-            modelObject2.Transform.Translate(modelObject2.Transform.Forward * offset, Space.World);
+            modelObject2.Transform.Translate(modelObject2.Transform.Forward * offset, RelativeSpace.World);
             modelObject2.Transform.Rotation = new Rotation(0f, 180f, 0);
             modelObject2.Name = "WheelHub";
-            modelObject2.Material.Outlined = true;
-            var rotater = modelObject2.AddComponent<AnonymousBehaviour>();
+            meshRenderer.Outlined = true;
+            var rotater = modelObject2.AddComponent<AnonymousBehavior>();
             
             
             rotater.Update = (ob, dt) =>
              {
-                 (ob.EngineObject as SceneObject).Transform.Rotate(new Rotation(0f, 0f, 90f * (float)dt), Space.Self);
+                 (ob.EngineObject as SceneObject).Transform.Rotate(new Rotation(0f, 0f, 90f * (float)dt), RelativeSpace.Self);
 
              };
-            
+            MyScene.Start();
         }
 
         private void button1_Click(object sender, EventArgs e)

@@ -88,6 +88,7 @@ namespace Poly3D.Maths
                 _TransformMatrix = Matrix4.Mult(_TransformMatrix, Matrix4.CreateTranslation(Translation));
                 isDirty = false;
             }
+
             return _TransformMatrix;
         }
         

@@ -17,6 +17,6 @@ namespace Poly3D.Engine
 
     public interface IEngineComponent<T> : IEngineComponent where T : EngineObject
     {
-        T EngineObject { get; }
+        new T EngineObject { get; }
     }
 }

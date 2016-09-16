@@ -8,10 +8,6 @@ namespace Poly3D.Engine
 {
     public class ObjectComponent : BaseComponent<SceneObject>
     {
-        public ObjectComponent()
-        {
-            
-        }
-
+        
     }
 }

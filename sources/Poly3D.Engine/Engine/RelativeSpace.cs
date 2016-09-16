@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Poly3D.Engine
 {
-    public enum Space
+    public enum RelativeSpace
     {
         World,
         Parent,

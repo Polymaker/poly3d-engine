@@ -5,11 +5,10 @@ using System.Text;
 
 namespace Poly3D.Engine
 {
-    public class ObjectBehaviour : ObjectComponent
+    public abstract class BaseBehavior<T> : BaseComponent<T> where T : EngineObject
     {
-        // Fields...
-        private bool _Initialized;
         private bool _Enabled;
+        private bool isStarted;
 
         public bool Enabled
         {
@@ -26,38 +25,33 @@ namespace Poly3D.Engine
             }
         }
 
-        public ObjectBehaviour()
+        public BaseBehavior()
         {
-            _Initialized = false;
             _Enabled = true;
+            isStarted = false;
         }
 
-        public bool Initialized
-        {
-            get { return _Initialized; }
-        }
-
-        protected virtual void OnInitialize() { }
-
-        protected virtual void OnUpdate(float deltaTime) { }
-
-        protected virtual void OnRender(Camera camera) { }
+        protected virtual void OnStart() { }
 
         protected virtual void OnEnable() { }
 
         protected virtual void OnDisable() { }
 
+        protected virtual void OnUpdate(float deltaTime) { }
+
+        protected virtual void OnRender(Camera camera) { }
+
         internal void DoUpdate(float deltaTime)
         {
-            if (!Initialized)
-                DoInitialize();
-            OnUpdate(deltaTime);
-        }
+            if (!IsInitialized || !Enabled)
+                return;
 
-        internal void DoInitialize()
-        {
-            OnInitialize();
-            _Initialized = true;
+            if (!isStarted)
+            {
+                OnStart();
+                isStarted = true;
+            }
+            OnUpdate(deltaTime);
         }
     }
 }
