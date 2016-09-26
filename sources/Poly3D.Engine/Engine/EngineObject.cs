@@ -166,7 +166,7 @@ namespace Poly3D.Engine
         {
             return _Components.OfType<T>().FirstOrDefault();
         }
-
+        
         public IEnumerable<T> GetComponents<T>() where T : IEngineComponent
         {
             return _Components.OfType<T>();

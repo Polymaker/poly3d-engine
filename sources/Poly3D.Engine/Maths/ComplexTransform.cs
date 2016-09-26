@@ -9,9 +9,10 @@ namespace Poly3D.Maths
     public struct ComplexTransform
     {
         // Fields...
-        private Vector3 _Scale;
         private Vector3 _Translation;
         private Rotation _Rotation;
+        private Vector3 _Scale;
+        
         private bool isDirty;
         private Matrix4 _TransformMatrix;
 
@@ -61,6 +62,24 @@ namespace Poly3D.Maths
             {
                 SetTransformMatrix(value);
             }
+        }
+
+        public ComplexTransform(Vector3 translation, Rotation rotation, Vector3 scale)
+        {
+            _Translation = translation;
+            _Rotation = rotation;
+            _Scale = scale;
+            isDirty = true;
+            _TransformMatrix = Matrix4.Zero;
+        }
+
+        public ComplexTransform(Vector3 translation, Rotation rotation)
+        {
+            _Translation = translation;
+            _Rotation = rotation;
+            _Scale = Vector3.One;
+            isDirty = false;
+            _TransformMatrix = Matrix4.Zero;
         }
 
         public static implicit operator ComplexTransform(Matrix4 transformMatrix)

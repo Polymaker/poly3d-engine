@@ -72,7 +72,8 @@ namespace Poly3D.Engine
 
         public IEnumerable<SceneObject> AllChilds
         {
-            get { return Childs.Concat(Childs.SelectMany(c => c.AllChilds)); }
+            get { return GetAllChilds(); }
+            //get { return Childs.Concat(Childs.SelectMany(c => c.AllChilds)); }
         }
 
         public int RenderLayer { get; set; }
@@ -135,6 +136,45 @@ namespace Poly3D.Engine
             var newObject = Scene.AddObject<T>();
             _Childs.Add(newObject);
             return newObject;
+        }
+
+        public IEnumerable<SceneObject> GetAllChilds()
+        {
+            foreach (var child in Childs)
+            {
+                yield return child;
+            }
+            foreach (var child in Childs)
+            {
+                foreach (var grandChild in child.GetAllChilds())
+                    yield return grandChild;
+            }
+        }
+
+        public T GetComponentDownward<T>() where T : IEngineComponent
+        {
+            var foundComp = GetComponent<T>();
+            if (foundComp != null)
+                return foundComp;
+            foreach (var child in AllChilds)
+            {
+                foundComp = child.GetComponent<T>();
+                if (foundComp != null)
+                    return foundComp;
+            }
+            return default(T);
+        }
+
+        public T GetComponentUpward<T>() where T : IEngineComponent
+        {
+            var foundComp = GetComponent<T>();
+            if (foundComp != null)
+                return foundComp;
+
+            if (Parent != null)
+                return Parent.GetComponentUpward<T>();
+
+            return default(T);
         }
 
         public void SetTransform(Transform transform, bool keepWorldPosition)
