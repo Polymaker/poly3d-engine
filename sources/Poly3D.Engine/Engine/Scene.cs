@@ -143,6 +143,17 @@ namespace Poly3D.Engine
 
         public void RemoveObject(EngineObject engineObject)
         {
+            if (engineObject is SceneObject)
+            {
+                var allChilds = (engineObject as SceneObject).AllChilds.ToList();
+                allChilds.Reverse();
+                allChilds.ForEach(c =>
+                {
+                    c.OnDestroy();
+                    _Objects.Remove(c);
+                });
+            }
+            engineObject.OnDestroy();
             _Objects.Remove(engineObject);
         }
 
@@ -169,6 +180,7 @@ namespace Poly3D.Engine
         private double MinFPS;
         private double MaxFPS;
         private double AvgFPS;
+
         private void EngineLoop_UpdateFrame(object sender, OpenTK.FrameEventArgs e)
         {
             lock (UpdateLocker)

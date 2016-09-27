@@ -196,6 +196,11 @@ namespace Poly3D.Engine
                 Scene.RemoveObject(this);
         }
 
+        protected internal void OnDestroy()
+        {
+
+        }
+
         public long GetInstanceId()
         {
             return InstanceId;
