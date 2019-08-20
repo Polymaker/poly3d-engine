@@ -22,6 +22,8 @@ namespace Poly3D.Engine
 
         protected override void SetChildOwner(SceneObject child)
         {
+            if (!child.isInitialized && Owner.isInitialized)
+                child.AssignScene(Owner.Scene);
             child.SetParent(Owner, true);
         }
 

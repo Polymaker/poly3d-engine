@@ -374,6 +374,19 @@ namespace Poly3D.Engine
             }
         }
 
+        public void Rotate(RotationComponent component, Angle value)
+        {
+            Rotate(component, value, RelativeSpace.Self);
+        }
+
+        public void Rotate(RotationComponent component, Angle value, RelativeSpace relativeTo)
+        {
+            var angles = new Vector3();
+            angles[(int)component] = value.Degrees;
+            var rotation = new Rotation(angles);
+            Rotate(rotation, relativeTo);
+        }
+
         public void SetRotation(RotationComponent component, Angle value)
         {
             SetRotation(component, value, SceneSpace.Local);

@@ -25,7 +25,7 @@ namespace Poly3D.Engine
 
         public Scene Scene
         {
-            get { return IsInitialized ? EngineObject.Scene : null; }
+            get { return EngineObject.Scene ?? null; }
         }
 
         public BaseComponent()

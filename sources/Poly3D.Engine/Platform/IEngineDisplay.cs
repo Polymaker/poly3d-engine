@@ -1,4 +1,5 @@
-﻿using Poly3D.Engine;
+﻿using OpenTK;
+using Poly3D.Engine;
 using Poly3D.Maths;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,8 @@ namespace Poly3D.Platform
         void LoadScene(Scene scene);
 
         void LoadScene(Scene scene, bool autostart);
+
+        Vector2 GetMousePosition();
 
         System.Drawing.Rectangle GetDisplayBounds();
     }

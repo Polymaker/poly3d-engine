@@ -87,15 +87,15 @@ namespace Poly3D.Engine
             _Scene = scene;
             _Name = Scene.GetDefaultName(this);
             if (scene.Initialized)
-                Initialize();
+                InitializeCore();
         }
 
         void IInternalInitialize.Initialize()
         {
-            Initialize();
+            InitializeCore();
         }
 
-        private void Initialize()
+        protected internal void InitializeCore()
         {
             //redundant check considering this method is internal and I should not call this method twice but it's there for 'safety'
             if (!isInitialized && Scene != null && Scene.Initialized)

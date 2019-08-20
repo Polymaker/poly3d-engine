@@ -52,6 +52,36 @@ namespace Poly3D.Maths
             }
         }
 
+        public Angle this[RotationComponent component]
+        {
+            get
+            {
+                switch (component)
+                {
+                    case RotationComponent.Roll:
+                        return Roll;
+                    case RotationComponent.Pitch:
+                        return Pitch;
+                    case RotationComponent.Yaw:
+                        return Yaw;
+                    default:
+                        return Angle.Zero;
+                }
+            }
+            set
+            {
+                switch (component)
+                {
+                    case RotationComponent.Roll:
+                        Roll = value; break;
+                    case RotationComponent.Pitch:
+                        Pitch = value; break;
+                    case RotationComponent.Yaw:
+                        Yaw = value; break;
+                }
+            }
+        }
+
         /// <summary>
         /// Gets or sets the rotation angles in degrees. Vector3(Pitch, Yaw, Roll)
         /// </summary>

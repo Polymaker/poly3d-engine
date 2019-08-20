@@ -267,6 +267,11 @@ namespace Poly3D.Platform
                 scene.Start();
         }
 
+        public Vector2 GetMousePosition()
+        {
+            return new Vector2(0, 0);
+        }
+
         public Rectangle GetDisplayBounds()
         {
             return Bounds;
@@ -335,6 +340,7 @@ namespace Poly3D.Platform
                 return WinAPI.IsIdle(Handle);
             else if (Utility.CurrentPlatform == GLPlatforms.SDL2)
                 return Sdl2API.SDL_HasEvents(0, 65535);
+            
             return true;
         }
 

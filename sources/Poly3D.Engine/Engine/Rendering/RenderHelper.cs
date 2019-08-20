@@ -406,21 +406,29 @@ namespace Poly3D.Engine
 
         #region Manipulators
 
-        public static void RenderManipulator(Camera camera, Vector3 position, TransformType manipulatorType)
+        public static void RenderUIScaledManipulator(Camera camera, Vector3 position, TransformType manipulatorType)
         {
-            GL.PushAttrib(AttribMask.LightingBit | AttribMask.DepthBufferBit);
-            //GL.Clear(ClearBufferMask.DepthBufferBit);
+            RenderUIScaledManipulator(camera, position, 80, manipulatorType);
+        }
 
+        public static void RenderUIScaledManipulator(Camera camera, Vector3 position, float size, TransformType manipulatorType)
+        {
             var distFromCam = camera.GetDistanceFromCamera(position);
             var viewSize = camera.GetViewSize(distFromCam);
-            
-            var maniScale = Manipulator.SCREEN_SIZE * viewSize.Y / camera.DisplayRectangle.Height;
+            var maniScale = size * viewSize.Y / camera.DisplayRectangle.Height;
 
-            DrawManipulatorAxis(Vector3.UnitX, UNIT_X_COLOR, manipulatorType, maniScale, false);
+            RenderManipulator(camera, position, maniScale, manipulatorType);
+        }
 
-            DrawManipulatorAxis(Vector3.UnitY, UNIT_Y_COLOR, manipulatorType, maniScale, false);
+        public static void RenderManipulator(Camera camera, Vector3 position, float size, TransformType manipulatorType)
+        {
+            GL.PushAttrib(AttribMask.LightingBit | AttribMask.DepthBufferBit);
 
-            DrawManipulatorAxis(Vector3.UnitZ, UNIT_Z_COLOR, manipulatorType, maniScale, false);
+            DrawManipulatorAxis(Vector3.UnitX, UNIT_X_COLOR, manipulatorType, size, false);
+
+            DrawManipulatorAxis(Vector3.UnitY, UNIT_Y_COLOR, manipulatorType, size, false);
+
+            DrawManipulatorAxis(Vector3.UnitZ, UNIT_Z_COLOR, manipulatorType, size, false);
 
             GL.PopAttrib();
         }
@@ -434,7 +442,7 @@ namespace Poly3D.Engine
                 var rotMat = GLMath.RotationFromTo(Vector3.UnitZ, axis);
                 GL.MultMatrix(ref rotMat);
                 GL.Color4(color);
-                DrawCircle(length, selected ? 3 : 1.5f);
+                DrawCircle(length, selected ? 3.5f : 2f);
             }
             else
             {

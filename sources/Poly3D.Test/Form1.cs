@@ -59,7 +59,7 @@ namespace Poly3D.Test
             meshRenderer = modelObject2.AddComponent<MeshRenderer>();
             meshRenderer.Mesh = model;
 
-            var offset = 13.3f * modelScale;
+            var offset = 1.33f * modelScale;
 
             modelObject2.Transform.Translate(modelObject2.Transform.Forward * offset, RelativeSpace.World);
             modelObject2.Transform.Rotation = new Rotation(0f, 180f, 0);

@@ -183,6 +183,11 @@ namespace Poly3D.Maths
             return bb;
         }
 
+        public override string ToString()
+        {
+            return $"Center: {Center} Size: {Size}";
+        }
+
         public static readonly BoundingBox Zero = default(BoundingBox);
     }
 }

@@ -120,6 +120,16 @@ namespace Poly3D.Engine
                 handler(this, ea);
         }
 
+        protected override void OnInitialize()
+        {
+            base.OnInitialize();
+            foreach (var child in Childs)
+            {
+                if (child.Scene == null && Scene != null)
+                    Scene.AddObject(child);
+            }
+        }
+
         public SceneObject AddObject() 
         {
             if (Scene == null)
@@ -136,6 +146,18 @@ namespace Poly3D.Engine
             var newObject = Scene.AddObject<T>();
             _Childs.Add(newObject);
             return newObject;
+        }
+
+        public void AddObject<T>(T engineObject) where T : SceneObject
+        {
+            if (engineObject != null && !_Childs.Contains(engineObject))
+            {
+                //if (!Scene.Objects.Contains(engineObject))
+                //    Scene.AddObject(engineObject);
+                if (engineObject.Scene == null)
+                    Scene.AddObject(engineObject);
+                _Childs.Add(engineObject);
+            }
         }
 
         public IEnumerable<SceneObject> GetAllChilds()
@@ -163,6 +185,18 @@ namespace Poly3D.Engine
                     return foundComp;
             }
             return default(T);
+        }
+
+        public IEnumerable<T> GetComponentsDownward<T>() where T : IEngineComponent
+        {
+            foreach (var comp in GetComponents<T>())
+                yield return comp;
+
+            foreach (var child in AllChilds)
+            {
+                foreach (var comp in child.GetComponents<T>())
+                    yield return comp;
+            }
         }
 
         public T GetComponentUpward<T>() where T : IEngineComponent
@@ -228,9 +262,7 @@ namespace Poly3D.Engine
 
                 //adding itself into one of its child (this check is already done when adding object from the collection)
                 if (!fromCollection && AllChilds.Contains(newParent))
-                {
                     return;
-                }
 
                 if (_Parent != null)
                 {
@@ -253,8 +285,17 @@ namespace Poly3D.Engine
                 }
 
                 _Parent = newParent;
-                OnParentChangedInternal();
-                OnHierarchyChangedInternal();
+                if (isInitialized)
+                {
+                    OnParentChangedInternal();
+                    OnHierarchyChangedInternal();
+                }
+                else if (!isInitialized && _Parent != null && Parent.isInitialized)
+                {
+                    //ini
+                }
+                
+                
             }
         }
 

@@ -14,19 +14,21 @@ namespace Poly3D.Prefabs.Scripts
         private float _TargetDistance;
         private MouseState lastMouse;
         private Vector2 lastMousePos = Vector2.Zero;
+        private CameraMovement CurrentMovement;
         //private Vector3 _CameraTarget;
+        private Transform _Target;
 
         public Vector3 CameraTarget
         {
             get
             {
                 return Camera.Transform.WorldPosition + Camera.Transform.Forward * TargetDistance;
-                //return _CameraTarget;
             }
             set
             {
-                //_CameraTarget = value;
+                Angle currentRoll = Camera.Transform.Rotation.Roll;
                 Camera.Transform.LookAt(value);
+                Camera.Transform.SetRotation(RotationComponent.Roll, currentRoll);
                 _TargetDistance = (value - Camera.Transform.WorldPosition).Length;
             }
         }
@@ -52,7 +54,7 @@ namespace Poly3D.Prefabs.Scripts
         protected override void OnInitialize()
         {
             lastMouse = Mouse.GetState();
-            lastMousePos = GetMousePosition();
+            lastMousePos = Scene.Display.GetMousePosition();
             RotationButton = MouseButton.Middle;
 
             var groundPlane = new Plane(Vector3.UnitY, 0);
@@ -62,15 +64,25 @@ namespace Poly3D.Prefabs.Scripts
             Vector3 camTarget = Vector3.Zero;
             if (groundPlane.Raycast(camRay, out distFromGround))
                 camTarget = camRay.GetPoint(distFromGround);
-            
+
+            //_Target = new Transform(camTarget, Rotation.Identity, Vector3.One);
+
             TargetDistance = (camTarget - Camera.Transform.WorldPosition).Length;
+        }
+
+        enum CameraMovement
+        {
+            None,
+            Orbit,
+            Pan,
+            Roll
         }
 
         protected override void OnUpdate(float deltaTime)
         {
             var mouseState = Mouse.GetState();
             var keyState = Keyboard.GetState();
-            var mousePos = GetMousePosition();
+            var mousePos = Scene.Display.GetMousePosition();
             var mouseDelta = new Vector2(mousePos.X - lastMousePos.X, mousePos.Y - lastMousePos.Y);
 
             //AdjustTarget();
@@ -91,6 +103,7 @@ namespace Poly3D.Prefabs.Scripts
                 AdjustTargetDist(Vector3.Zero);
             }
 
+            
             if (mouseState.IsButtonDown(RotationButton) && Math.Abs(mouseDelta.Length) > 1)
             {
                 var mouseViewDelta = Vector2.Divide(mouseDelta, Camera.DisplayRectangle.Size);
@@ -98,13 +111,14 @@ namespace Poly3D.Prefabs.Scripts
                 //Roll camera
                 if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
                 {
+                    CurrentMovement = CameraMovement.Roll;
                     var rollAmount = mouseViewDelta.X * 360f;
                     Camera.Transform.Rotate(new Rotation(0, 0, rollAmount), RelativeSpace.Self);
                 }
                 //Pan camera
                 else if (keyState.IsKeyDown(Key.LShift) || keyState.IsKeyDown(Key.RShift))
                 {
-
+                    CurrentMovement = CameraMovement.Pan;
                     var viewSize = Camera.GetViewSize(Camera.GetDistanceFromCamera(CameraTarget));
 
                     var panTranslate = Camera.Transform.Up * mouseViewDelta.Y * viewSize.Y;
@@ -115,7 +129,8 @@ namespace Poly3D.Prefabs.Scripts
                 //Orbit camera
                 else
                 {
-                    
+                    CurrentMovement = CameraMovement.Orbit;
+
                     var cameraPivot = CameraTarget;
                     var cameraOffset = Camera.Transform.WorldPosition - cameraPivot;
 
@@ -138,6 +153,10 @@ namespace Poly3D.Prefabs.Scripts
 
                     AdjustTargetDist(cameraPivot);
                 }
+            }
+            else if (!mouseState.IsButtonDown(RotationButton))
+            {
+                CurrentMovement = CameraMovement.None;
             }
 
             if (mouseState.Wheel != lastMouse.Wheel && 
@@ -165,6 +184,21 @@ namespace Poly3D.Prefabs.Scripts
             lastMouse = mouseState;
         }
 
+        protected override void OnRender(Camera camera)
+        {
+            base.OnRender(camera);
+            if (CurrentMovement == CameraMovement.Orbit)
+            {
+                OpenTK.Graphics.OpenGL.GL.PushMatrix();
+                var invertMat = EngineObject.Transform.LocalToWorldMatrix.Inverted();
+                OpenTK.Graphics.OpenGL.GL.MultMatrix(ref invertMat);
+                var targetMat = new ComplexTransform(CameraTarget, Rotation.Identity, Vector3.One).TransformMatrix;
+                OpenTK.Graphics.OpenGL.GL.MultMatrix(ref targetMat);
+                RenderHelper.RenderUIScaledManipulator(camera, CameraTarget, 40, TransformType.Rotation);
+                OpenTK.Graphics.OpenGL.GL.PopMatrix();
+            }
+        }
+
         //private void AdjustTarget()
         //{
         //    var calcTarget = Camera.Transform.WorldPosition + Camera.Transform.Forward * TargetDistance;
@@ -174,15 +208,16 @@ namespace Poly3D.Prefabs.Scripts
         //    }
         //}
 
+        public void SetDistanceFromTarget(float distance)
+        {
+            var finalPos = CameraTarget + (Camera.Transform.Forward * -1 * distance);
+            TargetDistance = distance;
+            Camera.Transform.WorldPosition = finalPos;
+        }
+
         private void AdjustTargetDist(Vector3 newTarget)
         {
             TargetDistance = (newTarget - Camera.Transform.WorldPosition).Length;
-        }
-
-        private static Vector2 GetMousePosition()
-        {
-            var curPos = System.Windows.Forms.Cursor.Position;
-            return new Vector2(curPos.X, curPos.Y);
         }
     }
 }

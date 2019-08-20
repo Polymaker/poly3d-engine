@@ -122,6 +122,11 @@ namespace Poly3D.Platform
             OnDisplayChanged(e);
         }
 
+        public Vector2 GetMousePosition()
+        {
+            return new Vector2(MousePosition.X, MousePosition.Y);
+        }
+
         public Rectangle GetDisplayBounds()
         {
             return RectangleToScreen(Bounds);
@@ -163,6 +168,8 @@ namespace Poly3D.Platform
         {
             UnloadScene();
             myScene = scene;
+            foreach (var camera in scene.AllCameras)
+                camera.BackColor = BackColor;
             scene.AssignDisplay(this);
             if (autostart)
             {
@@ -178,6 +185,7 @@ namespace Poly3D.Platform
         private void Application_Idle(object sender, EventArgs e)
         {
             Application.Idle -= Application_Idle;
+            
             myScene.Start();
         }
 
@@ -204,5 +212,7 @@ namespace Poly3D.Platform
             UnloadScene();
             base.Dispose(disposing);
         }
+
+        
     }
 }

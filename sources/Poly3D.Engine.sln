@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2019
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poly3D.Engine", "Poly3D.Engine\Poly3D.Engine.csproj", "{6C937D0C-0BF2-4681-BB78-57712EC43A74}"
 EndProject
@@ -33,5 +33,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E4292A2A-3D73-4BBC-8509-3CEA50E6F882}
 	EndGlobalSection
 EndGlobal

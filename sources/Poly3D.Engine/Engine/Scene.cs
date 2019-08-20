@@ -22,7 +22,7 @@ namespace Poly3D.Engine
         private SceneState _State;
         private IEngineDisplay _Display;
         private List<EngineObject> _Objects;
-        private LoopController EngineLoop;
+        public LoopController EngineLoop { get; private set; }
 
         public IEngineDisplay Display
         {
@@ -126,6 +126,7 @@ namespace Poly3D.Engine
         {
             var camera = AddObject<Camera>();
             camera.Active = true;
+            camera.RenderLayer = 1;
             camera.Transform.Position = new OpenTK.Vector3(10, 10, 10);
             camera.Transform.LookAt(new OpenTK.Vector3(0, 0f, 0));
             camera.AddComponent<PanOrbitCamera>();
@@ -139,6 +140,15 @@ namespace Poly3D.Engine
             engineObject.AssignScene(this);
             _Objects.Add(engineObject);
             return engineObject;
+        }
+
+        public void AddObject<T>(T engineObject) where T : EngineObject
+        {
+            if (!_Objects.Contains(engineObject))
+            {
+                engineObject.AssignScene(this);
+                _Objects.Add(engineObject);
+            }
         }
 
         public void RemoveObject(EngineObject engineObject)
@@ -201,7 +211,7 @@ namespace Poly3D.Engine
                         if (!objBehave.Enabled)
                             continue;
 
-                        objBehave.DoUpdate((float)e.Time + (float)UpdateDelay.Elapsed.TotalSeconds);
+                        (objBehave as IEngineBehavior).Update((float)e.Time + (float)UpdateDelay.Elapsed.TotalSeconds);
                     }
                 }
 
@@ -227,22 +237,6 @@ namespace Poly3D.Engine
             }
         }
 
-        public void OnUpdate(float deltaTime)
-        {
-            var delay = Stopwatch.StartNew();
-            foreach (var so in EngineObjects)
-            {
-                if (!so.IsActive)
-                    continue;
-                foreach (var objBehave in so.Components.OfType<ObjectBehavior>())
-                {
-                    if (!objBehave.Enabled)
-                        continue;
-                    
-                    objBehave.DoUpdate(deltaTime + (float)delay.Elapsed.TotalSeconds);
-                }
-            }
-        }
 
         #region Pause/Resume
 
@@ -276,7 +270,6 @@ namespace Poly3D.Engine
             Trace.WriteLine("Avg FPS= " + AvgFPS);
             Trace.WriteLine("Min FPS= " + MinFPS);
             Trace.WriteLine("Max FPS= " + MaxFPS);
-
         }
 
         #endregion

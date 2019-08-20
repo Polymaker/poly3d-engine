@@ -47,7 +47,5 @@ namespace Poly3D.Engine
             OutlineColor = Color.Black;
             OutlineSize = 2f;
         }
-
-        
     }
 }

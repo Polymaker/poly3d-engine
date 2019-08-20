@@ -32,8 +32,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'LDD Modder|AnyCPU'">
     <OutputPath>bin\LDD Modder\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>false</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -64,6 +64,7 @@
     <Compile Include="Engine\Components\BaseBehavior.cs" />
     <Compile Include="Engine\Components\BaseComponent.cs" />
     <Compile Include="Engine\Components\ComponentBehaviorAttribute.cs" />
+    <Compile Include="Engine\Components\IEngineBehavior.cs" />
     <Compile Include="Engine\Components\MeshRenderer.cs" />
     <Compile Include="Engine\EngineObject.cs" />
     <Compile Include="Engine\IInternalInitialize.cs" />
@@ -151,6 +152,7 @@
     <Compile Include="Platform\Native\WinAPI.cs" />
     <Compile Include="Platform\Utility.cs" />
     <Compile Include="Prefabs\Scripts\Animator.cs" />
+    <Compile Include="Prefabs\Scripts\TransformManipulator.cs" />
     <Compile Include="Prefabs\Scripts\PanOrbitCamera.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine\Components\Transform.cs" />
@@ -170,8 +172,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>IF "$(ConfigurationName)" == "LDD Modder" (
-
-copy /Y "$(TargetPath)" "../../../../../ldd-modder/External references/"
+copy /Y "$(TargetDir)Poly3D.Engine.*" "D:/Programming/C#/ldd-modder/External references/"
 )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

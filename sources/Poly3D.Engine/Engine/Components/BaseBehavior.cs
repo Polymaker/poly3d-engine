@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Poly3D.Engine
 {
-    public abstract class BaseBehavior<T> : BaseComponent<T> where T : EngineObject
+    public abstract class BaseBehavior<T> : BaseComponent<T>, IEngineBehavior where T : EngineObject
     {
         private bool _Enabled;
         private bool isStarted;
@@ -41,7 +41,14 @@ namespace Poly3D.Engine
 
         protected virtual void OnRender(Camera camera) { }
 
-        internal void DoUpdate(float deltaTime)
+        void IEngineBehavior.Render(Camera camera)
+        {
+            if (!IsInitialized || !Enabled)
+                return;
+            OnRender(camera);
+        }
+
+        void IEngineBehavior.Update(float deltaTime)
         {
             if (!IsInitialized || !Enabled)
                 return;
@@ -51,6 +58,7 @@ namespace Poly3D.Engine
                 OnStart();
                 isStarted = true;
             }
+
             OnUpdate(deltaTime);
         }
     }

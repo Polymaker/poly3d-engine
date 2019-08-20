@@ -64,7 +64,7 @@ namespace Poly3D.Engine.Rendering
             }
 
             
-            RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Translation);
+            //RenderHelper.RenderManipulator(camera, Vector3.Zero, TransformType.Translation);
 
             /*
             //UI Rendering
@@ -94,6 +94,9 @@ namespace Poly3D.Engine.Rendering
             GL.PushMatrix();
             var transMat = sceneObject.Transform.LocalToWorldMatrix;
             GL.MultMatrix(ref transMat);
+            
+            foreach (var component in sceneObject.GetComponents<ObjectBehavior>())
+                (component as IEngineBehavior).Render(camera);
 
             if (sceneObject.HasComponent<MeshRenderer>())
                 RenderMeshObject(camera, sceneObject.GetComponent<MeshRenderer>());
